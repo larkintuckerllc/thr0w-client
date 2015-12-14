@@ -1,0 +1,10 @@
+#thr0w_base_login, #thr0w_base_connect {
+  display: none;
+  z-index: 99;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin-right: -50%;
+  text-align: center;
+}

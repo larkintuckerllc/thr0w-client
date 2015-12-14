@@ -1,0 +1,10 @@
+{
+  "name": "thr0w-client",
+  "version": "0.0.1",
+  "authors": [
+    "John Tucker <john@larkintuckerllc.com>"
+  ],
+  "main": "dist/thr0w-client.js",
+  "license": "MIT",
+  "ignore": []
+}
