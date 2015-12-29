@@ -1,0 +1,17 @@
+.thr0w_windows_window {
+  position: absolute;
+  background-color: red;
+}
+.thr0w_windows_window__bar {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  right: 0px;
+  height: 50px; 
+  background-color: blue;
+}
+.thr0w_windows_window__content {
+  position: absolute;
+  left: 0px;
+  top: 50px;
+}

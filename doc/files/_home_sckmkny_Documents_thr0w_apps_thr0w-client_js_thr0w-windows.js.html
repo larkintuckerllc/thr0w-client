@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>/home/sckmkny/Documents/thr0w/apps/thr0w-client/js/thr0w-windows.js</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="shortcut icon" type="image/png" href="../assets/favicon.png">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+            
+                <h1><img src="../assets/css/logo.png" title=""></h1>
+            
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: </em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+    <h2 class="off-left">APIs</h2>
+    <div id="api-tabview" class="tabview">
+        <ul class="tabs">
+            <li><a href="#api-classes">Classes</a></li>
+            <li><a href="#api-modules">Modules</a></li>
+        </ul>
+
+        <div id="api-tabview-filter">
+            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+        </div>
+
+        <div id="api-tabview-panel">
+            <ul id="api-classes" class="apis classes">
+            
+                <li><a href="../classes/thr0w.html">thr0w</a></li>
+            
+                <li><a href="../classes/thr0w.draw.html">thr0w.draw</a></li>
+            
+                <li><a href="../classes/thr0w.Grid.html">thr0w.Grid</a></li>
+            
+                <li><a href="../classes/thr0w.Sync.html">thr0w.Sync</a></li>
+            
+                <li><a href="../classes/thr0w.windows.html">thr0w.windows</a></li>
+            
+                <li><a href="../classes/thr0w.windows.WindowManager.html">thr0w.windows.WindowManager</a></li>
+            
+                <li><a href="../classes/thr0w.windows.WindowManager.Window.html">thr0w.windows.WindowManager.Window</a></li>
+            
+            </ul>
+
+            <ul id="api-modules" class="apis modules">
+            
+                <li><a href="../modules/thr0w.html">thr0w</a></li>
+            
+                <li><a href="../modules/thr0w-draw.html">thr0w-draw</a></li>
+            
+                <li><a href="../modules/thr0w-windows.html">thr0w-windows</a></li>
+            
+            </ul>
+        </div>
+    </div>
+</div>
+
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+        Show:
+        <label for="api-show-inherited">
+            <input type="checkbox" id="api-show-inherited" checked>
+            Inherited
+        </label>
+
+        <label for="api-show-protected">
+            <input type="checkbox" id="api-show-protected">
+            Protected
+        </label>
+
+        <label for="api-show-private">
+            <input type="checkbox" id="api-show-private">
+            Private
+        </label>
+        <label for="api-show-deprecated">
+            <input type="checkbox" id="api-show-deprecated">
+            Deprecated
+        </label>
+
+    </div>
+
+
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+                        <h1 class="file-heading">File: /home/sckmkny/Documents/thr0w/apps/thr0w-client/js/thr0w-windows.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+(function() {
+  /**
+  * This module provides a window manager.
+  * @module thr0w-windows
+  */
+  &#x27;use strict&#x27;;
+  if (window.thr0w === undefined) {
+    throw 400;
+  }
+  var service = {}; 
+  service.WindowManager = WindowManager;
+  /**
+  * This object provides the window management functionality.
+  * @namespace thr0w
+  * @class windows
+  * @static
+  */
+  window.thr0w.windows = service;
+  /**
+  * This class is used to create window managers.
+  * @namespace thr0w.windows
+  * @class WindowManager
+  * @constructor
+  * @param grid {Object} The grid, {{#crossLink &quot;thr0w.Grid&quot;}}Thr0w.Grid{{/crossLink}}, object.
+  */
+  function WindowManager(grid) {
+    if (!grid || typeof grid !== &#x27;object&#x27;) {
+      throw 400;
+    }
+    var windows = [];
+    var contentEl = grid.getContent();
+    var sync = new window.thr0w.Sync(
+      grid,
+      &#x27;thr0w_windows_&#x27; + contentEl.id,
+      message,
+      receive
+      );
+    this.Window = Window;
+    function message() {
+      var data = [];
+      var i;
+      for (i = 0; i &lt; windows.length; i++) {
+        var iWindow = windows[i];
+        data.push({
+          id: iWindow.getId(),
+          x: iWindow.getX(),
+          y: iWindow.getY(),
+          width: iWindow.getWidth(),
+          height: iWindow.getHeight(),
+          src: iWindow.getSrc() 
+        });
+      }
+      return data;
+    }
+    function receive(data) {
+      var windowIds = windows.map(getWindowId);
+      var i;
+      for (i = 0; i &lt; data.length; i++) {
+        if (windowIds.indexOf(data[i].id) === -1) {
+          new Window(data[i].id, data[i].x, data[i].y);
+        }
+      }
+      function getWindowId(obj) {
+        return obj.getId();
+      }
+    }
+    /**
+    * This class is used to create windows.
+    * @namespace thr0w.windows.WindowManager
+    * @class Window
+    * @constructor
+    * @param id {Object} The id.
+    * @param x {Object} The x.
+    * @param y {Object} The y.
+    */
+    function Window(id, x, y) {
+      if (id === undefined || typeof id !== &#x27;string&#x27;) {
+       throw 400;
+      } 
+      if (x === undefined || typeof x !== &#x27;number&#x27;) {
+        throw 400;
+      }
+      if (y === undefined || typeof y !== &#x27;number&#x27;) {
+        throw 400;
+      }
+      // TODO PARAMS
+      var windowWidth = 200;
+      var windowHeight = 300;
+      var windowSrc = &#x27;/client/doc/&#x27;;
+      //
+      var lastX;
+      var lastY;
+      var moving = false;
+      var scrollX = 0;
+      var scrollY = 0;
+      var startScrolling = false;
+      var endScrolling = true;
+      var windowEl = document.createElement(&#x27;div&#x27;);
+      var windowBarEl;
+      var windowContentEl;
+      var windowSync = new window.thr0w.Sync(
+        grid,
+        &#x27;thr0w_windows_&#x27; + contentEl.id + &#x27;_&#x27; + id,
+        windowMessage,
+        windowReceive
+        );
+      windowEl.style.left = x + &#x27;px&#x27;;
+      windowEl.style.top = y + &#x27;px&#x27;;
+      windowEl.style.width = windowWidth + &#x27;px&#x27;;
+      windowEl.style.height = windowHeight + &#x27;px&#x27;;
+      windowEl.classList.add(&#x27;thr0w_windows_window&#x27;);
+      windowEl.innerHTML = [
+        &#x27;&lt;div class=&quot;thr0w_windows_window__bar&quot;&gt;&#x27;,
+        &#x27;&lt;/div&gt;&#x27;,
+        &#x27;&lt;iframe src=&quot;/client/doc/&quot; width=&quot;200&quot; height=&quot;260&quot; frameborder=&quot;0&quot; class=&quot;thr0w_windows_window__content&quot;&gt;&#x27;,
+        &#x27;&lt;/iframe&gt;&#x27;].join(&#x27;\n&#x27;);
+      windowBarEl = windowEl.querySelector(&#x27;.thr0w_windows_window__bar&#x27;);
+      windowBarEl.addEventListener(&#x27;mousedown&#x27;, startMoving);
+      windowBarEl.addEventListener(&#x27;mousemove&#x27;, move);
+      windowBarEl.addEventListener(&#x27;mouseup&#x27;, endMoving);
+      windowBarEl.addEventListener(&#x27;mouseleave&#x27;, endMoving);
+      windowContentEl = windowEl.querySelector(&#x27;.thr0w_windows_window__content&#x27;);
+      windowContentEl.addEventListener(&#x27;load&#x27;, contentLoaded);
+      contentEl.appendChild(windowEl);
+      this.getId = getId;
+      this.getX = getX;
+      this.getY = getY;
+      this.getWidth = getWidth;
+      this.getHeight = getHeight;
+      this.getSrc = getSrc;
+      windows.push(this);
+      sync.update();
+      sync.idle();
+      function windowMessage() {
+        return {
+          x: x,
+          y: y,
+          scrollX: scrollX,
+          scrollY: scrollY
+        };
+      }
+      function windowReceive(data) {
+        x = data.x;
+        y = data.y;
+        scrollX = data.scrollX;
+        scrollY = data.scrollY;
+        windowEl.style.left = x + &#x27;px&#x27;; 
+        windowEl.style.top = y + &#x27;px&#x27;; 
+        windowContentEl.contentWindow.document.body.scrollTop = scrollX;
+        windowContentEl.contentWindow.document.body.scrollLeft = scrollY;
+      }
+      function startMoving(e) {
+        moving = true;
+        lastX = e.pageX; 
+        lastY = e.pageY; 
+        windowSync.update();
+      }
+      function move(e) {
+        if (!moving) { 
+          return;
+        }
+        var currentX = e.pageX; 
+        var currentY = e.pageY; 
+        x = Math.min(x + currentX - lastX, grid.getWidth() - windowWidth);
+        x = Math.max(x, 0);
+        y = Math.min(y + currentY - lastY, grid.getHeight() - windowHeight);
+        y = Math.max(y, 0);
+        windowEl.style.left = x + &#x27;px&#x27;; 
+        windowEl.style.top = y + &#x27;px&#x27;; 
+        lastX = currentX;
+        lastY = currentY;
+        windowSync.update();
+      }
+      function endMoving() {
+        moving = false;
+        windowSync.idle();
+      }
+      function contentLoaded() {
+        windowContentEl.contentWindow.document.addEventListener(&#x27;scroll&#x27;, scrolling);
+        function scrolling() {
+          if (!startScrolling) {
+            window.setTimeout(checkScrolling, 1000); 
+            startScrolling = true;
+          }
+          endScrolling = false;
+          scrollX = windowContentEl.contentWindow.document.body.scrollTop;
+          scrollY = windowContentEl.contentWindow.document.body.scrollLeft;
+          windowSync.update();
+          function checkScrolling() {
+            if (endScrolling) {
+              startScrolling = false;
+              windowSync.idle();
+            } else {
+              endScrolling = true;
+              window.setTimeout(checkScrolling, 1000); 
+            }
+          }
+        }
+      }
+      /**
+      * This function returns the window&#x27;s id.
+      * @method getId
+      * @return {String} The window&#x27;s id.
+      */
+      function getId() {
+        return id;
+      }
+      /**
+      * This function returns the window&#x27;s horizontal position.
+      * @method getX
+      * @return {Integer} The window&#x27;s horizontal position.
+      */
+      function getX() {
+        return x;
+      }
+      /**
+      * This function returns the window&#x27;s vertical position.
+      * @method getY
+      * @return {Integer} The window&#x27;s vertical position.
+      */
+      function getY() {
+        return y;
+      }
+      /**
+      * This function returns the window&#x27;s width.
+      * @method getWidth
+      * @return {Integer} The window&#x27;s width.
+      */
+      function getWidth() {
+        return windowWidth;
+      }
+      /**
+      * This function returns the window&#x27;s height.
+      * @method getHeight
+      * @return {Integer} The window&#x27;s height.
+      */
+      function getHeight() {
+        return windowHeight;
+      }
+      /**
+      * This function returns the window&#x27;s src.
+      * @method getSrc
+      * @return {String} The window&#x27;s src.
+      */
+      function getSrc() {
+        return windowSrc;
+      }
+    }
+  }
+})();
+
+
+    </pre>
+</div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>
