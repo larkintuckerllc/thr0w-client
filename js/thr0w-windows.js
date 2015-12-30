@@ -57,7 +57,7 @@
       var i;
       for (i = 0; i < data.length; i++) {
         if (windowIds.indexOf(data[i].id) === -1) {
-          new Window(data[i].id, data[i].x, data[i].y);
+          new Window(data[i].id, data[i].x, data[i].y, data[i].width, data[i].height, data[i].src);
         }
       }
       function getWindowId(obj) {
@@ -69,11 +69,15 @@
     * @namespace thr0w.windows.WindowManager
     * @class Window
     * @constructor
-    * @param id {Object} The id.
-    * @param x {Object} The x.
-    * @param y {Object} The y.
+    * @param id {String} The id.
+    * @param x {Integer} The horizontal position.
+    * @param y {Integer} The vertical position.
+    * @param width {Integer} The width.
+    * @param height {Integer} The height.
+    * @param src {String} The source url.
     */
-    function Window(id, x, y) {
+    function Window(id, x, y, width, height, src) {
+      var BAR_HEIGHT = 50;
       if (id === undefined || typeof id !== 'string') {
        throw 400;
       } 
@@ -83,11 +87,21 @@
       if (y === undefined || typeof y !== 'number') {
         throw 400;
       }
-      // TODO PARAMS
-      var windowWidth = 200;
-      var windowHeight = 300;
-      var windowSrc = '/client/doc/';
-      //
+      if (width === undefined || typeof width !== 'number') {
+        throw 400;
+      }
+      if (height === undefined || typeof height !== 'number') {
+        throw 400;
+      }
+      if (src === undefined || typeof src !== 'string') {
+        throw 400;
+      }
+      if (x + width > grid.getWidth()) {
+        throw 400;
+      }
+      if (y + height + BAR_HEIGHT > grid.getHeight()) {
+        throw 400;
+      } 
       var lastX;
       var lastY;
       var moving = false;
@@ -106,13 +120,13 @@
         );
       windowEl.style.left = x + 'px';
       windowEl.style.top = y + 'px';
-      windowEl.style.width = windowWidth + 'px';
-      windowEl.style.height = windowHeight + 'px';
+      windowEl.style.width = + width + 'px';
+      windowEl.style.height = (height + BAR_HEIGHT) + 'px';
       windowEl.classList.add('thr0w_windows_window');
       windowEl.innerHTML = [
         '<div class="thr0w_windows_window__bar">',
         '</div>',
-        '<iframe src="/client/doc/" width="200" height="260" frameborder="0" class="thr0w_windows_window__content">',
+        '<iframe src="' + src + '" width="' + width + '" height="' + height + '" frameborder="0" class="thr0w_windows_window__content">',
         '</iframe>'].join('\n');
       windowBarEl = windowEl.querySelector('.thr0w_windows_window__bar');
       windowBarEl.addEventListener('mousedown', startMoving);
@@ -161,9 +175,9 @@
         }
         var currentX = e.pageX; 
         var currentY = e.pageY; 
-        x = Math.min(x + currentX - lastX, grid.getWidth() - windowWidth);
+        x = Math.min(x + currentX - lastX, grid.getWidth() - width);
         x = Math.max(x, 0);
-        y = Math.min(y + currentY - lastY, grid.getHeight() - windowHeight);
+        y = Math.min(y + currentY - lastY, grid.getHeight() - (height + BAR_HEIGHT));
         y = Math.max(y, 0);
         windowEl.style.left = x + 'px'; 
         windowEl.style.top = y + 'px'; 
@@ -227,7 +241,7 @@
       * @return {Integer} The window's width.
       */
       function getWidth() {
-        return windowWidth;
+        return width;
       }
       /**
       * This function returns the window's height.
@@ -235,7 +249,7 @@
       * @return {Integer} The window's height.
       */
       function getHeight() {
-        return windowHeight;
+        return height;
       }
       /**
       * This function returns the window's src.
@@ -243,7 +257,7 @@
       * @return {String} The window's src.
       */
       function getSrc() {
-        return windowSrc;
+        return src;
       }
     }
   }
