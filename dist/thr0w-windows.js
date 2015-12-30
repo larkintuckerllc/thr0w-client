@@ -60,9 +60,6 @@
           new Window(data[i].id, data[i].x, data[i].y, data[i].width, data[i].height, data[i].src);
         }
       }
-      function getWindowId(obj) {
-        return obj.getId();
-      }
     }
     /**
     * This class is used to create windows.
@@ -78,7 +75,8 @@
     */
     function Window(id, x, y, width, height, src) {
       var BAR_HEIGHT = 50;
-      if (id === undefined || typeof id !== 'string') {
+      var windowIds = windows.map(getWindowId);
+      if (id === undefined || typeof id !== 'string'|| windowIds.indexOf(id) !== -1) {
        throw 400;
       } 
       if (x === undefined || typeof x !== 'number') {
@@ -259,6 +257,9 @@
       function getSrc() {
         return src;
       }
+    }
+    function getWindowId(obj) {
+      return obj.getId();
     }
   }
 })();
