@@ -1,5 +1,5 @@
 .thr0w_draw_canvas {
-  z-index: 98;
+  z-index: 998;
   position: absolute;
   top: 0px;
   left: 0px;
@@ -8,7 +8,7 @@
   visibility: hidden;
 }
 .thr0w_draw_palatte {
-  z-index: 99;
+  z-index: 999;
   position: absolute;
   top: 0px;
   left: 0px;

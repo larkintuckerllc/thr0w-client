@@ -74,7 +74,9 @@
     * @param src {String} The source url.
     */
     function Window(id, x, y, width, height, src) {
+      // TODO:  MiN MAX WIDTH HEIGHT
       var BAR_HEIGHT = 50;
+      var BASE = 799;
       var windowIds = windows.map(getWindowId);
       if (id === undefined || typeof id !== 'string'|| windowIds.indexOf(id) !== -1) {
        throw 400;
@@ -100,6 +102,8 @@
       if (y + height + BAR_HEIGHT > grid.getHeight()) {
         throw 400;
       } 
+      var z = BASE;
+      var active = false;
       var lastX;
       var lastY;
       var moving = false;
@@ -109,7 +113,9 @@
       var endScrolling = true;
       var windowEl = document.createElement('div');
       var windowBarEl;
+      var windowControlsEl;
       var windowContentEl;
+      var windowCoverEl;
       var windowSync = new window.thr0w.Sync(
         grid,
         'thr0w_windows_' + contentEl.id + '_' + id,
@@ -123,16 +129,42 @@
       windowEl.classList.add('thr0w_windows_window');
       windowEl.innerHTML = [
         '<div class="thr0w_windows_window__bar">',
+        '<div class="thr0w_windows_window__bar__controls">',
+'<svg xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" viewbox="0 0 100 100" class="thr0w_windows_window__bar__controls__control">',
+'<g>',
+'<ellipse fill="#ffffff" stroke-width="2" cx="50" cy="50" id="svg_1" rx="49" ry="49" stroke="#cccccc"/>',
+'<rect fill="#cccccc" stroke-width="2" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x="1" y="75" width="99" height="24" id="svg_3" fill-opacity="0.5" stroke="#cccccc"/>',
+'</g>',
+'</svg>',
+'<svg xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" viewbox="0 0 100 100" class="thr0w_windows_window__bar__controls__control">',
+'<g>',
+'<ellipse fill="#ffffff" stroke-width="2" cx="50" cy="50" id="svg_1" rx="49" ry="49" stroke="#cccccc"/>',
+'<rect fill="#cccccc" stroke-width="2" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x="1" y="1" width="99" height="24" id="svg_3" fill-opacity="0.5" stroke="#cccccc"/>',
+'</g>',
+'</svg>',
+'<svg xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" viewbox="0 0 100 100" class="thr0w_windows_window__bar__controls__control">',
+'<g>',
+'<ellipse stroke="#cccccc" ry="49" rx="49" id="svg_1" cy="50" cx="50" stroke-width="2" fill="#ffffff"/>',
+'<path id="svg_4" fill-opacity="0.5" stroke-linecap="null" stroke-linejoin="null" stroke-dasharray="null" stroke-width="2" stroke="#cccccc" fill="#cccccc"/>',
+'<path id="svg_6" d="m13.75,30.5l18.5,18.75l-19.5,20.25l17.25,16.75l20.5,-19l19.25,19.5l17.25,-17l-19.5,-19.25l19.75,-19.75l-17.5,-17.5l-19.25,20l-19.5,-20l-17.25,17.25z" fill-opacity="0.5" stroke-linecap="null" stroke-linejoin="null" stroke-dasharray="null" stroke-width="2" stroke="#cccccc" fill="#cccccc"/>',
+'</g>',
+'</svg>',
+        '</div>',
         '</div>',
         '<iframe src="' + src + '" width="' + width + '" height="' + height + '" frameborder="0" class="thr0w_windows_window__content">',
-        '</iframe>'].join('\n');
+        '</iframe>',
+        '<div style="width: '  + width + 'px; height: ' + height +'px;" class="thr0w_windows_window__cover"></div>',
+      ].join('\n');
+      windowEl.addEventListener('mousedown', activate);
       windowBarEl = windowEl.querySelector('.thr0w_windows_window__bar');
       windowBarEl.addEventListener('mousedown', startMoving);
       windowBarEl.addEventListener('mousemove', move);
       windowBarEl.addEventListener('mouseup', endMoving);
       windowBarEl.addEventListener('mouseleave', endMoving);
+      windowControlsEl = windowEl.querySelector('.thr0w_windows_window__bar__controls');
       windowContentEl = windowEl.querySelector('.thr0w_windows_window__content');
       windowContentEl.addEventListener('load', contentLoaded);
+      windowCoverEl = windowEl.querySelector('.thr0w_windows_window__cover');
       contentEl.appendChild(windowEl);
       this.getId = getId;
       this.getX = getX;
@@ -140,9 +172,12 @@
       this.getWidth = getWidth;
       this.getHeight = getHeight;
       this.getSrc = getSrc;
+      this.getZ = getZ;
+      this.deactivate = deactivate;
       windows.push(this);
       sync.update();
       sync.idle();
+      activate();
       function windowMessage() {
         return {
           x: x,
@@ -152,6 +187,7 @@
         };
       }
       function windowReceive(data) {
+        activate();
         x = data.x;
         y = data.y;
         scrollX = data.scrollX;
@@ -160,6 +196,25 @@
         windowEl.style.top = y + 'px'; 
         windowContentEl.contentWindow.document.body.scrollTop = scrollX;
         windowContentEl.contentWindow.document.body.scrollLeft = scrollY;
+      }
+      function activate() {
+        // TODO: WORRY ABOUT TOO BIG Z
+        if (active) {
+          return;
+        }
+        var i;
+        var top = BASE;
+        for (i = 0; i < windows.length; i++) {
+          top = Math.max(top, windows[i].getZ());
+          windows[i].deactivate();
+        }
+        active = true;
+        z = top + 1;
+        windowEl.style.zIndex = z;
+        windowCoverEl.style.visibility = 'hidden';
+        windowControlsEl.style.visibility = 'visible';
+        windowSync.update();
+        windowSync.idle();
       }
       function startMoving(e) {
         moving = true;
@@ -209,53 +264,31 @@
           }
         }
       }
-      /**
-      * This function returns the window's id.
-      * @method getId
-      * @return {String} The window's id.
-      */
       function getId() {
         return id;
       }
-      /**
-      * This function returns the window's horizontal position.
-      * @method getX
-      * @return {Integer} The window's horizontal position.
-      */
       function getX() {
         return x;
       }
-      /**
-      * This function returns the window's vertical position.
-      * @method getY
-      * @return {Integer} The window's vertical position.
-      */
       function getY() {
         return y;
       }
-      /**
-      * This function returns the window's width.
-      * @method getWidth
-      * @return {Integer} The window's width.
-      */
       function getWidth() {
         return width;
       }
-      /**
-      * This function returns the window's height.
-      * @method getHeight
-      * @return {Integer} The window's height.
-      */
       function getHeight() {
         return height;
       }
-      /**
-      * This function returns the window's src.
-      * @method getSrc
-      * @return {String} The window's src.
-      */
       function getSrc() {
         return src;
+      }
+      function getZ() {
+        return z;
+      }
+      function deactivate() {
+        active = false;
+        windowCoverEl.style.visibility = 'visible';
+        windowControlsEl.style.visibility = 'hidden';
       }
     }
     function getWindowId(obj) {

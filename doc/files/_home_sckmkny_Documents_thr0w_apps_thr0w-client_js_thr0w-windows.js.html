@@ -180,7 +180,9 @@
     * @param src {String} The source url.
     */
     function Window(id, x, y, width, height, src) {
+      // TODO:  MiN MAX WIDTH HEIGHT
       var BAR_HEIGHT = 50;
+      var BASE = 799;
       var windowIds = windows.map(getWindowId);
       if (id === undefined || typeof id !== &#x27;string&#x27;|| windowIds.indexOf(id) !== -1) {
        throw 400;
@@ -206,6 +208,8 @@
       if (y + height + BAR_HEIGHT &gt; grid.getHeight()) {
         throw 400;
       } 
+      var z = BASE;
+      var active = false;
       var lastX;
       var lastY;
       var moving = false;
@@ -215,7 +219,9 @@
       var endScrolling = true;
       var windowEl = document.createElement(&#x27;div&#x27;);
       var windowBarEl;
+      var windowControlsEl;
       var windowContentEl;
+      var windowCoverEl;
       var windowSync = new window.thr0w.Sync(
         grid,
         &#x27;thr0w_windows_&#x27; + contentEl.id + &#x27;_&#x27; + id,
@@ -229,16 +235,42 @@
       windowEl.classList.add(&#x27;thr0w_windows_window&#x27;);
       windowEl.innerHTML = [
         &#x27;&lt;div class=&quot;thr0w_windows_window__bar&quot;&gt;&#x27;,
+        &#x27;&lt;div class=&quot;thr0w_windows_window__bar__controls&quot;&gt;&#x27;,
+&#x27;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; xmlns:svg=&quot;http://www.w3.org/2000/svg&quot; viewbox=&quot;0 0 100 100&quot; class=&quot;thr0w_windows_window__bar__controls__control&quot;&gt;&#x27;,
+&#x27;&lt;g&gt;&#x27;,
+&#x27;&lt;ellipse fill=&quot;#ffffff&quot; stroke-width=&quot;2&quot; cx=&quot;50&quot; cy=&quot;50&quot; id=&quot;svg_1&quot; rx=&quot;49&quot; ry=&quot;49&quot; stroke=&quot;#cccccc&quot;/&gt;&#x27;,
+&#x27;&lt;rect fill=&quot;#cccccc&quot; stroke-width=&quot;2&quot; stroke-dasharray=&quot;null&quot; stroke-linejoin=&quot;null&quot; stroke-linecap=&quot;null&quot; x=&quot;1&quot; y=&quot;75&quot; width=&quot;99&quot; height=&quot;24&quot; id=&quot;svg_3&quot; fill-opacity=&quot;0.5&quot; stroke=&quot;#cccccc&quot;/&gt;&#x27;,
+&#x27;&lt;/g&gt;&#x27;,
+&#x27;&lt;/svg&gt;&#x27;,
+&#x27;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; xmlns:svg=&quot;http://www.w3.org/2000/svg&quot; viewbox=&quot;0 0 100 100&quot; class=&quot;thr0w_windows_window__bar__controls__control&quot;&gt;&#x27;,
+&#x27;&lt;g&gt;&#x27;,
+&#x27;&lt;ellipse fill=&quot;#ffffff&quot; stroke-width=&quot;2&quot; cx=&quot;50&quot; cy=&quot;50&quot; id=&quot;svg_1&quot; rx=&quot;49&quot; ry=&quot;49&quot; stroke=&quot;#cccccc&quot;/&gt;&#x27;,
+&#x27;&lt;rect fill=&quot;#cccccc&quot; stroke-width=&quot;2&quot; stroke-dasharray=&quot;null&quot; stroke-linejoin=&quot;null&quot; stroke-linecap=&quot;null&quot; x=&quot;1&quot; y=&quot;1&quot; width=&quot;99&quot; height=&quot;24&quot; id=&quot;svg_3&quot; fill-opacity=&quot;0.5&quot; stroke=&quot;#cccccc&quot;/&gt;&#x27;,
+&#x27;&lt;/g&gt;&#x27;,
+&#x27;&lt;/svg&gt;&#x27;,
+&#x27;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; xmlns:svg=&quot;http://www.w3.org/2000/svg&quot; viewbox=&quot;0 0 100 100&quot; class=&quot;thr0w_windows_window__bar__controls__control&quot;&gt;&#x27;,
+&#x27;&lt;g&gt;&#x27;,
+&#x27;&lt;ellipse stroke=&quot;#cccccc&quot; ry=&quot;49&quot; rx=&quot;49&quot; id=&quot;svg_1&quot; cy=&quot;50&quot; cx=&quot;50&quot; stroke-width=&quot;2&quot; fill=&quot;#ffffff&quot;/&gt;&#x27;,
+&#x27;&lt;path id=&quot;svg_4&quot; fill-opacity=&quot;0.5&quot; stroke-linecap=&quot;null&quot; stroke-linejoin=&quot;null&quot; stroke-dasharray=&quot;null&quot; stroke-width=&quot;2&quot; stroke=&quot;#cccccc&quot; fill=&quot;#cccccc&quot;/&gt;&#x27;,
+&#x27;&lt;path id=&quot;svg_6&quot; d=&quot;m13.75,30.5l18.5,18.75l-19.5,20.25l17.25,16.75l20.5,-19l19.25,19.5l17.25,-17l-19.5,-19.25l19.75,-19.75l-17.5,-17.5l-19.25,20l-19.5,-20l-17.25,17.25z&quot; fill-opacity=&quot;0.5&quot; stroke-linecap=&quot;null&quot; stroke-linejoin=&quot;null&quot; stroke-dasharray=&quot;null&quot; stroke-width=&quot;2&quot; stroke=&quot;#cccccc&quot; fill=&quot;#cccccc&quot;/&gt;&#x27;,
+&#x27;&lt;/g&gt;&#x27;,
+&#x27;&lt;/svg&gt;&#x27;,
+        &#x27;&lt;/div&gt;&#x27;,
         &#x27;&lt;/div&gt;&#x27;,
         &#x27;&lt;iframe src=&quot;&#x27; + src + &#x27;&quot; width=&quot;&#x27; + width + &#x27;&quot; height=&quot;&#x27; + height + &#x27;&quot; frameborder=&quot;0&quot; class=&quot;thr0w_windows_window__content&quot;&gt;&#x27;,
-        &#x27;&lt;/iframe&gt;&#x27;].join(&#x27;\n&#x27;);
+        &#x27;&lt;/iframe&gt;&#x27;,
+        &#x27;&lt;div style=&quot;width: &#x27;  + width + &#x27;px; height: &#x27; + height +&#x27;px;&quot; class=&quot;thr0w_windows_window__cover&quot;&gt;&lt;/div&gt;&#x27;,
+      ].join(&#x27;\n&#x27;);
+      windowEl.addEventListener(&#x27;mousedown&#x27;, activate);
       windowBarEl = windowEl.querySelector(&#x27;.thr0w_windows_window__bar&#x27;);
       windowBarEl.addEventListener(&#x27;mousedown&#x27;, startMoving);
       windowBarEl.addEventListener(&#x27;mousemove&#x27;, move);
       windowBarEl.addEventListener(&#x27;mouseup&#x27;, endMoving);
       windowBarEl.addEventListener(&#x27;mouseleave&#x27;, endMoving);
+      windowControlsEl = windowEl.querySelector(&#x27;.thr0w_windows_window__bar__controls&#x27;);
       windowContentEl = windowEl.querySelector(&#x27;.thr0w_windows_window__content&#x27;);
       windowContentEl.addEventListener(&#x27;load&#x27;, contentLoaded);
+      windowCoverEl = windowEl.querySelector(&#x27;.thr0w_windows_window__cover&#x27;);
       contentEl.appendChild(windowEl);
       this.getId = getId;
       this.getX = getX;
@@ -246,9 +278,12 @@
       this.getWidth = getWidth;
       this.getHeight = getHeight;
       this.getSrc = getSrc;
+      this.getZ = getZ;
+      this.deactivate = deactivate;
       windows.push(this);
       sync.update();
       sync.idle();
+      activate();
       function windowMessage() {
         return {
           x: x,
@@ -258,6 +293,7 @@
         };
       }
       function windowReceive(data) {
+        activate();
         x = data.x;
         y = data.y;
         scrollX = data.scrollX;
@@ -266,6 +302,25 @@
         windowEl.style.top = y + &#x27;px&#x27;; 
         windowContentEl.contentWindow.document.body.scrollTop = scrollX;
         windowContentEl.contentWindow.document.body.scrollLeft = scrollY;
+      }
+      function activate() {
+        // TODO: WORRY ABOUT TOO BIG Z
+        if (active) {
+          return;
+        }
+        var i;
+        var top = BASE;
+        for (i = 0; i &lt; windows.length; i++) {
+          top = Math.max(top, windows[i].getZ());
+          windows[i].deactivate();
+        }
+        active = true;
+        z = top + 1;
+        windowEl.style.zIndex = z;
+        windowCoverEl.style.visibility = &#x27;hidden&#x27;;
+        windowControlsEl.style.visibility = &#x27;visible&#x27;;
+        windowSync.update();
+        windowSync.idle();
       }
       function startMoving(e) {
         moving = true;
@@ -315,53 +370,31 @@
           }
         }
       }
-      /**
-      * This function returns the window&#x27;s id.
-      * @method getId
-      * @return {String} The window&#x27;s id.
-      */
       function getId() {
         return id;
       }
-      /**
-      * This function returns the window&#x27;s horizontal position.
-      * @method getX
-      * @return {Integer} The window&#x27;s horizontal position.
-      */
       function getX() {
         return x;
       }
-      /**
-      * This function returns the window&#x27;s vertical position.
-      * @method getY
-      * @return {Integer} The window&#x27;s vertical position.
-      */
       function getY() {
         return y;
       }
-      /**
-      * This function returns the window&#x27;s width.
-      * @method getWidth
-      * @return {Integer} The window&#x27;s width.
-      */
       function getWidth() {
         return width;
       }
-      /**
-      * This function returns the window&#x27;s height.
-      * @method getHeight
-      * @return {Integer} The window&#x27;s height.
-      */
       function getHeight() {
         return height;
       }
-      /**
-      * This function returns the window&#x27;s src.
-      * @method getSrc
-      * @return {String} The window&#x27;s src.
-      */
       function getSrc() {
         return src;
+      }
+      function getZ() {
+        return z;
+      }
+      function deactivate() {
+        active = false;
+        windowCoverEl.style.visibility = &#x27;visible&#x27;;
+        windowControlsEl.style.visibility = &#x27;hidden&#x27;;
       }
     }
     function getWindowId(obj) {
