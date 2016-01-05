@@ -6,8 +6,7 @@ YUI.add("yuidoc-meta", function(Y) {
         "thr0w.Sync",
         "thr0w.draw",
         "thr0w.windows",
-        "thr0w.windows.WindowManager",
-        "thr0w.windows.WindowManager.Window"
+        "thr0w.windows.WindowManager"
     ],
     "modules": [
         "thr0w",

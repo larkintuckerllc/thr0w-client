@@ -15,7 +15,6 @@
 .thr0w_windows_window__bar__controls {
   width: 100%;
   height: 100%;
-  visibility: hidden;
 }
 .thr0w_windows_window__bar__controls__control {
   width: 30px;
@@ -29,7 +28,6 @@
 }
 .thr0w_windows_window__cover {
   position: absolute;
-  visibility: visible;
   left: 0px;
   top: 50px;
 }

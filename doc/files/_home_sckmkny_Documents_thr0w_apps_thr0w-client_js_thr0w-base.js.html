@@ -53,8 +53,6 @@
             
                 <li><a href="../classes/thr0w.windows.WindowManager.html">thr0w.windows.WindowManager</a></li>
             
-                <li><a href="../classes/thr0w.windows.WindowManager.Window.html">thr0w.windows.WindowManager.Window</a></li>
-            
             </ul>
 
             <ul id="api-modules" class="apis modules">
@@ -125,6 +123,7 @@
   service.thr0wChannel = thr0wChannel;
   service.Grid = Grid;
   service.Sync = Sync;
+  service.EventTarget = EventTarget;
   /**
   * This object provides the base functionality on the window object.
   * @class thr0w
@@ -538,6 +537,7 @@
     thr0wChannel(channels, {thr0w: {type: &#x27;sync&#x27;, _id: _id, hello: true}});
     this.update = update;
     this.idle = idle;
+    this.destroy = destroy;
     /**
     * This function is used to trigger an update message.
     * @method update
@@ -596,7 +596,52 @@
       }
       receive(thr0wMsg.message);
     }
+    function destroy() {
+      socket.off(&#x27;message&#x27;, syncMessageCallback);
+    }
   }
+  // Copyright (c) 2010 Nicholas C. Zakas. All rights reserved.
+  // MIT License
+  function EventTarget(){
+    this._listeners = {};
+  }
+  EventTarget.prototype = {
+//    constructor: EventTarget,
+    addListener: function(type, listener){
+      if (typeof this._listeners[type] === &quot;undefined&quot;){
+        this._listeners[type] = [];
+      }
+      this._listeners[type].push(listener);
+    },
+    fire: function(event){
+      if (typeof event === &quot;string&quot;){
+        event = { type: event };
+      }
+      if (!event.target){
+        event.target = this;
+      }
+      if (!event.type){  //falsy
+        throw new Error(&quot;Event object missing &#x27;type&#x27; property.&quot;);
+      }
+      if (this._listeners[event.type] instanceof Array) {
+        var listeners = this._listeners[event.type];
+        for (var i=0, len=listeners.length; i &lt; len; i++) {
+          listeners[i].call(this, event);
+        }
+      }
+    },
+    removeListener: function(type, listener) {
+      if (this._listeners[type] instanceof Array) {
+        var listeners = this._listeners[type];
+        for (var i=0, len=listeners.length; i &lt; len; i++) {
+          if (listeners[i] === listener) {
+            listeners.splice(i, 1);
+            break;
+          }
+        }
+      }
+    }
+  };
 })();
 
     </pre>
