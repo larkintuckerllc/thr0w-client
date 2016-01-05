@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>thr0w.Sync</title>
+    <title>thr0w.windows.WindowManager.Window</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -53,6 +53,8 @@
             
                 <li><a href="../classes/thr0w.windows.WindowManager.html">thr0w.windows.WindowManager</a></li>
             
+                <li><a href="../classes/thr0w.windows.WindowManager.Window.html">thr0w.windows.WindowManager.Window</a></li>
+            
             </ul>
 
             <ul id="api-modules" class="apis modules">
@@ -98,7 +100,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>thr0w.Sync Class</h1>
+                        <h1>thr0w.windows.WindowManager.Window Class</h1>
 <div class="box meta">
     
 
@@ -106,13 +108,13 @@
 
     
         <div class="foundat">
-            Defined in: <a href="../files/_home_sckmkny_Documents_thr0w_apps_thr0w-client_js_thr0w-base.js.html#l378"><code>&#x2F;home&#x2F;sckmkny&#x2F;Documents&#x2F;thr0w&#x2F;apps&#x2F;thr0w-client&#x2F;js&#x2F;thr0w-base.js:378</code></a>
+            Defined in: <a href="../files/_home_sckmkny_Documents_thr0w_apps_thr0w-client_js_thr0w-windows.js.html#l64"><code>&#x2F;home&#x2F;sckmkny&#x2F;Documents&#x2F;thr0w&#x2F;apps&#x2F;thr0w-client&#x2F;js&#x2F;thr0w-windows.js:64</code></a>
         </div>
     
 
     
         
-            Module: <a href="../modules/thr0w.html">thr0w</a>
+            Module: <a href="../modules/thr0w-windows.html">thr0w-windows</a>
         
     
 
@@ -122,15 +124,15 @@
 
 
 <div class="box intro">
-    <p>This class is used to create syncs.</p>
+    <p>This class is used to create windows.</p>
 
 </div>
 
 
     <div class="constructor">
         <h2>Constructor</h2>
-        <div id="method_thr0w.Sync" class="method item">
-    <h3 class="name"><code>thr0w.Sync</code></h3>
+        <div id="method_thr0w.windows.WindowManager.Window" class="method item">
+    <h3 class="name"><code>thr0w.windows.WindowManager.Window</code></h3>
 
     
         <div class="args">
@@ -138,25 +140,37 @@
             
                 <li class="arg">
                     
-                        <code>grid</code>
+                        <code>id</code>
                     
                 </li>
             
                 <li class="arg">
                     
-                        <code>_id</code>
+                        <code>x</code>
                     
                 </li>
             
                 <li class="arg">
                     
-                        <code>message</code>
+                        <code>y</code>
                     
                 </li>
             
                 <li class="arg">
                     
-                        <code>receive</code>
+                        <code>width</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>height</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>src</code>
                     
                 </li>
             
@@ -189,7 +203,7 @@
             
         
         
-        <a href="../files/_home_sckmkny_Documents_thr0w_apps_thr0w-client_js_thr0w-base.js.html#l378"><code>&#x2F;home&#x2F;sckmkny&#x2F;Documents&#x2F;thr0w&#x2F;apps&#x2F;thr0w-client&#x2F;js&#x2F;thr0w-base.js:378</code></a>
+        <a href="../files/_home_sckmkny_Documents_thr0w_apps_thr0w-client_js_thr0w-windows.js.html#l64"><code>&#x2F;home&#x2F;sckmkny&#x2F;Documents&#x2F;thr0w&#x2F;apps&#x2F;thr0w-client&#x2F;js&#x2F;thr0w-windows.js:64</code></a>
         
         </p>
 
@@ -211,30 +225,14 @@
             
                 <li class="param">
                     
-                        <code class="param-name">grid</code>
-                        <span class="type">Object</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>The <a href="../classes/thr0w.Grid.html" class="crosslink">Thr0w.Grid</a>, object.</p>
-
-                    </div>
-
-                    
-                </li>
-            
-                <li class="param">
-                    
-                        <code class="param-name">_id</code>
+                        <code class="param-name">id</code>
                         <span class="type">String</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The identifier for the sync.</p>
+                        <p>The id.</p>
 
                     </div>
 
@@ -243,19 +241,14 @@
             
                 <li class="param">
                     
-                        <code class="param-name">message</code>
-                        <span class="type">Function</span>
+                        <code class="param-name">x</code>
+                        <span class="type">Integer</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The function that generates the message.</p>
-<pre><code>function()
-
-Returns: 
-Object 
-The message data.</code></pre>
+                        <p>The horizontal position.</p>
 
                     </div>
 
@@ -264,20 +257,62 @@ The message data.</code></pre>
             
                 <li class="param">
                     
-                        <code class="param-name">receive</code>
-                        <span class="type">Function</span>
+                        <code class="param-name">y</code>
+                        <span class="type">Integer</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The function that handles received messages.</p>
-<pre><code>function(data)
+                        <p>The vertical position.</p>
 
-Parameters:
+                    </div>
 
-data Object
-The message data.</code></pre>
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">width</code>
+                        <span class="type">Integer</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The width.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">height</code>
+                        <span class="type">Integer</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The height.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">src</code>
+                        <span class="type">String</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The source url.</p>
 
                     </div>
 
@@ -301,8 +336,6 @@ The message data.</code></pre>
         <li class="api-class-tab index"><a href="#index">Index</a></li>
 
         
-            <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
-        
         
         
         
@@ -313,28 +346,6 @@ The message data.</code></pre>
             <h2 class="off-left">Item Index</h2>
 
             
-                <div class="index-section methods">
-                    <h3>Methods</h3>
-
-                    <ul class="index-list methods">
-                        
-                            <li class="index-item method">
-                                <a href="#method_idle">idle</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_update">update</a>
-
-                                
-                                
-                            </li>
-                        
-                    </ul>
-                </div>
-            
 
             
 
@@ -343,122 +354,6 @@ The message data.</code></pre>
             
         </div>
 
-        
-            <div id="methods" class="api-class-tabpanel">
-                <h2 class="off-left">Methods</h2>
-
-                
-                    <div id="method_idle" class="method item">
-    <h3 class="name"><code>idle</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/_home_sckmkny_Documents_thr0w_apps_thr0w-client_js_thr0w-base.js.html#l452"><code>&#x2F;home&#x2F;sckmkny&#x2F;Documents&#x2F;thr0w&#x2F;apps&#x2F;thr0w-client&#x2F;js&#x2F;thr0w-base.js:452</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>This function is used to release control to other channels.</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_update" class="method item">
-    <h3 class="name"><code>update</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/_home_sckmkny_Documents_thr0w_apps_thr0w-client_js_thr0w-base.js.html#l437"><code>&#x2F;home&#x2F;sckmkny&#x2F;Documents&#x2F;thr0w&#x2F;apps&#x2F;thr0w-client&#x2F;js&#x2F;thr0w-base.js:437</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>This function is used to trigger an update message.</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-            </div>
         
 
         
