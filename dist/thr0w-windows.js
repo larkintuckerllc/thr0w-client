@@ -10,7 +10,6 @@
     throw 400;
   }
   var service = {}; 
-  WindowManager.prototype = new window.thr0w.EventTarget();
   service.WindowManager = WindowManager;
   /**
   * This object provides the window management functionality.
@@ -24,42 +23,16 @@
   * @namespace thr0w.windows
   * @class WindowManager
   * @constructor
+  * @param id {String} The id.
   * @param grid {Object} The grid, {{#crossLink "thr0w.Grid"}}Thr0w.Grid{{/crossLink}}, object.
   */
-  function WindowManager(grid) {
+  function WindowManager(wm_id, grid) {
+    if (wm_id === undefined || typeof wm_id !== 'string') {
+     throw 400;
+    } 
     if (!grid || typeof grid !== 'object') {
       throw 400;
     }
-    var self = this;
-    /**
-    * This method is used to add an event listener.
-    * @method addListener
-    * @param type {String} The type of event: window_close.
-    * @param handler {Function} The event handler.
-    * ```
-    * function(event)
-    *
-    * Parameters:
-    *
-    * event Object
-    * The event.
-    * ```
-    */
-    /**
-    * This method is used to remove an event listener.
-    * @method removeListener
-    * @param type {String} The type of event: window_close.
-    * @param handler {Function} The event handler.
-    * ```
-    * function(event)
-    *
-    * Parameters:
-    *
-    * event Object
-    * The event.
-    * ```
-    */
-    window.thr0w.EventTarget.call(this);
     var windows = [];
     var contentEl = grid.getContent();
     var sync = new window.thr0w.Sync(
@@ -120,8 +93,7 @@
         }
       }
       windows = orderedWindows;
-      setZs();
-      activateTop();
+      stackWindows();
       function getDataId(obj) {
         return obj.id;
       } 
@@ -139,8 +111,7 @@
       }
       windows.splice(j, 1);
       windows.push(w);
-      setZs();
-      activateTop();
+      stackWindows();
       sync.update();
       sync.idle();
     }
@@ -190,8 +161,7 @@
         windows[i].deactivate();
       }
       windows.push(new WindowFrame(id, x, y - BAR_HEIGHT, width, height + BAR_HEIGHT, src));
-      setZs();
-      activateTop();
+      stackWindows();
       sync.update();
       sync.idle();
     }
@@ -201,7 +171,6 @@
     * @param id {String} The id.
     */
     function closeWindow(id) {
-      // TODO: Collapse setZs and activateTop.
       if (id === undefined || typeof id !== 'string') {
        throw 400;
       } 
@@ -212,23 +181,27 @@
       var w = windows[i];
       windows.splice(i, 1);
       w.destroy();
-      setZs();
-      activateTop();
+      stackWindows(); 
       sync.update();
       sync.idle();
-      self.fire({type: 'close_window', id: id});
+      /**
+      * Window closed.
+      *
+      * @event thr0w_windows_close_window 
+      * @param {String} wm_id The {{#crossLink "thr0w.windows.WindowManager"}}thr0w.windows.WindowManager{{/crossLink}} object's id.
+      * @param {String} id The window's id.
+      */
+      document.dispatchEvent(new CustomEvent('thr0w_windows_close_window', { detail: { wm_id: wm_id, id: id } }));
     }
     function getWindowId(obj) {
       return obj.getId();
     }
-    function setZs() {
+    function stackWindows() {
       var i;
       for (i = 0; i < windows.length; i++) {
         windows[i].setZ(BASE_Z + i);
       }
-    }
-    function activateTop() {
-      var i = windows.length - 1;
+      i = windows.length - 1;
       if (i !== -1) {
         windows[i].activate();
       }
