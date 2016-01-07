@@ -20,7 +20,7 @@
   * This function is used to load the draw functionality into a grid.
   * @method load
   * @static
-  * @param grid {Object} The grid, {{#crossLink "thr0w.Grid"}}Thr0w.Grid{{/crossLink}}, object.
+  * @param grid {Object} The grid, {{#crossLink "thr0w.Grid"}}thr0w.Grid{{/crossLink}}, object.
   */
   function load(grid) {
     if (!grid || typeof grid !== 'object') {

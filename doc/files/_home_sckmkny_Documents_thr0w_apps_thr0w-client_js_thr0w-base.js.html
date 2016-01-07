@@ -45,6 +45,8 @@
             
                 <li><a href="../classes/thr0w.draw.html">thr0w.draw</a></li>
             
+                <li><a href="../classes/thr0w.FlexGrid.html">thr0w.FlexGrid</a></li>
+            
                 <li><a href="../classes/thr0w.Grid.html">thr0w.Grid</a></li>
             
                 <li><a href="../classes/thr0w.Sync.html">thr0w.Sync</a></li>
@@ -122,6 +124,7 @@
   service.connect = connect;
   service.thr0wChannel = thr0wChannel;
   service.Grid = Grid;
+  service.FlexGrid = FlexGrid;
   service.Sync = Sync;
   service.EventTarget = EventTarget;
   /**
@@ -480,11 +483,113 @@
     }
   }
   /**
+  * This class is used to create flexible grids.
+  * @namespace thr0w
+  * @class FlexGrid
+  * @constructor
+  * @param {Object} frameEl The frame DOM element.
+  * @param {Object} contentEl The content DOM element.
+  * @param {Array} matrix An array of arrays of integers defining the channels for the grid.
+  * @param {Array} dimensions An array of objects consisting of width and height (and optional scale) of the frames in each row. 
+  */
+  function FlexGrid(frameEl, contentEl, matrix, dimensions) {
+    if (!socket) {
+      throw 400;
+    }
+    if (frameEl === undefined || typeof frameEl !== &#x27;object&#x27;) {
+      throw 400;
+    }
+    if (contentEl === undefined || typeof contentEl !== &#x27;object&#x27;) {
+      throw 400;
+    }
+    if (matrix === undefined || !Array.isArray(matrix)) {
+      throw 400;
+    }
+    if (dimensions === undefined || !Array.isArray(dimensions)) {
+      throw 400;
+    }
+    var i;
+    var j;
+    var hpos;
+    var vpos;
+    var width = 0;
+    var height = 0;
+    var shiftLeft = 0;
+    var shiftTop = 0;
+    for (i = 0; i &lt; matrix.length; i++) {
+      dimensions[i].scale = dimensions[i].scale ? dimensions[i].scale : 1;
+      width = Math.max(dimensions[i].scale * dimensions[i].width * matrix[i].length, width);
+      height += dimensions[i].scale * dimensions[i].height;
+      for (j = 0; j &lt; matrix[i].length; j++) {
+        if (channel === matrix[i][j]) {
+          hpos = j;
+          vpos = i;
+        }
+      }
+    }
+    frameEl.style.width = (dimensions[vpos].scale * dimensions[vpos].width) + &#x27;px&#x27;;
+    frameEl.style.height = (dimensions[vpos].scale * dimensions[vpos].height) + &#x27;px&#x27;;
+    frameEl.style.transform = &#x27;scale(&#x27; + (1 / dimensions[vpos].scale) + &#x27;, &#x27; + (1 / dimensions[vpos].scale) + &#x27;)&#x27;;
+    contentEl.style.width = width + &#x27;px&#x27;;
+    contentEl.style.height = height + &#x27;px&#x27;;
+    for (i = 0; i &lt; vpos; i++) {
+      shiftTop += dimensions[i].scale * dimensions[i].height;
+    }
+    shiftLeft = hpos * dimensions[vpos].scale * dimensions[vpos].width + hpos * (width - matrix[vpos].length * dimensions[vpos].scale * dimensions[vpos].width) / (matrix[vpos].length - 1);
+    contentEl.style.left = &#x27;-&#x27; + shiftLeft + &#x27;px&#x27;;
+    contentEl.style.top = &#x27;-&#x27; + shiftTop + &#x27;px&#x27;;
+    this.getFrame = getFrame;
+    this.getContent = getContent;
+    this.getMatrix = getMatrix;
+    this.getWidth = getWidth;
+    this.getHeight = getHeight;
+    /**
+    * This function returns the grid&#x27;s frame.
+    * @method getFrame
+    * @return {Object} The grid&#x27;s frame DOM object.
+    */
+    function getFrame() {
+      return frameEl;
+    }
+    /**
+    * This function returns the grid&#x27;s content.
+    * @method getContent
+    * @return {Object} The grid&#x27;s content DOM object.
+    */
+    function getContent() {
+      return contentEl;
+    }
+    /**
+    * This function returns the grid&#x27;s matrix.
+    * @method getMatrix
+    * @return {Array} An array of arrays of integers defining the channels for the grid.
+    */
+    function getMatrix() {
+      return matrix;
+    }
+    /**
+    * This function returns the grid&#x27;s width.
+    * @method getWidth
+    * @return {Integer} The width of the grid.
+    */
+    function getWidth() {
+      return width;
+    }
+    /**
+    * This function returns the grid&#x27;s height.
+    * @method getHeight
+    * @return {Integer} The height of the grid.
+    */
+    function getHeight() {
+      return height;
+    }
+  }
+  /**
   * This class is used to create syncs.
   * @namespace thr0w
   * @class Sync
   * @constructor
-  * @param {Object} grid The {{#crossLink &quot;thr0w.Grid&quot;}}Thr0w.Grid{{/crossLink}}, object.
+  * @param {Object} grid The grid, {{#crossLink &quot;thr0w.Grid&quot;}}thr0w.Grid{{/crossLink}} or {{#crossLink &quot;thr0w.FlexGrid&quot;}}thr0w.FlexGrid{{/crossLink}} object.
   * @param {String} _id The identifier for the sync.
   * @param {Function} message The function that generates the message.
   * &#x60;&#x60;&#x60;

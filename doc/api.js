@@ -2,6 +2,7 @@ YUI.add("yuidoc-meta", function(Y) {
    Y.YUIDoc = { meta: {
     "classes": [
         "thr0w",
+        "thr0w.FlexGrid",
         "thr0w.Grid",
         "thr0w.Sync",
         "thr0w.draw",

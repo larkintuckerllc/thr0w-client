@@ -18,6 +18,7 @@
   service.connect = connect;
   service.thr0wChannel = thr0wChannel;
   service.Grid = Grid;
+  service.FlexGrid = FlexGrid;
   service.Sync = Sync;
   service.EventTarget = EventTarget;
   /**
@@ -376,11 +377,113 @@
     }
   }
   /**
+  * This class is used to create flexible grids.
+  * @namespace thr0w
+  * @class FlexGrid
+  * @constructor
+  * @param {Object} frameEl The frame DOM element.
+  * @param {Object} contentEl The content DOM element.
+  * @param {Array} matrix An array of arrays of integers defining the channels for the grid.
+  * @param {Array} dimensions An array of objects consisting of width and height (and optional scale) of the frames in each row. 
+  */
+  function FlexGrid(frameEl, contentEl, matrix, dimensions) {
+    if (!socket) {
+      throw 400;
+    }
+    if (frameEl === undefined || typeof frameEl !== 'object') {
+      throw 400;
+    }
+    if (contentEl === undefined || typeof contentEl !== 'object') {
+      throw 400;
+    }
+    if (matrix === undefined || !Array.isArray(matrix)) {
+      throw 400;
+    }
+    if (dimensions === undefined || !Array.isArray(dimensions)) {
+      throw 400;
+    }
+    var i;
+    var j;
+    var hpos;
+    var vpos;
+    var width = 0;
+    var height = 0;
+    var shiftLeft = 0;
+    var shiftTop = 0;
+    for (i = 0; i < matrix.length; i++) {
+      dimensions[i].scale = dimensions[i].scale ? dimensions[i].scale : 1;
+      width = Math.max(dimensions[i].scale * dimensions[i].width * matrix[i].length, width);
+      height += dimensions[i].scale * dimensions[i].height;
+      for (j = 0; j < matrix[i].length; j++) {
+        if (channel === matrix[i][j]) {
+          hpos = j;
+          vpos = i;
+        }
+      }
+    }
+    frameEl.style.width = (dimensions[vpos].scale * dimensions[vpos].width) + 'px';
+    frameEl.style.height = (dimensions[vpos].scale * dimensions[vpos].height) + 'px';
+    frameEl.style.transform = 'scale(' + (1 / dimensions[vpos].scale) + ', ' + (1 / dimensions[vpos].scale) + ')';
+    contentEl.style.width = width + 'px';
+    contentEl.style.height = height + 'px';
+    for (i = 0; i < vpos; i++) {
+      shiftTop += dimensions[i].scale * dimensions[i].height;
+    }
+    shiftLeft = hpos * dimensions[vpos].scale * dimensions[vpos].width + hpos * (width - matrix[vpos].length * dimensions[vpos].scale * dimensions[vpos].width) / (matrix[vpos].length - 1);
+    contentEl.style.left = '-' + shiftLeft + 'px';
+    contentEl.style.top = '-' + shiftTop + 'px';
+    this.getFrame = getFrame;
+    this.getContent = getContent;
+    this.getMatrix = getMatrix;
+    this.getWidth = getWidth;
+    this.getHeight = getHeight;
+    /**
+    * This function returns the grid's frame.
+    * @method getFrame
+    * @return {Object} The grid's frame DOM object.
+    */
+    function getFrame() {
+      return frameEl;
+    }
+    /**
+    * This function returns the grid's content.
+    * @method getContent
+    * @return {Object} The grid's content DOM object.
+    */
+    function getContent() {
+      return contentEl;
+    }
+    /**
+    * This function returns the grid's matrix.
+    * @method getMatrix
+    * @return {Array} An array of arrays of integers defining the channels for the grid.
+    */
+    function getMatrix() {
+      return matrix;
+    }
+    /**
+    * This function returns the grid's width.
+    * @method getWidth
+    * @return {Integer} The width of the grid.
+    */
+    function getWidth() {
+      return width;
+    }
+    /**
+    * This function returns the grid's height.
+    * @method getHeight
+    * @return {Integer} The height of the grid.
+    */
+    function getHeight() {
+      return height;
+    }
+  }
+  /**
   * This class is used to create syncs.
   * @namespace thr0w
   * @class Sync
   * @constructor
-  * @param {Object} grid The {{#crossLink "thr0w.Grid"}}Thr0w.Grid{{/crossLink}}, object.
+  * @param {Object} grid The grid, {{#crossLink "thr0w.Grid"}}thr0w.Grid{{/crossLink}} or {{#crossLink "thr0w.FlexGrid"}}thr0w.FlexGrid{{/crossLink}} object.
   * @param {String} _id The identifier for the sync.
   * @param {Function} message The function that generates the message.
   * ```
