@@ -10,14 +10,14 @@ YUI.add("yuidoc-meta", function(Y) {
         "thr0w.windows.WindowManager"
     ],
     "modules": [
-        "thr0w",
+        "thr0w-base",
         "thr0w-draw",
         "thr0w-windows"
     ],
     "allModules": [
         {
-            "displayName": "thr0w",
-            "name": "thr0w",
+            "displayName": "thr0w-base",
+            "name": "thr0w-base",
             "description": "This module provides the core functionality."
         },
         {

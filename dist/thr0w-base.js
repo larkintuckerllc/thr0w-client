@@ -1,7 +1,7 @@
 (function() {
   /**
   * This module provides the core functionality.
-  * @module thr0w
+  * @module thr0w-base
   */
   'use strict';
   var baseref;
