@@ -523,6 +523,10 @@
     var locked = false;
     var lastActive = false;
     var matrix = grid.getMatrix();
+    var coverEl = document.createElement('div');
+    coverEl.classList.add('thr0w_base_cover');
+    coverEl.style.visibility = 'hidden';
+    grid.getFrame().appendChild(coverEl);
     for (var i = 0; i < matrix.length; i++) {
       for (var j = 0; j < matrix[i].length; j++) {
         channels.push(matrix[i][j]);
@@ -587,10 +591,12 @@
       if (thr0wMsg.lock && !active) {
         lastActive = false;
         locked = true;
+        coverEl.style.visibility = 'visible';
         return;
       }
       if (thr0wMsg.unlock && !active) {
         locked = false;
+        coverEl.style.visibility = 'hidden';
         return;
       }
       receive(thr0wMsg.message);
