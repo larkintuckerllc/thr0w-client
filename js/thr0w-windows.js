@@ -207,6 +207,9 @@
       }
     }
     function WindowFrame(id, x, y, width, height, src) {
+      var frameEl = grid.getFrame();
+      var offsetLeft = frameEl.offsetLeft + contentEl.offsetLeft;
+      var offsetTop = frameEl.offsetTop + contentEl.offsetTop;
       var active = true;
       var lastX;
       var lastY;
@@ -250,11 +253,16 @@
         '<div style="width: '  + width + 'px; height: ' + (height - BAR_HEIGHT) +'px;" class="thr0w_windows_window__cover"></div>',
       ].join('\n');
       windowEl.addEventListener('mousedown', sendSelfToTop);
+      windowEl.addEventListener('touchstart', sendSelfToTop);
       windowBarEl = windowEl.querySelector('.thr0w_windows_window__bar');
       windowBarEl.addEventListener('mousedown', startMoving);
+      windowBarEl.addEventListener('touchstart', startMoving);
       windowBarEl.addEventListener('mousemove', move);
+      windowBarEl.addEventListener('touchmove', move);
       windowBarEl.addEventListener('mouseup', endMoving);
       windowBarEl.addEventListener('mouseleave', endMoving);
+      windowBarEl.addEventListener('touchend', endMoving);
+      windowBarEl.addEventListener('touchcancel', endMoving);
       windowControlsEl = windowEl.querySelector('.thr0w_windows_window__bar__controls');
       windowControlsEl.style.visibility = 'visible'; 
       windowControlsCloseEl = windowControlsEl.querySelector('.thr0w_windows_window__bar__controls__control--close');
@@ -297,16 +305,28 @@
       }
       function startMoving(e) {
         moving = true;
-        lastX = e.pageX; 
-        lastY = e.pageY; 
+        if (e.type === 'mousedown') {
+          lastX = e.pageX - offsetLeft;
+          lastY = e.pageY - offsetTop;
+        } else {
+          lastX = Math.floor(e.changedTouches[0].pageX) - offsetLeft;
+          lastY = Math.floor(e.changedTouches[0].pageY) - offsetTop;
+        }
         windowSync.update();
       }
       function move(e) {
         if (!moving) { 
           return;
         }
-        var currentX = e.pageX; 
-        var currentY = e.pageY; 
+        var currentX;
+        var currentY;
+        if (e.type === 'mousemove') {
+          currentX = e.pageX - offsetLeft;
+          currentY = e.pageY - offsetTop;
+        } else {
+          currentX = Math.floor(e.changedTouches[0].pageX) - offsetLeft;
+          currentY = Math.floor(e.changedTouches[0].pageY) - offsetTop;
+        }
         x = Math.min(x + currentX - lastX, grid.getWidth() - width);
         x = Math.max(x, 0);
         y = Math.min(y + currentY - lastY, grid.getHeight() - height);
@@ -317,7 +337,7 @@
         lastY = currentY;
         windowSync.update();
       }
-      function endMoving() {
+      function endMoving(e) {
         moving = false;
         windowSync.idle();
       }
