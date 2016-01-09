@@ -337,7 +337,7 @@
         lastY = currentY;
         windowSync.update();
       }
-      function endMoving(e) {
+      function endMoving() {
         moving = false;
         windowSync.idle();
       }
@@ -387,10 +387,15 @@
       }
       function destroy() {
         windowEl.removeEventListener('mousedown', sendSelfToTop);
+        windowEl.removeEventListener('touchstart', sendSelfToTop);
         windowBarEl.removeEventListener('mousedown', startMoving);
+        windowBarEl.removeEventListener('touchstart', startMoving);
         windowBarEl.removeEventListener('mousemove', move);
+        windowBarEl.removeEventListener('touchmove', move);
         windowBarEl.removeEventListener('mouseup', endMoving);
         windowBarEl.removeEventListener('mouseleave', endMoving);
+        windowBarEl.removeEventListener('touchend', endMoving);
+        windowBarEl.removeEventListener('touchcancel', endMoving);
         windowControlsCloseEl.removeEventListener('click', closeSelf);
         windowContentEl.contentWindow.location.href = 'about:blank';
         contentEl.removeChild(windowEl);

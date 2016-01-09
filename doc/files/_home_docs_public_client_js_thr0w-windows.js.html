@@ -443,7 +443,7 @@
         lastY = currentY;
         windowSync.update();
       }
-      function endMoving(e) {
+      function endMoving() {
         moving = false;
         windowSync.idle();
       }
@@ -493,10 +493,15 @@
       }
       function destroy() {
         windowEl.removeEventListener(&#x27;mousedown&#x27;, sendSelfToTop);
+        windowEl.removeEventListener(&#x27;touchstart&#x27;, sendSelfToTop);
         windowBarEl.removeEventListener(&#x27;mousedown&#x27;, startMoving);
+        windowBarEl.removeEventListener(&#x27;touchstart&#x27;, startMoving);
         windowBarEl.removeEventListener(&#x27;mousemove&#x27;, move);
+        windowBarEl.removeEventListener(&#x27;touchmove&#x27;, move);
         windowBarEl.removeEventListener(&#x27;mouseup&#x27;, endMoving);
         windowBarEl.removeEventListener(&#x27;mouseleave&#x27;, endMoving);
+        windowBarEl.removeEventListener(&#x27;touchend&#x27;, endMoving);
+        windowBarEl.removeEventListener(&#x27;touchcancel&#x27;, endMoving);
         windowControlsCloseEl.removeEventListener(&#x27;click&#x27;, closeSelf);
         windowContentEl.contentWindow.location.href = &#x27;about:blank&#x27;;
         contentEl.removeChild(windowEl);
