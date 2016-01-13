@@ -85,7 +85,6 @@
     palatteEl.querySelector('.thr0w_svg_palette__row__cell--plus').addEventListener('click', zoomIn);
     palatteEl.querySelector('.thr0w_svg_palette__row__cell--minus').addEventListener('click', zoomOut);
     setSVGViewBox();
-    zoom(2);
     function message() {
       return {
         left: left,
