@@ -1,5 +1,4 @@
 (function() {
-  // TODO: SYNC?
   /**
   * This module provides tools to manage SVGs.
   * @module thr0w-svg
