@@ -49,6 +49,8 @@
             
                 <li><a href="../classes/thr0w.Grid.html">thr0w.Grid</a></li>
             
+                <li><a href="../classes/thr0w.svg.html">thr0w.svg</a></li>
+            
                 <li><a href="../classes/thr0w.Sync.html">thr0w.Sync</a></li>
             
                 <li><a href="../classes/thr0w.windows.html">thr0w.windows</a></li>
@@ -62,6 +64,8 @@
                 <li><a href="../modules/thr0w-base.html">thr0w-base</a></li>
             
                 <li><a href="../modules/thr0w-draw.html">thr0w-draw</a></li>
+            
+                <li><a href="../modules/thr0w-svg.html">thr0w-svg</a></li>
             
                 <li><a href="../modules/thr0w-windows.html">thr0w-windows</a></li>
             
@@ -313,6 +317,9 @@
       }
     }
     function WindowFrame(id, x, y, width, height, src) {
+      var frameEl = grid.getFrame();
+      var offsetLeft = frameEl.offsetLeft + contentEl.offsetLeft;
+      var offsetTop = frameEl.offsetTop + contentEl.offsetTop;
       var active = true;
       var lastX;
       var lastY;
@@ -356,11 +363,16 @@
         &#x27;&lt;div style=&quot;width: &#x27;  + width + &#x27;px; height: &#x27; + (height - BAR_HEIGHT) +&#x27;px;&quot; class=&quot;thr0w_windows_window__cover&quot;&gt;&lt;/div&gt;&#x27;,
       ].join(&#x27;\n&#x27;);
       windowEl.addEventListener(&#x27;mousedown&#x27;, sendSelfToTop);
+      windowEl.addEventListener(&#x27;touchstart&#x27;, sendSelfToTop);
       windowBarEl = windowEl.querySelector(&#x27;.thr0w_windows_window__bar&#x27;);
       windowBarEl.addEventListener(&#x27;mousedown&#x27;, startMoving);
+      windowBarEl.addEventListener(&#x27;touchstart&#x27;, startMoving);
       windowBarEl.addEventListener(&#x27;mousemove&#x27;, move);
+      windowBarEl.addEventListener(&#x27;touchmove&#x27;, move);
       windowBarEl.addEventListener(&#x27;mouseup&#x27;, endMoving);
       windowBarEl.addEventListener(&#x27;mouseleave&#x27;, endMoving);
+      windowBarEl.addEventListener(&#x27;touchend&#x27;, endMoving);
+      windowBarEl.addEventListener(&#x27;touchcancel&#x27;, endMoving);
       windowControlsEl = windowEl.querySelector(&#x27;.thr0w_windows_window__bar__controls&#x27;);
       windowControlsEl.style.visibility = &#x27;visible&#x27;; 
       windowControlsCloseEl = windowControlsEl.querySelector(&#x27;.thr0w_windows_window__bar__controls__control--close&#x27;);
@@ -403,16 +415,28 @@
       }
       function startMoving(e) {
         moving = true;
-        lastX = e.pageX; 
-        lastY = e.pageY; 
+        if (e.type === &#x27;mousedown&#x27;) {
+          lastX = e.pageX - offsetLeft;
+          lastY = e.pageY - offsetTop;
+        } else {
+          lastX = Math.floor(e.changedTouches[0].pageX) - offsetLeft;
+          lastY = Math.floor(e.changedTouches[0].pageY) - offsetTop;
+        }
         windowSync.update();
       }
       function move(e) {
         if (!moving) { 
           return;
         }
-        var currentX = e.pageX; 
-        var currentY = e.pageY; 
+        var currentX;
+        var currentY;
+        if (e.type === &#x27;mousemove&#x27;) {
+          currentX = e.pageX - offsetLeft;
+          currentY = e.pageY - offsetTop;
+        } else {
+          currentX = Math.floor(e.changedTouches[0].pageX) - offsetLeft;
+          currentY = Math.floor(e.changedTouches[0].pageY) - offsetTop;
+        }
         x = Math.min(x + currentX - lastX, grid.getWidth() - width);
         x = Math.max(x, 0);
         y = Math.min(y + currentY - lastY, grid.getHeight() - height);
@@ -473,10 +497,15 @@
       }
       function destroy() {
         windowEl.removeEventListener(&#x27;mousedown&#x27;, sendSelfToTop);
+        windowEl.removeEventListener(&#x27;touchstart&#x27;, sendSelfToTop);
         windowBarEl.removeEventListener(&#x27;mousedown&#x27;, startMoving);
+        windowBarEl.removeEventListener(&#x27;touchstart&#x27;, startMoving);
         windowBarEl.removeEventListener(&#x27;mousemove&#x27;, move);
+        windowBarEl.removeEventListener(&#x27;touchmove&#x27;, move);
         windowBarEl.removeEventListener(&#x27;mouseup&#x27;, endMoving);
         windowBarEl.removeEventListener(&#x27;mouseleave&#x27;, endMoving);
+        windowBarEl.removeEventListener(&#x27;touchend&#x27;, endMoving);
+        windowBarEl.removeEventListener(&#x27;touchcancel&#x27;, endMoving);
         windowControlsCloseEl.removeEventListener(&#x27;click&#x27;, closeSelf);
         windowContentEl.contentWindow.location.href = &#x27;about:blank&#x27;;
         contentEl.removeChild(windowEl);

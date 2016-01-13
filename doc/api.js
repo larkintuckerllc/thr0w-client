@@ -6,12 +6,14 @@ YUI.add("yuidoc-meta", function(Y) {
         "thr0w.Grid",
         "thr0w.Sync",
         "thr0w.draw",
+        "thr0w.svg",
         "thr0w.windows",
         "thr0w.windows.WindowManager"
     ],
     "modules": [
         "thr0w-base",
         "thr0w-draw",
+        "thr0w-svg",
         "thr0w-windows"
     ],
     "allModules": [
@@ -24,6 +26,11 @@ YUI.add("yuidoc-meta", function(Y) {
             "displayName": "thr0w-draw",
             "name": "thr0w-draw",
             "description": "This module provides a drawing tool."
+        },
+        {
+            "displayName": "thr0w-svg",
+            "name": "thr0w-svg",
+            "description": "This module provides tools to manage SVGs."
         },
         {
             "displayName": "thr0w-windows",
