@@ -1,27 +1,33 @@
 (function() {
+  // jscs:disable
   /**
   * This module provides a drawing tool.
   * @module thr0w-draw
   */
+  // jscs:enable
   'use strict';
   if (window.thr0w === undefined) {
     throw 400;
   }
-  var service = {}; 
+  var service = {};
   service.load = load;
+  // jscs:disable
   /**
   * This object provides draw functionality.
   * @namespace thr0w
   * @class draw
   * @static
   */
+  // jscs:enable
   window.thr0w.draw = service;
+  // jscs:disable
   /**
   * This function is used to load the draw functionality into a grid.
   * @method load
   * @static
   * @param grid {Object} The grid, {{#crossLink "thr0w.Grid"}}thr0w.Grid{{/crossLink}}, object.
   */
+  // jscs:enable
   function load(grid) {
     if (!grid || typeof grid !== 'object') {
       throw 400;
@@ -38,27 +44,29 @@
     var palatteEl = document.createElement('div');
     var canvasEl = document.createElement('canvas');
     var context = canvasEl.getContext('2d');
-    palatteEl.classList.add('thr0w_draw_palatte'); 
-    palatteEl.classList.add('thr0w_draw_palatte--closed'); 
-    palatteEl.innerHTML = [ 
-      '<div class="thr0w_draw_palatte__color_picker--default thr0w_draw_palatte__color_picker" style="background: black;">\n',
-      '</div>\n',
-      '<div class="thr0w_draw_palatte__color_picker" style="background: white;">\n',
-      '</div>\n',
-      '<div class="thr0w_draw_palatte__color_picker" style="background: red;">\n',
-      '</div>\n',
-      '<div class="thr0w_draw_palatte__color_picker" style="background: orange;">\n',
-      '</div>\n',
-      '<div class="thr0w_draw_palatte__color_picker" style="background: yellow;">\n',
-      '</div>\n',
-      '<div class="thr0w_draw_palatte__color_picker" style="background: green;">\n',
-      '</div>\n',
-      '<div class="thr0w_draw_palatte__color_picker" style="background: blue;">\n',
-      '</div>\n',
-      '<div class="thr0w_draw_palatte__color_picker" style="background: purple;">\n',
-      '</div>\n',
-      '<div class="thr0w_draw_palatte__thumb thr0w_draw_palatte__thumb--closed">\n',
-      '</div>\n'].join('');
+    palatteEl.classList.add('thr0w_draw_palatte');
+    palatteEl.classList.add('thr0w_draw_palatte--closed');
+    // jscs:disable
+    palatteEl.innerHTML = [
+      '<div class="thr0w_draw_palatte__color_picker--default thr0w_draw_palatte__color_picker" style="background: black;">',
+      '</div>',
+      '<div class="thr0w_draw_palatte__color_picker" style="background: white;">',
+      '</div>',
+      '<div class="thr0w_draw_palatte__color_picker" style="background: red;">',
+      '</div>',
+      '<div class="thr0w_draw_palatte__color_picker" style="background: orange;">',
+      '</div>',
+      '<div class="thr0w_draw_palatte__color_picker" style="background: yellow;">',
+      '</div>',
+      '<div class="thr0w_draw_palatte__color_picker" style="background: green;">',
+      '</div>',
+      '<div class="thr0w_draw_palatte__color_picker" style="background: blue;">',
+      '</div>',
+      '<div class="thr0w_draw_palatte__color_picker" style="background: purple;">',
+      '</div>',
+      '<div class="thr0w_draw_palatte__thumb thr0w_draw_palatte__thumb--closed">',
+      '</div>'].join('\n');
+    // jscs:disable
     contentEl.appendChild(palatteEl);
     var thumbEl = palatteEl.querySelector('.thr0w_draw_palatte__thumb');
     var pickerEls = palatteEl.querySelectorAll('.thr0w_draw_palatte__color_picker');

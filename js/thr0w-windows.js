@@ -1,23 +1,28 @@
 (function() {
+  // jscs:disable
   /**
   * This module provides a window manager.
   * @module thr0w-windows
   */
+  // jscs:enable
   'use strict';
   var BAR_HEIGHT = 50;
   var BASE_Z = 800;
   if (window.thr0w === undefined) {
     throw 400;
   }
-  var service = {}; 
+  var service = {};
   service.WindowManager = WindowManager;
+  // jscs:disable
   /**
   * This object provides the window management functionality.
   * @namespace thr0w
   * @class windows
   * @static
   */
+  // jscs:enable
   window.thr0w.windows = service;
+  // jscs:disable
   /**
   * This class is used to create window managers.
   * @namespace thr0w.windows
@@ -26,10 +31,11 @@
   * @param id {String} The id.
   * @param grid {Object} The grid, {{#crossLink "thr0w.Grid"}}Thr0w.Grid{{/crossLink}}, object.
   */
-  function WindowManager(wm_id, grid) {
-    if (wm_id === undefined || typeof wm_id !== 'string') {
-     throw 400;
-    } 
+  // jscs:enable
+  function WindowManager(wmId, grid) {
+    if (wmId === undefined || typeof wmId !== 'string') {
+      throw 400;
+    }
     if (!grid || typeof grid !== 'object') {
       throw 400;
     }
@@ -77,7 +83,8 @@
       // DATA NOT IN WINDOWS
       for (i = 0; i < data.length; i++) {
         if (windowIds.indexOf(data[i].id) === -1) {
-          windows.push(new WindowFrame(data[i].id, data[i].x, data[i].y, data[i].width, data[i].height, data[i].src));
+          windows.push(new WindowFrame(data[i].id, data[i].x,
+            data[i].y, data[i].width, data[i].height, data[i].src));
         }
       }
       // RESETTING WINDOWS ORDER
@@ -96,7 +103,7 @@
       stackWindows();
       function getDataId(obj) {
         return obj.id;
-      } 
+      }
     }
     function sendToTop(id) {
       var i;
@@ -106,8 +113,8 @@
         windows[i].deactivate();
         if (windows[i].getId() === id) {
           j = i;
-          w = windows[i]; 
-        } 
+          w = windows[i];
+        }
       }
       windows.splice(j, 1);
       windows.push(w);
@@ -115,6 +122,7 @@
       sync.update();
       sync.idle();
     }
+    // jscs:disable
     /**
     * This method is used to create windows; max windows = 100;
     * @method openWindow
@@ -125,16 +133,17 @@
     * @param height {Integer} The height.
     * @param src {String} The source url.
     */
+    // jscs:enable
     function openWindow(id, x, y, width, height, src) {
       if (windows.length > 99) {
         throw 400;
       }
       if (windows.map(getWindowId).indexOf(id) !== -1) {
         throw 400;
-      } 
+      }
       if (id === undefined || typeof id !== 'string') {
-       throw 400;
-      } 
+        throw 400;
+      }
       if (x === undefined || typeof x !== 'number' || x < 0) {
         throw 400;
       }
@@ -155,43 +164,49 @@
       }
       if (y + height + BAR_HEIGHT > grid.getHeight()) {
         throw 400;
-      } 
+      }
       var i;
       for (i = 0; i < windows.length; i++) {
         windows[i].deactivate();
       }
-      windows.push(new WindowFrame(id, x, y - BAR_HEIGHT, width, height + BAR_HEIGHT, src));
+      windows.push(new WindowFrame(id, x, y - BAR_HEIGHT, width,
+        height + BAR_HEIGHT, src));
       stackWindows();
       sync.update();
       sync.idle();
     }
+    // jscs:disable
     /**
     * This method is used to close windows.
     * @method closeWindow
     * @param id {String} The id.
     */
+    // jscs:enable
     function closeWindow(id) {
       if (id === undefined || typeof id !== 'string') {
-       throw 400;
-      } 
+        throw 400;
+      }
       var i = windows.map(getWindowId).indexOf(id);
       if (i === -1) {
         throw 400;
-      } 
+      }
       var w = windows[i];
       windows.splice(i, 1);
       w.destroy();
-      stackWindows(); 
+      stackWindows();
       sync.update();
       sync.idle();
+      // jscs:disable
       /**
       * Window closed.
       *
       * @event thr0w_windows_close_window 
-      * @param {String} wm_id The {{#crossLink "thr0w.windows.WindowManager"}}thr0w.windows.WindowManager{{/crossLink}} object's id.
+      * @param {String} wmid The {{#crossLink "thr0w.windows.WindowManager"}}thr0w.windows.WindowManager{{/crossLink}} object's id.
       * @param {String} id The window's id.
       */
-      document.dispatchEvent(new CustomEvent('thr0w_windows_close_window', { detail: { wm_id: wm_id, id: id } }));
+      // jscs:enable
+      document.dispatchEvent(new CustomEvent('thr0w_windows_close_window',
+        {detail: {wmid: wmId, id: id}}));
     }
     function getWindowId(obj) {
       return obj.getId();
@@ -233,25 +248,27 @@
       windowEl.id = id;
       windowEl.style.left = x + 'px';
       windowEl.style.top = y + 'px';
-      windowEl.style.width = + width + 'px';
+      windowEl.style.width = width + 'px';
       windowEl.style.height = height + 'px';
       windowEl.classList.add('thr0w_windows_window');
+      // jscs:disable
       windowEl.innerHTML = [
         '<div class="thr0w_windows_window__bar">',
         '<div class="thr0w_windows_window__bar__controls">',
-  '<svg xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" viewbox="0 0 100 100" class="thr0w_windows_window__bar__controls__control thr0w_windows_window__bar__controls__control--close">',
-  '<g>',
-  '<ellipse stroke="#cccccc" ry="49" rx="49" id="svg_1" cy="50" cx="50" stroke-width="2" fill="#ffffff"/>',
-  '<path id="svg_4" fill-opacity="0.5" stroke-linecap="null" stroke-linejoin="null" stroke-dasharray="null" stroke-width="2" stroke="#cccccc" fill="#cccccc"/>',
-  '<path id="svg_6" d="m13.75,30.5l18.5,18.75l-19.5,20.25l17.25,16.75l20.5,-19l19.25,19.5l17.25,-17l-19.5,-19.25l19.75,-19.75l-17.5,-17.5l-19.25,20l-19.5,-20l-17.25,17.25z" fill-opacity="0.5" stroke-linecap="null" stroke-linejoin="null" stroke-dasharray="null" stroke-width="2" stroke="#cccccc" fill="#cccccc"/>',
-  '</g>',
-  '</svg>',
+        '<svg xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" viewbox="0 0 100 100" class="thr0w_windows_window__bar__controls__control thr0w_windows_window__bar__controls__control--close">',
+        '<g>',
+        '<ellipse stroke="#cccccc" ry="49" rx="49" id="svg_1" cy="50" cx="50" stroke-width="2" fill="#ffffff"/>',
+        '<path id="svg_4" fill-opacity="0.5" stroke-linecap="null" stroke-linejoin="null" stroke-dasharray="null" stroke-width="2" stroke="#cccccc" fill="#cccccc"/>',
+        '<path id="svg_6" d="m13.75,30.5l18.5,18.75l-19.5,20.25l17.25,16.75l20.5,-19l19.25,19.5l17.25,-17l-19.5,-19.25l19.75,-19.75l-17.5,-17.5l-19.25,20l-19.5,-20l-17.25,17.25z" fill-opacity="0.5" stroke-linecap="null" stroke-linejoin="null" stroke-dasharray="null" stroke-width="2" stroke="#cccccc" fill="#cccccc"/>',
+        '</g>',
+        '</svg>',
         '</div>',
         '</div>',
         '<iframe src="' + src + '" width="' + width + '" height="' + (height - BAR_HEIGHT) + '" frameborder="0" class="thr0w_windows_window__content">',
         '</iframe>',
         '<div style="width: '  + width + 'px; height: ' + (height - BAR_HEIGHT) +'px;" class="thr0w_windows_window__cover"></div>',
       ].join('\n');
+      // jscs:enable
       windowEl.addEventListener('mousedown', sendSelfToTop);
       windowEl.addEventListener('touchstart', sendSelfToTop);
       windowBarEl = windowEl.querySelector('.thr0w_windows_window__bar');
@@ -263,14 +280,17 @@
       windowBarEl.addEventListener('mouseleave', endMoving);
       windowBarEl.addEventListener('touchend', endMoving);
       windowBarEl.addEventListener('touchcancel', endMoving);
-      windowControlsEl = windowEl.querySelector('.thr0w_windows_window__bar__controls');
-      windowControlsEl.style.visibility = 'visible'; 
-      windowControlsCloseEl = windowControlsEl.querySelector('.thr0w_windows_window__bar__controls__control--close');
+      windowControlsEl = windowEl
+        .querySelector('.thr0w_windows_window__bar__controls');
+      windowControlsEl.style.visibility = 'visible';
+      windowControlsCloseEl = windowControlsEl
+        .querySelector('.thr0w_windows_window__bar__controls__control--close');
       windowControlsCloseEl.addEventListener('click', closeSelf);
-      windowContentEl = windowEl.querySelector('.thr0w_windows_window__content');
+      windowContentEl = windowEl
+        .querySelector('.thr0w_windows_window__content');
       windowContentEl.addEventListener('load', contentLoaded);
       windowCoverEl = windowEl.querySelector('.thr0w_windows_window__cover');
-      windowCoverEl.style.visibility = 'hidden'; 
+      windowCoverEl.style.visibility = 'hidden';
       contentEl.appendChild(windowEl);
       this.getId = getId;
       this.getX = getX;
@@ -295,8 +315,8 @@
         y = data.y;
         scrollX = data.scrollX;
         scrollY = data.scrollY;
-        windowEl.style.left = x + 'px'; 
-        windowEl.style.top = y + 'px'; 
+        windowEl.style.left = x + 'px';
+        windowEl.style.top = y + 'px';
         windowContentEl.contentWindow.document.body.scrollTop = scrollX;
         windowContentEl.contentWindow.document.body.scrollLeft = scrollY;
       }
@@ -315,7 +335,7 @@
         windowSync.update();
       }
       function move(e) {
-        if (!moving) { 
+        if (!moving) {
           return;
         }
         var currentX;
@@ -331,8 +351,8 @@
         x = Math.max(x, 0);
         y = Math.min(y + currentY - lastY, grid.getHeight() - height);
         y = Math.max(y, 0);
-        windowEl.style.left = x + 'px'; 
-        windowEl.style.top = y + 'px'; 
+        windowEl.style.left = x + 'px';
+        windowEl.style.top = y + 'px';
         lastX = currentX;
         lastY = currentY;
         windowSync.update();
@@ -346,7 +366,8 @@
       }
       function contentLoaded() {
         windowContentEl.removeEventListener('load', contentLoaded);
-        windowContentEl.contentWindow.document.addEventListener('scroll', scrolling);
+        windowContentEl.contentWindow.document
+          .addEventListener('scroll', scrolling);
       }
       function getId() {
         return id;
@@ -374,16 +395,16 @@
           return;
         }
         active = true;
-        windowCoverEl.style.visibility = 'hidden'; 
-        windowControlsEl.style.visibility = 'visible'; 
+        windowCoverEl.style.visibility = 'hidden';
+        windowControlsEl.style.visibility = 'visible';
       }
       function deactivate() {
         if (!active) {
           return;
         }
         active = false;
-        windowControlsEl.style.visibility = 'hidden'; 
-        windowCoverEl.style.visibility = 'visible'; 
+        windowControlsEl.style.visibility = 'hidden';
+        windowCoverEl.style.visibility = 'visible';
       }
       function destroy() {
         windowEl.removeEventListener('mousedown', sendSelfToTop);
@@ -403,7 +424,7 @@
       }
       function scrolling() {
         if (!startScrolling) {
-          window.setTimeout(checkScrolling, 1000); 
+          window.setTimeout(checkScrolling, 1000);
           startScrolling = true;
         }
         endScrolling = false;
@@ -416,7 +437,7 @@
             windowSync.idle();
           } else {
             endScrolling = true;
-            window.setTimeout(checkScrolling, 1000); 
+            window.setTimeout(checkScrolling, 1000);
           }
         }
       }

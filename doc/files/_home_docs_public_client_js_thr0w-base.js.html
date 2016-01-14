@@ -49,6 +49,8 @@
             
                 <li><a href="../classes/thr0w.Grid.html">thr0w.Grid</a></li>
             
+                <li><a href="../classes/thr0w.svg.html">thr0w.svg</a></li>
+            
                 <li><a href="../classes/thr0w.Sync.html">thr0w.Sync</a></li>
             
                 <li><a href="../classes/thr0w.windows.html">thr0w.windows</a></li>
@@ -62,6 +64,8 @@
                 <li><a href="../modules/thr0w-base.html">thr0w-base</a></li>
             
                 <li><a href="../modules/thr0w-draw.html">thr0w-draw</a></li>
+            
+                <li><a href="../modules/thr0w-svg.html">thr0w-svg</a></li>
             
                 <li><a href="../modules/thr0w-windows.html">thr0w-windows</a></li>
             
@@ -105,10 +109,12 @@
 <div class="file">
     <pre class="code prettyprint linenums">
 (function() {
+  // jscs:disable
   /**
   * This module provides the core functionality.
   * @module thr0w-base
   */
+  // jscs:enable
   &#x27;use strict&#x27;;
   var baseref;
   var socket = null;
@@ -126,22 +132,26 @@
   service.Grid = Grid;
   service.FlexGrid = FlexGrid;
   service.Sync = Sync;
-  service.EventTarget = EventTarget;
+  // jscs:disable
   /**
   * This object provides the base functionality on the window object.
   * @class thr0w
   * @static
   */
+  // jscs:enable
   window.thr0w = service;
+  // jscs:disable
   /**
   * This function is used to set the base URI for the thr0w service.
   * @method setBase
   * @static
   * @param base {String} The URI. 
   */
+  // jscs:enable
   function setBase(base) {
     baseref = base;
   }
+  // jscs:disable
   /**
   * This function is used to add the administration tools (login, etc.).
   * @method addAdminTools
@@ -161,25 +171,30 @@
   * The message data.
   * &#x60;&#x60;&#x60;
   */
+  // jscs:enable
   function addAdminTools(frameEl, connectCallback, messageCallback) {
     if (frameEl === undefined || typeof frameEl !== &#x27;object&#x27;) {
       throw 400;
     }
-    if (connectCallback === undefined || typeof connectCallback !== &#x27;function&#x27;) {
+    if (connectCallback === undefined ||
+      typeof connectCallback !== &#x27;function&#x27;) {
       throw 400;
     }
-    if (messageCallback === undefined || typeof messageCallback !== &#x27;function&#x27;) {
+    if (messageCallback === undefined ||
+      typeof messageCallback !== &#x27;function&#x27;) {
       throw 400;
     }
     var loginEl = document.createElement(&#x27;form&#x27;);
     var connectEl = document.createElement(&#x27;div&#x27;);
     var connectConnectEl;
     loginEl.id = &#x27;thr0w_base_login&#x27;;
+    // jscs:disable
     loginEl.innerHTML = [
       &#x27;&lt;input id=&quot;thr0w_base_login__username&quot; type=&quot;text&quot; placeholder=&quot;Username&quot;&gt;&#x27;,
       &#x27;&lt;input id=&quot;thr0w_base_login__password&quot; type=&quot;password&quot; placeholder=&quot;Password&quot;&gt;&#x27;,
       &#x27;&lt;button type=&quot;submit&quot;&gt;Login&lt;/button&gt;&#x27;
     ].join(&#x27;&#x27;);
+    // jscs:enable
     connectEl.id = &#x27;thr0w_base_connect&#x27;;
     connectEl.innerHTML = [
       &#x27;&lt;form id=&quot;thr0w_base_connect__connect&quot;&gt;&#x27;,
@@ -197,7 +212,8 @@
       loginEl.style.display = &#x27;block&#x27;;
     }
     loginEl.addEventListener(&#x27;submit&#x27;, loginElSubmit);
-    connectEl.querySelector(&#x27;#thr0w_base_connect__logout&#x27;).addEventListener(&#x27;click&#x27;, logout);
+    connectEl.querySelector(&#x27;#thr0w_base_connect__logout&#x27;)
+      .addEventListener(&#x27;click&#x27;, logout);
     connectConnectEl.addEventListener(&#x27;submit&#x27;, connectConnectElSubmit);
     function loginElSubmit(e) {
       e.preventDefault();
@@ -215,7 +231,8 @@
     }
     function connectConnectElSubmit(e) {
       e.preventDefault();
-      var channel = parseInt(connectEl.querySelector(&#x27;#thr0w_base_connect__connect__channel&#x27;).value);
+      var channel = parseInt(connectEl
+        .querySelector(&#x27;#thr0w_base_connect__connect__channel&#x27;).value);
       if (!channel || channel &lt; 0) {
         channel = 0;
       }
@@ -228,15 +245,18 @@
       }
     }
   }
+  // jscs:disable
   /**
   * This function returns the channel number.
   * @method getChannel
   * @static
   * @return {Integer} The channel number.
   */
+  // jscs:enable
   function getChannel() {
     return channel;
   }
+  // jscs:disable
   /**
   * This function logs in a user.
   * @method login
@@ -253,12 +273,13 @@
   * The error code; null is success.
   * &#x60;&#x60;&#x60;
   */
+  // jscs:enable
   function login(username, password, callback) {
     if (username === undefined || typeof username !== &#x27;string&#x27;) {
-      throw 400; 
+      throw 400;
     }
     if (password === undefined || typeof password !== &#x27;string&#x27;) {
-      throw 400; 
+      throw 400;
     }
     if (callback === undefined || typeof callback !== &#x27;function&#x27;) {
       throw 400;
@@ -287,29 +308,34 @@
             token);
           return callback(null);
         } else {
-          return callback(xmlhttp.status ? xmlhttp.status: 500);
+          return callback(xmlhttp.status ? xmlhttp.status : 500);
         }
       }
     }
   }
+  // jscs:disable
   /**
   * This function logs out a user.
   * @method logout
   * @static
   */
+  // jscs:enable
   function logout() {
     window.localStorage.removeItem(&#x27;thr0w_token&#x27;);
     window.location.reload();
   }
+  // jscs:disable
   /**
   * This function returns if authenticated.
   * @method authenticated
   * @static
   * @return {Boolean} If authenticated.
   */
+  // jscs:enable
   function authenticated() {
     return window.localStorage.getItem(&#x27;thr0w_token&#x27;) !== null;
   }
+  // jscs:disable
   /**
   * This function is used send messages to channels.
   * @method thr0w
@@ -317,6 +343,7 @@
   * @param channels {Array} Array of Integers; channel ids.
   * @param data {Object} The message data.
   */
+  // jscs:enable
   function thr0w(channels, data) {
     // RELYING ON SERVER FOR PARAMETER VALIDATION FOR PERFORMANCE
     var ref = baseref + &#x27;:3000/api/thr0w&#x27;;
@@ -329,6 +356,7 @@
       &#x27;application/json&#x27;);
     xmlhttp.send(JSON.stringify({channels: channels, message: data}));
   }
+  // jscs:disable
   /**
   * This function is used to connect to a channel.
   * @method connect
@@ -348,6 +376,7 @@
   * The message data.
   * &#x60;&#x60;&#x60;
   */
+  // jscs:enable
   function connect(chn, connectCallback, messageCallback) {
     var token;
     var authTimeout;
@@ -360,11 +389,13 @@
     if (chn === undefined || typeof chn !== &#x27;number&#x27;) {
       throw 400;
     }
-    if (connectCallback === undefined || typeof connectCallback !== &#x27;function&#x27;) {
+    if (connectCallback === undefined ||
+      typeof connectCallback !== &#x27;function&#x27;) {
       throw 400;
     }
-    if (messageCallback === undefined || typeof messageCallback !== &#x27;function&#x27;) {
-      throw 400; 
+    if (messageCallback === undefined ||
+      typeof messageCallback !== &#x27;function&#x27;) {
+      throw 400;
     }
     channel = chn;
     token = window.localStorage.getItem(&#x27;thr0w_token&#x27;);
@@ -388,6 +419,7 @@
       }
     }
   }
+  // jscs:disable
   /**
   * This function is used to send messages via the channel.
   * @method thr0wChannel
@@ -395,6 +427,7 @@
   * @param channels {Array} Array of Integers; channel ids.
   * @param data {Object} The message data.
   */
+  // jscs:enable
   function thr0wChannel(channels, data) {
     // RELYING ON SERVER FOR PARAMETER VALIDATION FOR PERFORMANCE
     if (!socket) {
@@ -402,6 +435,7 @@
     }
     socket.emit(&#x27;thr0w&#x27;, JSON.stringify({channels: channels, message: data}));
   }
+  // jscs:disable
   /**
   * This class is used to create grids.
   * @namespace thr0w
@@ -411,6 +445,7 @@
   * @param {Object} contentEl The content DOM element.
   * @param {Array} matrix An array of arrays of integers defining the channels for the grid.
   */
+  // jscs:enable
   function Grid(frameEl, contentEl, matrix) {
     if (!socket) {
       throw 400;
@@ -441,47 +476,58 @@
     this.getMatrix = getMatrix;
     this.getWidth = getWidth;
     this.getHeight = getHeight;
+    // jscs:disable
     /**
     * This function returns the grid&#x27;s frame.
     * @method getFrame
     * @return {Object} The grid&#x27;s frame DOM object.
     */
+    // jscs:enable
     function getFrame() {
       return frameEl;
     }
+    // jscs:disable
     /**
     * This function returns the grid&#x27;s content.
     * @method getContent
     * @return {Object} The grid&#x27;s content DOM object.
     */
+    // jscs:enable
     function getContent() {
       return contentEl;
     }
+    // jscs:disable
     /**
     * This function returns the grid&#x27;s matrix.
     * @method getMatrix
     * @return {Array} An array of arrays of integers defining the channels for the grid.
     */
+    // jscs:enable
     function getMatrix() {
       return matrix;
     }
+    // jscs:disable
     /**
     * This function returns the grid&#x27;s width.
     * @method getWidth
     * @return {Integer} The width of the grid.
     */
+    // jscs:enable
     function getWidth() {
-      return contentEl.offsetWidth; 
+      return contentEl.offsetWidth;
     }
+    // jscs:disable
     /**
     * This function returns the grid&#x27;s height.
     * @method getHeight
     * @return {Integer} The height of the grid.
     */
+    // jscs:enable
     function getHeight() {
-      return contentEl.offsetHeight; 
+      return contentEl.offsetHeight;
     }
   }
+  // jscs:disable
   /**
   * This class is used to create flexible grids.
   * @namespace thr0w
@@ -492,6 +538,7 @@
   * @param {Array} matrix An array of arrays of integers defining the channels for the grid.
   * @param {Array} dimensions An array of objects consisting of width and height (and optional scale) of the frames in each row. 
   */
+  // jscs:enable
   function FlexGrid(frameEl, contentEl, matrix, dimensions) {
     if (!socket) {
       throw 400;
@@ -518,7 +565,8 @@
     var shiftTop = 0;
     for (i = 0; i &lt; matrix.length; i++) {
       dimensions[i].scale = dimensions[i].scale ? dimensions[i].scale : 1;
-      width = Math.max(dimensions[i].scale * dimensions[i].width * matrix[i].length, width);
+      width = Math.max(dimensions[i].scale * dimensions[i].width *
+        matrix[i].length, width);
       height += dimensions[i].scale * dimensions[i].height;
       for (j = 0; j &lt; matrix[i].length; j++) {
         if (channel === matrix[i][j]) {
@@ -527,15 +575,20 @@
         }
       }
     }
-    frameEl.style.width = (dimensions[vpos].scale * dimensions[vpos].width) + &#x27;px&#x27;;
-    frameEl.style.height = (dimensions[vpos].scale * dimensions[vpos].height) + &#x27;px&#x27;;
-    frameEl.style.transform = &#x27;scale(&#x27; + (1 / dimensions[vpos].scale) + &#x27;, &#x27; + (1 / dimensions[vpos].scale) + &#x27;)&#x27;;
+    frameEl.style.width = (dimensions[vpos].scale *
+      dimensions[vpos].width) + &#x27;px&#x27;;
+    frameEl.style.height = (dimensions[vpos].scale *
+      dimensions[vpos].height) + &#x27;px&#x27;;
+    frameEl.style.transform = &#x27;scale(&#x27; + (1 / dimensions[vpos].scale) +
+      &#x27;, &#x27; + (1 / dimensions[vpos].scale) + &#x27;)&#x27;;
     contentEl.style.width = width + &#x27;px&#x27;;
     contentEl.style.height = height + &#x27;px&#x27;;
     for (i = 0; i &lt; vpos; i++) {
       shiftTop += dimensions[i].scale * dimensions[i].height;
     }
-    shiftLeft = hpos * dimensions[vpos].scale * dimensions[vpos].width + hpos * (width - matrix[vpos].length * dimensions[vpos].scale * dimensions[vpos].width) / (matrix[vpos].length - 1);
+    shiftLeft = hpos * dimensions[vpos].scale * dimensions[vpos].width +
+      hpos * (width - matrix[vpos].length * dimensions[vpos].scale *
+      dimensions[vpos].width) / (matrix[vpos].length - 1);
     contentEl.style.left = &#x27;-&#x27; + shiftLeft + &#x27;px&#x27;;
     contentEl.style.top = &#x27;-&#x27; + shiftTop + &#x27;px&#x27;;
     this.getFrame = getFrame;
@@ -543,47 +596,58 @@
     this.getMatrix = getMatrix;
     this.getWidth = getWidth;
     this.getHeight = getHeight;
+    // jscs:disable
     /**
     * This function returns the grid&#x27;s frame.
     * @method getFrame
     * @return {Object} The grid&#x27;s frame DOM object.
     */
+    // jscs:enable
     function getFrame() {
       return frameEl;
     }
+    // jscs:disable
     /**
     * This function returns the grid&#x27;s content.
     * @method getContent
     * @return {Object} The grid&#x27;s content DOM object.
     */
+    // jscs:enable
     function getContent() {
       return contentEl;
     }
+    // jscs:disable
     /**
     * This function returns the grid&#x27;s matrix.
     * @method getMatrix
     * @return {Array} An array of arrays of integers defining the channels for the grid.
     */
+    // jscs:enable
     function getMatrix() {
       return matrix;
     }
+    // jscs:disable
     /**
     * This function returns the grid&#x27;s width.
     * @method getWidth
     * @return {Integer} The width of the grid.
     */
+    // jscs:enable
     function getWidth() {
       return width;
     }
+    // jscs:disable
     /**
     * This function returns the grid&#x27;s height.
     * @method getHeight
     * @return {Integer} The height of the grid.
     */
+    // jscs:enable
     function getHeight() {
       return height;
     }
   }
+  // jscs:disable
   /**
   * This class is used to create syncs.
   * @namespace thr0w
@@ -609,13 +673,14 @@
   * The message data.
   * &#x60;&#x60;&#x60;
   */
+  // jscs:enable
   function Sync(grid, _id, message, receive) {
     if (grid === undefined || typeof grid !== &#x27;object&#x27;) {
       throw 400;
     }
     if (_id === undefined || typeof _id !== &#x27;string&#x27;) {
       throw 400;
-    } 
+    }
     if (message === undefined || typeof message !== &#x27;function&#x27;) {
       throw 400;
     }
@@ -647,10 +712,12 @@
     this.update = update;
     this.idle = idle;
     this.destroy = destroy;
+    // jscs:disable
     /**
     * This function is used to trigger an update message.
     * @method update
     */
+    // jscs:enable
     function update() {
       if (locked) {
         return;
@@ -660,12 +727,15 @@
         lastActive = true;
         thr0wChannel(channels, {thr0w: {type: &#x27;sync&#x27;, _id: _id, lock: true}});
       }
-      thr0wChannel(channels, {thr0w: {type: &#x27;sync&#x27;, _id: _id, message: message()}});
+      thr0wChannel(channels, {thr0w: {type: &#x27;sync&#x27;,
+        _id: _id, message: message()}});
     }
+    // jscs:disable
     /**
     * This function is used to release control to other channels.
     * @method idle
     */
+    // jscs:enable
     function idle() {
       if (locked) {
         return;
@@ -677,9 +747,10 @@
       var msg = rawMsg.message;
       if (msg === undefined || rawMsg.source === channel) {
         return;
-      }       
+      }
       var thr0wMsg = msg.thr0w;
-      if (thr0wMsg === undefined || thr0wMsg.type !== &#x27;sync&#x27; || thr0wMsg._id !== _id) {
+      if (thr0wMsg === undefined || thr0wMsg.type !== &#x27;sync&#x27; ||
+        thr0wMsg._id !== _id) {
         return;
       }
       if (thr0wMsg.hello) {
@@ -687,7 +758,8 @@
           thr0wChannel(channels, {thr0w: {type: &#x27;sync&#x27;, _id: _id, lock: true}});
         }
         if (lastActive) {
-          thr0wChannel(channels, {thr0w: {type: &#x27;sync&#x27;, _id: _id, message: message()}});
+          thr0wChannel(channels, {thr0w: {type: &#x27;sync&#x27;,
+            _id: _id, message: message()}});
         }
         return;
       }
@@ -711,48 +783,6 @@
       socket.off(&#x27;message&#x27;, syncMessageCallback);
     }
   }
-  // Copyright (c) 2010 Nicholas C. Zakas. All rights reserved.
-  // MIT License
-  function EventTarget(){
-    this._listeners = {};
-  }
-  EventTarget.prototype = {
-//    constructor: EventTarget,
-    addListener: function(type, listener){
-      if (typeof this._listeners[type] === &quot;undefined&quot;){
-        this._listeners[type] = [];
-      }
-      this._listeners[type].push(listener);
-    },
-    fire: function(event){
-      if (typeof event === &quot;string&quot;){
-        event = { type: event };
-      }
-      if (!event.target){
-        event.target = this;
-      }
-      if (!event.type){  //falsy
-        throw new Error(&quot;Event object missing &#x27;type&#x27; property.&quot;);
-      }
-      if (this._listeners[event.type] instanceof Array) {
-        var listeners = this._listeners[event.type];
-        for (var i=0, len=listeners.length; i &lt; len; i++) {
-          listeners[i].call(this, event);
-        }
-      }
-    },
-    removeListener: function(type, listener) {
-      if (this._listeners[type] instanceof Array) {
-        var listeners = this._listeners[type];
-        for (var i=0, len=listeners.length; i &lt; len; i++) {
-          if (listeners[i] === listener) {
-            listeners.splice(i, 1);
-            break;
-          }
-        }
-      }
-    }
-  };
 })();
 
     </pre>
