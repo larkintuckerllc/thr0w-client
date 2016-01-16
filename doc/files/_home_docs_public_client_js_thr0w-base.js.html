@@ -153,7 +153,7 @@
   }
   // jscs:disable
   /**
-  * This function is used to add the administration tools (login, etc.).
+  * This function is used to add the administration tools (login, etc.) and ESC key reloads.
   * @method addAdminTools
   * @static
   * @param base {Object} The frame DOM element.
@@ -184,63 +184,86 @@
       typeof messageCallback !== &#x27;function&#x27;) {
       throw 400;
     }
-    var loginEl = document.createElement(&#x27;form&#x27;);
-    var connectEl = document.createElement(&#x27;div&#x27;);
-    var connectConnectEl;
-    loginEl.id = &#x27;thr0w_base_login&#x27;;
-    // jscs:disable
-    loginEl.innerHTML = [
-      &#x27;&lt;input id=&quot;thr0w_base_login__username&quot; type=&quot;text&quot; placeholder=&quot;Username&quot;&gt;&#x27;,
-      &#x27;&lt;input id=&quot;thr0w_base_login__password&quot; type=&quot;password&quot; placeholder=&quot;Password&quot;&gt;&#x27;,
-      &#x27;&lt;button type=&quot;submit&quot;&gt;Login&lt;/button&gt;&#x27;
-    ].join(&#x27;&#x27;);
-    // jscs:enable
-    connectEl.id = &#x27;thr0w_base_connect&#x27;;
-    connectEl.innerHTML = [
-      &#x27;&lt;form id=&quot;thr0w_base_connect__connect&quot;&gt;&#x27;,
-      &#x27;&lt;input id=&quot;thr0w_base_connect__connect__channel&quot; type=&quot;number&quot; /&gt;&#x27;,
-      &#x27;&lt;button type=&quot;submit&quot;&gt;Connect&lt;/button&gt;&#x27;,
-      &#x27;&lt;/form&gt;&#x27;,
-      &#x27;&lt;button id=&quot;thr0w_base_connect__logout&quot;&gt;Logout&lt;/button&gt;&#x27;
-    ].join(&#x27;&#x27;);
-    frameEl.appendChild(loginEl);
-    frameEl.appendChild(connectEl);
-    connectConnectEl = connectEl.querySelector(&#x27;#thr0w_base_connect__connect&#x27;);
-    if (authenticated()) {
-      connectEl.style.display = &#x27;block&#x27;;
+    var channel = window.localStorage.getItem(&#x27;thr0w_channel&#x27;);
+    if (channel !== null) {
+      channel = parseInt(channel);
+      adminToolsConnect();
+    } else if (authenticated()) {
+      addConnectTools();
     } else {
-      loginEl.style.display = &#x27;block&#x27;;
+      addLoginTools();
     }
-    loginEl.addEventListener(&#x27;submit&#x27;, loginElSubmit);
-    connectEl.querySelector(&#x27;#thr0w_base_connect__logout&#x27;)
-      .addEventListener(&#x27;click&#x27;, logout);
-    connectConnectEl.addEventListener(&#x27;submit&#x27;, connectConnectElSubmit);
-    function loginElSubmit(e) {
-      e.preventDefault();
-      var username = loginEl.querySelector(&#x27;#thr0w_base_login__username&#x27;).value;
-      var password = loginEl.querySelector(&#x27;#thr0w_base_login__password&#x27;).value;
-      if (username &amp;&amp; password) {
-        login(username, password, callback);
-      }
-      function callback(error) {
-        if (!error) {
-          loginEl.style.display = &#x27;none&#x27;;
-          connectEl.style.display = &#x27;block&#x27;;
-        }
-      }
-    }
-    function connectConnectElSubmit(e) {
-      e.preventDefault();
-      var channel = parseInt(connectEl
-        .querySelector(&#x27;#thr0w_base_connect__connect__channel&#x27;).value);
-      if (!channel || channel &lt; 0) {
-        channel = 0;
-      }
+    function adminToolsConnect() {
       connect(channel, callback, messageCallback);
       function callback(error) {
         if (!error) {
-          connectEl.style.display = &#x27;none&#x27;;
+          window.localStorage.setItem(&#x27;thr0w_channel&#x27;, channel);
+          document.addEventListener(&#x27;keydown&#x27;, checkEsc);
           connectCallback();
+        } else {
+          window.localStorage.removeItem(&#x27;thr0w_channel&#x27;, channel);
+          window.location.reload();
+        }
+        function checkEsc(e) {
+          if (e.keyCode === 27) {
+            window.localStorage.removeItem(&#x27;thr0w_channel&#x27;, channel);
+            window.location.reload();
+          }
+        }
+      }
+    }
+    function addConnectTools() {
+      var connectEl = document.createElement(&#x27;div&#x27;);
+      connectEl.id = &#x27;thr0w_base_connect&#x27;;
+      connectEl.innerHTML = [
+        &#x27;&lt;form id=&quot;thr0w_base_connect__connect&quot;&gt;&#x27;,
+        &#x27;&lt;input id=&quot;thr0w_base_connect__connect__channel&quot; type=&quot;number&quot; /&gt;&#x27;,
+        &#x27;&lt;button type=&quot;submit&quot;&gt;Connect&lt;/button&gt;&#x27;,
+        &#x27;&lt;/form&gt;&#x27;,
+        &#x27;&lt;button id=&quot;thr0w_base_connect__logout&quot;&gt;Logout&lt;/button&gt;&#x27;
+      ].join(&#x27;\n&#x27;);
+      connectEl.querySelector(&#x27;#thr0w_base_connect__logout&#x27;)
+        .addEventListener(&#x27;click&#x27;, logout);
+      connectEl.querySelector(&#x27;#thr0w_base_connect__connect&#x27;)
+        .addEventListener(&#x27;submit&#x27;, connectConnectElSubmit);
+      frameEl.appendChild(connectEl);
+      function connectConnectElSubmit(e) {
+        e.preventDefault();
+        connectEl.style.display = &#x27;none&#x27;;
+        channel = parseInt(connectEl
+          .querySelector(&#x27;#thr0w_base_connect__connect__channel&#x27;).value);
+        if (!channel || channel &lt; 0) {
+          channel = 0;
+        }
+        adminToolsConnect();
+      }
+    }
+    function addLoginTools() {
+      var loginEl = document.createElement(&#x27;form&#x27;);
+      loginEl.id = &#x27;thr0w_base_login&#x27;;
+      // jscs:disable
+      loginEl.innerHTML = [
+        &#x27;&lt;input id=&quot;thr0w_base_login__username&quot; type=&quot;text&quot; placeholder=&quot;Username&quot;&gt;&#x27;,
+        &#x27;&lt;input id=&quot;thr0w_base_login__password&quot; type=&quot;password&quot; placeholder=&quot;Password&quot;&gt;&#x27;,
+        &#x27;&lt;button type=&quot;submit&quot;&gt;Login&lt;/button&gt;&#x27;
+      ].join(&#x27;\n&#x27;);
+      // jscs:enable
+      loginEl.addEventListener(&#x27;submit&#x27;, loginElSubmit);
+      frameEl.appendChild(loginEl);
+      function loginElSubmit(e) {
+        e.preventDefault();
+        var username = loginEl
+          .querySelector(&#x27;#thr0w_base_login__username&#x27;).value;
+        var password = loginEl
+          .querySelector(&#x27;#thr0w_base_login__password&#x27;).value;
+        if (username &amp;&amp; password) {
+          login(username, password, callback);
+        }
+        function callback(error) {
+          if (!error) {
+            loginEl.style.display = &#x27;none&#x27;;
+            addConnectTools();
+          }
         }
       }
     }
