@@ -91,13 +91,11 @@
           document.addEventListener('keydown', checkEsc);
           connectCallback();
         } else {
-          window.localStorage.removeItem('thr0w_channel', channel);
-          window.location.reload();
+          abort();
         }
         function checkEsc(e) {
           if (e.keyCode === 27) {
-            window.localStorage.removeItem('thr0w_channel', channel);
-            window.location.reload();
+            abort();
           }
         }
       }
@@ -235,7 +233,7 @@
   // jscs:enable
   function logout() {
     window.localStorage.removeItem('thr0w_token');
-    window.location.reload();
+    abort();
   }
   // jscs:disable
   /**
@@ -328,7 +326,7 @@
       socket.on('duplicate', duplicateCallback);
       connectCallback(null);
       function duplicateCallback() {
-        window.location.reload();
+        abort();
       }
     }
   }
@@ -695,5 +693,9 @@
     function destroy() {
       socket.off('message', syncMessageCallback);
     }
+  }
+  function abort() {
+    window.localStorage.removeItem('thr0w_channel', channel);
+    window.location.reload();
   }
 })();

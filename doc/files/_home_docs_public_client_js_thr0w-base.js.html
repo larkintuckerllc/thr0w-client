@@ -201,13 +201,11 @@
           document.addEventListener(&#x27;keydown&#x27;, checkEsc);
           connectCallback();
         } else {
-          window.localStorage.removeItem(&#x27;thr0w_channel&#x27;, channel);
-          window.location.reload();
+          abort();
         }
         function checkEsc(e) {
           if (e.keyCode === 27) {
-            window.localStorage.removeItem(&#x27;thr0w_channel&#x27;, channel);
-            window.location.reload();
+            abort();
           }
         }
       }
@@ -345,7 +343,7 @@
   // jscs:enable
   function logout() {
     window.localStorage.removeItem(&#x27;thr0w_token&#x27;);
-    window.location.reload();
+    abort();
   }
   // jscs:disable
   /**
@@ -438,7 +436,7 @@
       socket.on(&#x27;duplicate&#x27;, duplicateCallback);
       connectCallback(null);
       function duplicateCallback() {
-        window.location.reload();
+        abort();
       }
     }
   }
@@ -805,6 +803,10 @@
     function destroy() {
       socket.off(&#x27;message&#x27;, syncMessageCallback);
     }
+  }
+  function abort() {
+    window.localStorage.removeItem(&#x27;thr0w_channel&#x27;, channel);
+    window.location.reload();
   }
 })();
 
