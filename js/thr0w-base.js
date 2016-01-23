@@ -447,7 +447,7 @@
   * @param {Object} frameEl The frame DOM element.
   * @param {Object} contentEl The content DOM element.
   * @param {Array} matrix An array of arrays of integers defining the channels for the grid.
-  * @param {Array} dimensions An array of objects consisting of width and height (and optional scale) of the frames in each row. 
+  * @param {Array} dimensions An array of objects consisting of width and height (and optional scale, spacing, padding, and bottom margin) of the frames in each row. 
   */
   // jscs:enable
   function FlexGrid(frameEl, contentEl, matrix, dimensions) {
@@ -475,10 +475,18 @@
     var shiftLeft = 0;
     var shiftTop = 0;
     for (i = 0; i < matrix.length; i++) {
+      dimensions[i].spacing = dimensions[i].spacing ? dimensions[i].spacing : 0;
       dimensions[i].scale = dimensions[i].scale ? dimensions[i].scale : 1;
+      dimensions[i].padding = dimensions[i].padding ? dimensions[i].padding : 0;
+      dimensions[i].margin = dimensions[i].margin ? dimensions[i].margin : 0;
       width = Math.max(dimensions[i].scale * dimensions[i].width *
-        matrix[i].length, width);
-      height += dimensions[i].scale * dimensions[i].height;
+        matrix[i].length + // FRAMES
+        dimensions[i].padding * 2 * dimensions[i].scale + // PADDING
+        dimensions[i].spacing * (matrix[i].length - 1) * // SPACING
+        dimensions[i].scale,
+        width);
+      height += dimensions[i].scale * dimensions[i].height +
+        dimensions[i].scale * dimensions[i].margin;
       for (j = 0; j < matrix[i].length; j++) {
         if (channel === matrix[i][j]) {
           hpos = j;
@@ -490,16 +498,25 @@
       dimensions[vpos].width) + 'px';
     frameEl.style.height = (dimensions[vpos].scale *
       dimensions[vpos].height) + 'px';
+    frameEl.style.left = dimensions[vpos].width *
+      (1 - dimensions[vpos].scale) / 2 + 'px';
+    frameEl.style.top = dimensions[vpos].height *
+      (1 - dimensions[vpos].scale) / 2 + 'px';
     frameEl.style.transform = 'scale(' + (1 / dimensions[vpos].scale) +
       ', ' + (1 / dimensions[vpos].scale) + ')';
     contentEl.style.width = width + 'px';
     contentEl.style.height = height + 'px';
     for (i = 0; i < vpos; i++) {
-      shiftTop += dimensions[i].scale * dimensions[i].height;
+      shiftTop += dimensions[i].scale * dimensions[i].height +
+        dimensions[i].scale * dimensions[i].margin;
     }
-    shiftLeft = hpos * dimensions[vpos].scale * dimensions[vpos].width +
-      hpos * (width - matrix[vpos].length * dimensions[vpos].scale *
-      dimensions[vpos].width) / (matrix[vpos].length - 1);
+    // TODO: COLLAPSE VARS
+    var shiftLeftPadding = dimensions[vpos].padding * dimensions[vpos].scale;
+    var shiftLeftWindows = hpos * dimensions[vpos].scale *
+      dimensions[vpos].width;
+    var shiftLeftSpacing = hpos * dimensions[vpos].spacing *
+      dimensions[vpos].scale;
+    shiftLeft = shiftLeftPadding + shiftLeftWindows + shiftLeftSpacing;
     contentEl.style.left = '-' + shiftLeft + 'px';
     contentEl.style.top = '-' + shiftTop + 'px';
     this.getFrame = getFrame;
