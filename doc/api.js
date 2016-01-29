@@ -30,7 +30,7 @@ YUI.add("yuidoc-meta", function(Y) {
         {
             "displayName": "thr0w-svg",
             "name": "thr0w-svg",
-            "description": "This module provides tools to manage SVGs. Requires\nlodash library."
+            "description": "This module provides tools to manage SVGs."
         },
         {
             "displayName": "thr0w-windows",

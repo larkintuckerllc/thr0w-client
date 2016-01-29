@@ -1,16 +1,12 @@
 (function() {
   // jscs:disable
   /**
-  * This module provides tools to manage SVGs. Requires
-  * lodash library.
+  * This module provides tools to manage SVGs. 
   * @module thr0w-svg
   */
   // jscs:enable
   'use strict';
   if (window.thr0w === undefined) {
-    throw 400;
-  }
-  if (window._ === undefined) {
     throw 400;
   }
   var service = {};
@@ -33,10 +29,9 @@
   * @param grid {Object} The grid, {{#crossLink "thr0w.Grid"}}thr0w.Grid{{/crossLink}}, object.
   * @param svg {Object} The SVG DOM object.
   * @param max {Integer} The maximum zoom factor.
-  * @param throttle {Integer} Optional milliseconds between screen updates.
   */
   // jscs:enable
-  function manage(grid, svgEl, max, throttle) {
+  function manage(grid, svgEl, max) {
     if (!grid || typeof grid !== 'object') {
       throw 400;
     }
@@ -46,10 +41,7 @@
     if (max === undefined || typeof max !== 'number' || max < 1) {
       throw 400;
     }
-    if (throttle !== undefined &&
-      (typeof throttle !== 'number' || throttle < 0)) {
-      throw 400;
-    }
+    var HANDLERTIMEOUT = 20;
     var contentEl = grid.getContent();
     var palatteEl = document.createElement('div');
     palatteEl.classList.add('thr0w_svg_palette');
@@ -90,18 +82,14 @@
     var mouseLastY;
     var totalShiftX;
     var totalShiftY;
-    var panHandler;
-    var zoomHandler;
+    var panUpdater;
+    var zoomUpdater;
     var sync = new window.thr0w.Sync(
       grid,
       'thr0w_svg_' + contentEl.id,
       message,
       receive
       );
-    panHandler = throttle ? window._.throttle(heavyPanHandler, throttle) :
-      heavyPanHandler;
-    zoomHandler = throttle ? window._.throttle(heavyZoomHandler, throttle) :
-      heavyZoomHandler;
     svgEl.addEventListener('mousedown', handleMouseDown);
     svgEl.addEventListener('mousemove', handleMouseMove);
     svgEl.addEventListener('mouseup', handleMouseEnd);
@@ -149,6 +137,9 @@
       totalShiftX = 0;
       totalShiftY = 0;
       sync.update();
+      panUpdater = window.setInterval(function() {
+        heavyPanHandler();
+      }, HANDLERTIMEOUT);
     }
     function handleMouseMove(e) {
       if (mousePanning) {
@@ -164,27 +155,37 @@
         totalShiftY += shiftY;
         mouseLastX = mouseCurrentX;
         mouseLastY = mouseCurrentY;
-        panHandler();
       }
     }
     function handleMouseEnd() {
+      window.clearInterval(panUpdater);
+      heavyPanHandler();
       mousePanning = false;
       sync.idle();
     }
     function handleTouchStart(e) {
+      e.preventDefault();
       touchOneLastX = e.touches[0].pageX;
       touchOneLastY = e.touches[0].pageY;
       if (e.touches.length === 2) {
+        window.clearInterval(panUpdater);
+        heavyPanHandler();
         touchStartRadius = Math.floor(Math.sqrt(
           Math.pow(touchOneLastX - e.touches[1].pageX, 2) +
           Math.pow(touchOneLastY - e.touches[1].pageY, 2)
         ));
         touchStartZoomLevel = zoomLevel;
+        zoomUpdater = window.setInterval(function() {
+          heavyZoomHandler();
+        }, HANDLERTIMEOUT);
       }
       if (e.touches.length === 1) {
         totalShiftX = 0;
         totalShiftY = 0;
         sync.update();
+        panUpdater = window.setInterval(function() {
+          heavyPanHandler();
+        }, HANDLERTIMEOUT);
       }
     }
     function handleTouchMove(e) {
@@ -199,23 +200,28 @@
           (scaledSvgHeight / svgElHeight) / zoomLevel;
         totalShiftX += shiftX;
         totalShiftY += shiftY;
-        panHandler();
       } else {
         touchCurrentRadius = Math.floor(Math.sqrt(
           Math.pow(touchOneCurrentX - e.touches[1].pageX, 2) +
           Math.pow(touchOneCurrentY - e.touches[1].pageY, 2)
         ));
-        zoomHandler();
       }
       touchOneLastX = touchOneCurrentX;
       touchOneLastY = touchOneCurrentY;
     }
     function handleTouchEnd(e) {
       if (e.touches.length === 1) {
+        window.clearInterval(zoomUpdater);
+        heavyZoomHandler();
         touchOneLastX = e.touches[0].pageX;
         touchOneLastY = e.touches[0].pageY;
+        panUpdater = window.setInterval(function() {
+          heavyPanHandler();
+        }, HANDLERTIMEOUT);
       }
       if (e.touches.length === 0) {
+        window.clearInterval(panUpdater);
+        heavyPanHandler();
         sync.idle();
       }
     }
