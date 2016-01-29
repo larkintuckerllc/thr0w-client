@@ -41,7 +41,7 @@
     if (max === undefined || typeof max !== 'number' || max < 1) {
       throw 400;
     }
-    var HANDLERTIMEOUT = 20;
+    var HANDLERTIMEOUT = 1000 / 60;
     var contentEl = grid.getContent();
     var palatteEl = document.createElement('div');
     palatteEl.classList.add('thr0w_svg_palette');
