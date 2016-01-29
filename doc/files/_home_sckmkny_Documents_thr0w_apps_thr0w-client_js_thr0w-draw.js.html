@@ -109,29 +109,35 @@
 <div class="file">
     <pre class="code prettyprint linenums">
 (function() {
+  // jscs:disable
   /**
   * This module provides a drawing tool.
   * @module thr0w-draw
   */
+  // jscs:enable
   &#x27;use strict&#x27;;
   if (window.thr0w === undefined) {
     throw 400;
   }
-  var service = {}; 
+  var service = {};
   service.load = load;
+  // jscs:disable
   /**
   * This object provides draw functionality.
   * @namespace thr0w
   * @class draw
   * @static
   */
+  // jscs:enable
   window.thr0w.draw = service;
+  // jscs:disable
   /**
   * This function is used to load the draw functionality into a grid.
   * @method load
   * @static
   * @param grid {Object} The grid, {{#crossLink &quot;thr0w.Grid&quot;}}thr0w.Grid{{/crossLink}}, object.
   */
+  // jscs:enable
   function load(grid) {
     if (!grid || typeof grid !== &#x27;object&#x27;) {
       throw 400;
@@ -148,27 +154,29 @@
     var palatteEl = document.createElement(&#x27;div&#x27;);
     var canvasEl = document.createElement(&#x27;canvas&#x27;);
     var context = canvasEl.getContext(&#x27;2d&#x27;);
-    palatteEl.classList.add(&#x27;thr0w_draw_palatte&#x27;); 
-    palatteEl.classList.add(&#x27;thr0w_draw_palatte--closed&#x27;); 
-    palatteEl.innerHTML = [ 
-      &#x27;&lt;div class=&quot;thr0w_draw_palatte__color_picker--default thr0w_draw_palatte__color_picker&quot; style=&quot;background: black;&quot;&gt;\n&#x27;,
-      &#x27;&lt;/div&gt;\n&#x27;,
-      &#x27;&lt;div class=&quot;thr0w_draw_palatte__color_picker&quot; style=&quot;background: white;&quot;&gt;\n&#x27;,
-      &#x27;&lt;/div&gt;\n&#x27;,
-      &#x27;&lt;div class=&quot;thr0w_draw_palatte__color_picker&quot; style=&quot;background: red;&quot;&gt;\n&#x27;,
-      &#x27;&lt;/div&gt;\n&#x27;,
-      &#x27;&lt;div class=&quot;thr0w_draw_palatte__color_picker&quot; style=&quot;background: orange;&quot;&gt;\n&#x27;,
-      &#x27;&lt;/div&gt;\n&#x27;,
-      &#x27;&lt;div class=&quot;thr0w_draw_palatte__color_picker&quot; style=&quot;background: yellow;&quot;&gt;\n&#x27;,
-      &#x27;&lt;/div&gt;\n&#x27;,
-      &#x27;&lt;div class=&quot;thr0w_draw_palatte__color_picker&quot; style=&quot;background: green;&quot;&gt;\n&#x27;,
-      &#x27;&lt;/div&gt;\n&#x27;,
-      &#x27;&lt;div class=&quot;thr0w_draw_palatte__color_picker&quot; style=&quot;background: blue;&quot;&gt;\n&#x27;,
-      &#x27;&lt;/div&gt;\n&#x27;,
-      &#x27;&lt;div class=&quot;thr0w_draw_palatte__color_picker&quot; style=&quot;background: purple;&quot;&gt;\n&#x27;,
-      &#x27;&lt;/div&gt;\n&#x27;,
-      &#x27;&lt;div class=&quot;thr0w_draw_palatte__thumb thr0w_draw_palatte__thumb--closed&quot;&gt;\n&#x27;,
-      &#x27;&lt;/div&gt;\n&#x27;].join(&#x27;&#x27;);
+    palatteEl.classList.add(&#x27;thr0w_draw_palatte&#x27;);
+    palatteEl.classList.add(&#x27;thr0w_draw_palatte--closed&#x27;);
+    // jscs:disable
+    palatteEl.innerHTML = [
+      &#x27;&lt;div class=&quot;thr0w_draw_palatte__color_picker--default thr0w_draw_palatte__color_picker&quot; style=&quot;background: black;&quot;&gt;&#x27;,
+      &#x27;&lt;/div&gt;&#x27;,
+      &#x27;&lt;div class=&quot;thr0w_draw_palatte__color_picker&quot; style=&quot;background: white;&quot;&gt;&#x27;,
+      &#x27;&lt;/div&gt;&#x27;,
+      &#x27;&lt;div class=&quot;thr0w_draw_palatte__color_picker&quot; style=&quot;background: red;&quot;&gt;&#x27;,
+      &#x27;&lt;/div&gt;&#x27;,
+      &#x27;&lt;div class=&quot;thr0w_draw_palatte__color_picker&quot; style=&quot;background: orange;&quot;&gt;&#x27;,
+      &#x27;&lt;/div&gt;&#x27;,
+      &#x27;&lt;div class=&quot;thr0w_draw_palatte__color_picker&quot; style=&quot;background: yellow;&quot;&gt;&#x27;,
+      &#x27;&lt;/div&gt;&#x27;,
+      &#x27;&lt;div class=&quot;thr0w_draw_palatte__color_picker&quot; style=&quot;background: green;&quot;&gt;&#x27;,
+      &#x27;&lt;/div&gt;&#x27;,
+      &#x27;&lt;div class=&quot;thr0w_draw_palatte__color_picker&quot; style=&quot;background: blue;&quot;&gt;&#x27;,
+      &#x27;&lt;/div&gt;&#x27;,
+      &#x27;&lt;div class=&quot;thr0w_draw_palatte__color_picker&quot; style=&quot;background: purple;&quot;&gt;&#x27;,
+      &#x27;&lt;/div&gt;&#x27;,
+      &#x27;&lt;div class=&quot;thr0w_draw_palatte__thumb thr0w_draw_palatte__thumb--closed&quot;&gt;&#x27;,
+      &#x27;&lt;/div&gt;&#x27;].join(&#x27;\n&#x27;);
+    // jscs:disable
     contentEl.appendChild(palatteEl);
     var thumbEl = palatteEl.querySelector(&#x27;.thr0w_draw_palatte__thumb&#x27;);
     var pickerEls = palatteEl.querySelectorAll(&#x27;.thr0w_draw_palatte__color_picker&#x27;);

@@ -1,12 +1,16 @@
 (function() {
   // jscs:disable
   /**
-  * This module provides tools to manage SVGs.
+  * This module provides tools to manage SVGs. Requires
+  * lodash library.
   * @module thr0w-svg
   */
   // jscs:enable
   'use strict';
   if (window.thr0w === undefined) {
+    throw 400;
+  }
+  if (window._ === undefined) {
     throw 400;
   }
   var service = {};
@@ -29,9 +33,10 @@
   * @param grid {Object} The grid, {{#crossLink "thr0w.Grid"}}thr0w.Grid{{/crossLink}}, object.
   * @param svg {Object} The SVG DOM object.
   * @param max {Integer} The maximum zoom factor.
+  * @param throttle {Integer} Optional milliseconds between screen updates.
   */
   // jscs:enable
-  function manage(grid, svgEl, max) {
+  function manage(grid, svgEl, max, throttle) {
     if (!grid || typeof grid !== 'object') {
       throw 400;
     }
@@ -39,6 +44,10 @@
       throw 400;
     }
     if (max === undefined || typeof max !== 'number' || max < 1) {
+      throw 400;
+    }
+    if (throttle !== undefined &&
+      (typeof throttle !== 'number' || throttle < 0)) {
       throw 400;
     }
     var contentEl = grid.getContent();
@@ -74,16 +83,25 @@
     var touchOneLastX;
     var touchOneLastY;
     var touchStartRadius;
+    var touchCurrentRadius;
     var touchStartZoomLevel;
     var mousePanning = false;
     var mouseLastX;
     var mouseLastY;
+    var totalShiftX;
+    var totalShiftY;
+    var panHandler;
+    var zoomHandler;
     var sync = new window.thr0w.Sync(
       grid,
       'thr0w_svg_' + contentEl.id,
       message,
       receive
       );
+    panHandler = throttle ? window._.throttle(heavyPanHandler, throttle) :
+      heavyPanHandler;
+    zoomHandler = throttle ? window._.throttle(heavyZoomHandler, throttle) :
+      heavyZoomHandler;
     svgEl.addEventListener('mousedown', handleMouseDown);
     svgEl.addEventListener('mousemove', handleMouseMove);
     svgEl.addEventListener('mouseup', handleMouseEnd);
@@ -113,10 +131,23 @@
       zoomLevel = data.zoomLevel;
       setSVGViewBox();
     }
+    function heavyPanHandler() {
+      pan(totalShiftX, totalShiftY);
+      totalShiftX = 0;
+      totalShiftY = 0;
+      sync.update();
+    }
+    function heavyZoomHandler() {
+      zoom(touchStartZoomLevel * touchCurrentRadius / touchStartRadius);
+      sync.update();
+    }
     function handleMouseDown(e) {
+      e.preventDefault();
       mousePanning = true;
       mouseLastX = e.pageX;
       mouseLastY = e.pageY;
+      totalShiftX = 0;
+      totalShiftY = 0;
       sync.update();
     }
     function handleMouseMove(e) {
@@ -129,10 +160,11 @@
           (scaledSvgWidth / svgElWidth) / zoomLevel;
         shiftY = -1 * (mouseCurrentY - mouseLastY) *
           (scaledSvgHeight / svgElHeight) / zoomLevel;
-        pan(shiftX, shiftY);
+        totalShiftX += shiftX;
+        totalShiftY += shiftY;
         mouseLastX = mouseCurrentX;
         mouseLastY = mouseCurrentY;
-        sync.update();
+        panHandler();
       }
     }
     function handleMouseEnd() {
@@ -150,13 +182,14 @@
         touchStartZoomLevel = zoomLevel;
       }
       if (e.touches.length === 1) {
+        totalShiftX = 0;
+        totalShiftY = 0;
         sync.update();
       }
     }
     function handleTouchMove(e) {
       var touchOneCurrentX = e.touches[0].pageX;
       var touchOneCurrentY = e.touches[0].pageY;
-      var touchCurrentRadius;
       var shiftX;
       var shiftY;
       if (e.touches.length === 1) {
@@ -164,20 +197,20 @@
           (scaledSvgWidth / svgElWidth) / zoomLevel;
         shiftY = -1 * (touchOneCurrentY - touchOneLastY) *
           (scaledSvgHeight / svgElHeight) / zoomLevel;
-        pan(shiftX, shiftY);
+        totalShiftX += shiftX;
+        totalShiftY += shiftY;
+        panHandler();
       } else {
         touchCurrentRadius = Math.floor(Math.sqrt(
           Math.pow(touchOneCurrentX - e.touches[1].pageX, 2) +
           Math.pow(touchOneCurrentY - e.touches[1].pageY, 2)
         ));
-        zoom(touchStartZoomLevel * touchCurrentRadius / touchStartRadius);
+        zoomHandler();
       }
       touchOneLastX = touchOneCurrentX;
       touchOneLastY = touchOneCurrentY;
-      sync.update();
     }
     function handleTouchEnd(e) {
-      e.preventDefault();
       if (e.touches.length === 1) {
         touchOneLastX = e.touches[0].pageX;
         touchOneLastY = e.touches[0].pageY;

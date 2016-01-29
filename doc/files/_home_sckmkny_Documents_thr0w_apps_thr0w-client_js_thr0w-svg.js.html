@@ -109,23 +109,32 @@
 <div class="file">
     <pre class="code prettyprint linenums">
 (function() {
+  // jscs:disable
   /**
-  * This module provides tools to manage SVGs.
+  * This module provides tools to manage SVGs. Requires
+  * lodash library.
   * @module thr0w-svg
   */
+  // jscs:enable
   &#x27;use strict&#x27;;
   if (window.thr0w === undefined) {
     throw 400;
   }
-  var service = {}; 
+  if (window._ === undefined) {
+    throw 400;
+  }
+  var service = {};
   service.manage = manage;
+  // jscs:disable
   /**
   * This object provides SVG management functionality.
   * @namespace thr0w
   * @class svg
   * @static
   */
+  // jscs:enable
   window.thr0w.svg = service;
+  // jscs:disable
   /**
   * This function manages a SVG; initially scales them to fit and then
   * handles panning and zooming.
@@ -134,8 +143,10 @@
   * @param grid {Object} The grid, {{#crossLink &quot;thr0w.Grid&quot;}}thr0w.Grid{{/crossLink}}, object.
   * @param svg {Object} The SVG DOM object.
   * @param max {Integer} The maximum zoom factor.
+  * @param throttle {Integer} Optional milliseconds between screen updates.
   */
-  function manage(grid, svgEl, max) {
+  // jscs:enable
+  function manage(grid, svgEl, max, throttle) {
     if (!grid || typeof grid !== &#x27;object&#x27;) {
       throw 400;
     }
@@ -145,10 +156,15 @@
     if (max === undefined || typeof max !== &#x27;number&#x27; || max &lt; 1) {
       throw 400;
     }
+    if (throttle !== undefined &amp;&amp;
+      (typeof throttle !== &#x27;number&#x27; || throttle &lt; 0)) {
+      throw 400;
+    }
     var contentEl = grid.getContent();
     var palatteEl = document.createElement(&#x27;div&#x27;);
-    palatteEl.classList.add(&#x27;thr0w_svg_palette&#x27;); 
-    palatteEl.innerHTML = [ 
+    palatteEl.classList.add(&#x27;thr0w_svg_palette&#x27;);
+    // jscs:disable
+    palatteEl.innerHTML = [
       &#x27;&lt;div class=&quot;thr0w_svg_palette__row&quot;&gt;&#x27;,
       &#x27;&lt;div class=&quot;thr0w_svg_palette__row__cell thr0w_svg_palette__row__cell--plus&quot;&gt;+&lt;/div&gt;&#x27;,
       &#x27;&lt;/div&gt;&#x27;,
@@ -156,34 +172,46 @@
       &#x27;&lt;div class=&quot;thr0w_svg_palette__row__cell thr0w_svg_palette__row__cell--minus&quot;&gt;-&lt;/div&gt;&#x27;,
       &#x27;&lt;/div&gt;&#x27;
     ].join(&#x27;\n&#x27;);
+    // jscs:enable
     contentEl.appendChild(palatteEl);
     var svgElWidth = svgEl.offsetWidth;
     var svgElHeight = svgEl.offsetHeight;
-    var svgViewBox = svgEl.getAttribute(&quot;viewBox&quot;).split(&#x27; &#x27;);
+    var svgViewBox = svgEl.getAttribute(&#x27;viewBox&#x27;).split(&#x27; &#x27;);
     var svgWidth = svgViewBox[2];
     var svgHeight = svgViewBox[3];
-    var factorX= svgWidth / svgElWidth;
-    var factorY= svgHeight / svgElHeight;
-    var scaledSvgWidth = factorX &lt; factorY ? Math.floor(svgHeight * svgElWidth / svgElHeight) : svgWidth;
-    var scaledSvgHeight = factorY &lt; factorX ? Math.floor(svgWidth * svgElHeight / svgElWidth) : svgHeight;
+    var factorX = svgWidth / svgElWidth;
+    var factorY = svgHeight / svgElHeight;
+    var scaledSvgWidth = factorX &lt; factorY ? Math.floor(svgHeight *
+      svgElWidth / svgElHeight) : svgWidth;
+    var scaledSvgHeight = factorY &lt; factorX ? Math.floor(svgWidth *
+      svgElHeight / svgElWidth) : svgHeight;
     var left = 0;
     var top = 0;
     var width = scaledSvgWidth;
     var height = scaledSvgHeight;
     var zoomLevel = 1;
-    var touchOneLastX;  
+    var touchOneLastX;
     var touchOneLastY;
     var touchStartRadius;
+    var touchCurrentRadius;
     var touchStartZoomLevel;
     var mousePanning = false;
     var mouseLastX;
     var mouseLastY;
+    var totalShiftX;
+    var totalShiftY;
+    var panHandler;
+    var zoomHandler;
     var sync = new window.thr0w.Sync(
       grid,
       &#x27;thr0w_svg_&#x27; + contentEl.id,
       message,
       receive
       );
+    panHandler = throttle ? window._.throttle(heavyPanHandler, throttle) :
+      heavyPanHandler;
+    zoomHandler = throttle ? window._.throttle(heavyZoomHandler, throttle) :
+      heavyZoomHandler;
     svgEl.addEventListener(&#x27;mousedown&#x27;, handleMouseDown);
     svgEl.addEventListener(&#x27;mousemove&#x27;, handleMouseMove);
     svgEl.addEventListener(&#x27;mouseup&#x27;, handleMouseEnd);
@@ -191,8 +219,10 @@
     svgEl.addEventListener(&#x27;touchstart&#x27;, handleTouchStart);
     svgEl.addEventListener(&#x27;touchmove&#x27;, handleTouchMove);
     svgEl.addEventListener(&#x27;touchend&#x27;, handleTouchEnd);
-    palatteEl.querySelector(&#x27;.thr0w_svg_palette__row__cell--plus&#x27;).addEventListener(&#x27;click&#x27;, zoomIn);
-    palatteEl.querySelector(&#x27;.thr0w_svg_palette__row__cell--minus&#x27;).addEventListener(&#x27;click&#x27;, zoomOut);
+    palatteEl.querySelector(&#x27;.thr0w_svg_palette__row__cell--plus&#x27;)
+      .addEventListener(&#x27;click&#x27;, zoomIn);
+    palatteEl.querySelector(&#x27;.thr0w_svg_palette__row__cell--minus&#x27;)
+      .addEventListener(&#x27;click&#x27;, zoomOut);
     setSVGViewBox();
     function message() {
       return {
@@ -211,11 +241,24 @@
       zoomLevel = data.zoomLevel;
       setSVGViewBox();
     }
+    function heavyPanHandler() {
+      pan(totalShiftX, totalShiftY);
+      totalShiftX = 0;
+      totalShiftY = 0;
+      sync.update();
+    }
+    function heavyZoomHandler() {
+      zoom(touchStartZoomLevel * touchCurrentRadius / touchStartRadius);
+      sync.update();
+    }
     function handleMouseDown(e) {
+      e.preventDefault();
       mousePanning = true;
       mouseLastX = e.pageX;
       mouseLastY = e.pageY;
-      sync.update(); 
+      totalShiftX = 0;
+      totalShiftY = 0;
+      sync.update();
     }
     function handleMouseMove(e) {
       if (mousePanning) {
@@ -223,12 +266,15 @@
         var mouseCurrentY = e.pageY;
         var shiftX;
         var shiftY;
-        shiftX = -1 * (mouseCurrentX - mouseLastX) * (scaledSvgWidth / svgElWidth) / zoomLevel;
-        shiftY = -1 * (mouseCurrentY - mouseLastY) * (scaledSvgHeight / svgElHeight) / zoomLevel;
-        pan(shiftX, shiftY);
+        shiftX = -1 * (mouseCurrentX - mouseLastX) *
+          (scaledSvgWidth / svgElWidth) / zoomLevel;
+        shiftY = -1 * (mouseCurrentY - mouseLastY) *
+          (scaledSvgHeight / svgElHeight) / zoomLevel;
+        totalShiftX += shiftX;
+        totalShiftY += shiftY;
         mouseLastX = mouseCurrentX;
         mouseLastY = mouseCurrentY;
-        sync.update();
+        panHandler();
       }
     }
     function handleMouseEnd() {
@@ -246,32 +292,35 @@
         touchStartZoomLevel = zoomLevel;
       }
       if (e.touches.length === 1) {
+        totalShiftX = 0;
+        totalShiftY = 0;
         sync.update();
       }
     }
     function handleTouchMove(e) {
       var touchOneCurrentX = e.touches[0].pageX;
       var touchOneCurrentY = e.touches[0].pageY;
-      var touchCurrentRadius;
       var shiftX;
       var shiftY;
       if (e.touches.length === 1) {
-        shiftX = -1 * (touchOneCurrentX - touchOneLastX) * (scaledSvgWidth / svgElWidth) / zoomLevel;
-        shiftY = -1 * (touchOneCurrentY - touchOneLastY) * (scaledSvgHeight / svgElHeight) / zoomLevel;
-        pan(shiftX, shiftY);
+        shiftX = -1 * (touchOneCurrentX - touchOneLastX) *
+          (scaledSvgWidth / svgElWidth) / zoomLevel;
+        shiftY = -1 * (touchOneCurrentY - touchOneLastY) *
+          (scaledSvgHeight / svgElHeight) / zoomLevel;
+        totalShiftX += shiftX;
+        totalShiftY += shiftY;
+        panHandler();
       } else {
         touchCurrentRadius = Math.floor(Math.sqrt(
           Math.pow(touchOneCurrentX - e.touches[1].pageX, 2) +
           Math.pow(touchOneCurrentY - e.touches[1].pageY, 2)
         ));
-        zoom(touchStartZoomLevel * touchCurrentRadius / touchStartRadius);
+        zoomHandler();
       }
       touchOneLastX = touchOneCurrentX;
       touchOneLastY = touchOneCurrentY;
-      sync.update();
     }
     function handleTouchEnd(e) {
-      e.preventDefault();
       if (e.touches.length === 1) {
         touchOneLastX = e.touches[0].pageX;
         touchOneLastY = e.touches[0].pageY;
@@ -292,15 +341,17 @@
     }
     function pan(shiftX, shiftY) {
       if (shiftX &gt;= 0) {
-        left = left + shiftX &lt;= scaledSvgWidth - width ? left + shiftX : scaledSvgWidth - width;
+        left = left + shiftX &lt;= scaledSvgWidth - width ?
+          left + shiftX : scaledSvgWidth - width;
       } else {
         left = left + shiftX &gt; 0 ? left + shiftX : 0;
-      } 
+      }
       if (shiftY &gt;= 0) {
-        top = top + shiftY &lt;= scaledSvgHeight - height ? top + shiftY :  scaledSvgHeight - height;
+        top = top + shiftY &lt;= scaledSvgHeight - height ?
+          top + shiftY :  scaledSvgHeight - height;
       } else {
         top = top + shiftY &gt; 0 ? top + shiftY : 0;
-      } 
+      }
       setSVGViewBox();
     }
     function zoom(factor) {
@@ -316,7 +367,8 @@
       setSVGViewBox();
     }
     function setSVGViewBox() {
-      svgEl.setAttribute(&quot;viewBox&quot;, left + &#x27; &#x27; + top + &#x27; &#x27; + width + &#x27; &#x27; + height);
+      svgEl.setAttribute(&#x27;viewBox&#x27;, left + &#x27; &#x27; + top +
+        &#x27; &#x27; + width + &#x27; &#x27; + height);
     }
   }
 })();
