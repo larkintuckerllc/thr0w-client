@@ -1,7 +1,7 @@
 (function() {
   // jscs:disable
   /**
-  * This module provides tools to manage SVGs. 
+  * This module provides tools to manage SVGs.
   * @module thr0w-svg
   */
   // jscs:enable
@@ -41,7 +41,6 @@
     if (max === undefined || typeof max !== 'number' || max < 1) {
       throw 400;
     }
-    var HANDLERTIMEOUT = 1000 / 60;
     var contentEl = grid.getContent();
     var palatteEl = document.createElement('div');
     palatteEl.classList.add('thr0w_svg_palette');
@@ -75,15 +74,10 @@
     var touchOneLastX;
     var touchOneLastY;
     var touchStartRadius;
-    var touchCurrentRadius;
     var touchStartZoomLevel;
     var mousePanning = false;
     var mouseLastX;
     var mouseLastY;
-    var totalShiftX;
-    var totalShiftY;
-    var panUpdater;
-    var zoomUpdater;
     var sync = new window.thr0w.Sync(
       grid,
       'thr0w_svg_' + contentEl.id,
@@ -101,7 +95,7 @@
       .addEventListener('click', zoomIn);
     palatteEl.querySelector('.thr0w_svg_palette__row__cell--minus')
       .addEventListener('click', zoomOut);
-    setSVGViewBox();
+    setSVGViewBox(left, top, width, height);
     function message() {
       return {
         left: left,
@@ -117,29 +111,14 @@
       width = data.width;
       height = data.height;
       zoomLevel = data.zoomLevel;
-      setSVGViewBox();
-    }
-    function heavyPanHandler() {
-      pan(totalShiftX, totalShiftY);
-      totalShiftX = 0;
-      totalShiftY = 0;
-      sync.update();
-    }
-    function heavyZoomHandler() {
-      zoom(touchStartZoomLevel * touchCurrentRadius / touchStartRadius);
-      sync.update();
+      setSVGViewBox(left, top, width, height);
     }
     function handleMouseDown(e) {
       e.preventDefault();
       mousePanning = true;
       mouseLastX = e.pageX;
       mouseLastY = e.pageY;
-      totalShiftX = 0;
-      totalShiftY = 0;
       sync.update();
-      panUpdater = window.setInterval(function() {
-        heavyPanHandler();
-      }, HANDLERTIMEOUT);
     }
     function handleMouseMove(e) {
       if (mousePanning) {
@@ -151,15 +130,13 @@
           (scaledSvgWidth / svgElWidth) / zoomLevel;
         shiftY = -1 * (mouseCurrentY - mouseLastY) *
           (scaledSvgHeight / svgElHeight) / zoomLevel;
-        totalShiftX += shiftX;
-        totalShiftY += shiftY;
+        pan(shiftX, shiftY);
         mouseLastX = mouseCurrentX;
         mouseLastY = mouseCurrentY;
+        sync.update();
       }
     }
     function handleMouseEnd() {
-      window.clearInterval(panUpdater);
-      heavyPanHandler();
       mousePanning = false;
       sync.idle();
     }
@@ -168,29 +145,20 @@
       touchOneLastX = e.touches[0].pageX;
       touchOneLastY = e.touches[0].pageY;
       if (e.touches.length === 2) {
-        window.clearInterval(panUpdater);
-        heavyPanHandler();
         touchStartRadius = Math.floor(Math.sqrt(
           Math.pow(touchOneLastX - e.touches[1].pageX, 2) +
           Math.pow(touchOneLastY - e.touches[1].pageY, 2)
         ));
         touchStartZoomLevel = zoomLevel;
-        zoomUpdater = window.setInterval(function() {
-          heavyZoomHandler();
-        }, HANDLERTIMEOUT);
       }
       if (e.touches.length === 1) {
-        totalShiftX = 0;
-        totalShiftY = 0;
         sync.update();
-        panUpdater = window.setInterval(function() {
-          heavyPanHandler();
-        }, HANDLERTIMEOUT);
       }
     }
     function handleTouchMove(e) {
       var touchOneCurrentX = e.touches[0].pageX;
       var touchOneCurrentY = e.touches[0].pageY;
+      var touchCurrentRadius;
       var shiftX;
       var shiftY;
       if (e.touches.length === 1) {
@@ -198,30 +166,24 @@
           (scaledSvgWidth / svgElWidth) / zoomLevel;
         shiftY = -1 * (touchOneCurrentY - touchOneLastY) *
           (scaledSvgHeight / svgElHeight) / zoomLevel;
-        totalShiftX += shiftX;
-        totalShiftY += shiftY;
+        pan(shiftX, shiftY);
       } else {
         touchCurrentRadius = Math.floor(Math.sqrt(
           Math.pow(touchOneCurrentX - e.touches[1].pageX, 2) +
           Math.pow(touchOneCurrentY - e.touches[1].pageY, 2)
         ));
+        zoom(touchStartZoomLevel * touchCurrentRadius / touchStartRadius);
       }
       touchOneLastX = touchOneCurrentX;
       touchOneLastY = touchOneCurrentY;
+      sync.update();
     }
     function handleTouchEnd(e) {
       if (e.touches.length === 1) {
-        window.clearInterval(zoomUpdater);
-        heavyZoomHandler();
         touchOneLastX = e.touches[0].pageX;
         touchOneLastY = e.touches[0].pageY;
-        panUpdater = window.setInterval(function() {
-          heavyPanHandler();
-        }, HANDLERTIMEOUT);
       }
       if (e.touches.length === 0) {
-        window.clearInterval(panUpdater);
-        heavyPanHandler();
         sync.idle();
       }
     }
@@ -248,7 +210,7 @@
       } else {
         top = top + shiftY > 0 ? top + shiftY : 0;
       }
-      setSVGViewBox();
+      setSVGViewBox(left, top, width, height);
     }
     function zoom(factor) {
       zoomLevel = Math.max(Math.min(factor, max), 1);
@@ -260,11 +222,14 @@
       left = Math.min(left, scaledSvgWidth - width);
       top = Math.max(centerY - height / 2, 0);
       top = Math.min(top, scaledSvgHeight - height);
-      setSVGViewBox();
+      setSVGViewBox(left, top, width, height);
     }
-    function setSVGViewBox() {
-      svgEl.setAttribute('viewBox', left + ' ' + top +
-        ' ' + width + ' ' + height);
+    function setSVGViewBox(newLeft, newTop, newWidth, newHeight) {
+      window.requestAnimationFrame(animation);
+      function animation() {
+        svgEl.setAttribute('viewBox', newLeft + ' ' + newTop +
+          ' ' + newWidth + ' ' + newHeight);
+      }
     }
   }
 })();
