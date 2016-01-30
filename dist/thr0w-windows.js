@@ -147,13 +147,14 @@
       if (x === undefined || typeof x !== 'number' || x < 0) {
         throw 400;
       }
-      if (y === undefined || typeof y !== 'number' || y < BAR_HEIGHT) {
+      if (y === undefined || typeof y !== 'number') {
         throw 400;
       }
       if (width === undefined || typeof width !== 'number' || width < 140) {
         throw 400;
       }
-      if (height === undefined || typeof height !== 'number') {
+      if (height === undefined || typeof height !== 'number' ||
+        height < BAR_HEIGHT) {
         throw 400;
       }
       if (src === undefined || typeof src !== 'string') {
@@ -257,9 +258,9 @@
         '<div class="thr0w_windows_window__bar__controls">',
         '<svg xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" viewbox="0 0 100 100" class="thr0w_windows_window__bar__controls__control thr0w_windows_window__bar__controls__control--close">',
         '<g>',
-        '<ellipse stroke="#cccccc" ry="49" rx="49" id="svg_1" cy="50" cx="50" stroke-width="2" fill="#ffffff"/>',
-        '<path id="svg_4" fill-opacity="0.5" stroke-linecap="null" stroke-linejoin="null" stroke-dasharray="null" stroke-width="2" stroke="#cccccc" fill="#cccccc"/>',
-        '<path id="svg_6" d="m13.75,30.5l18.5,18.75l-19.5,20.25l17.25,16.75l20.5,-19l19.25,19.5l17.25,-17l-19.5,-19.25l19.75,-19.75l-17.5,-17.5l-19.25,20l-19.5,-20l-17.25,17.25z" fill-opacity="0.5" stroke-linecap="null" stroke-linejoin="null" stroke-dasharray="null" stroke-width="2" stroke="#cccccc" fill="#cccccc"/>',
+        '<ellipse stroke="#000000" ry="49" rx="49" id="svg_1" cy="50" cx="50" stroke-width="2" fill="#ffffff"/>',
+        '<path id="svg_4" fill-opacity="1" stroke-linecap="null" stroke-linejoin="null" stroke-dasharray="null" stroke-width="2" stroke="#808080" fill="#808080"/>',
+        '<path id="svg_6" d="m13.75,30.5l18.5,18.75l-19.5,20.25l17.25,16.75l20.5,-19l19.25,19.5l17.25,-17l-19.5,-19.25l19.75,-19.75l-17.5,-17.5l-19.25,20l-19.5,-20l-17.25,17.25z" fill-opacity="1" stroke-linecap="null" stroke-linejoin="null" stroke-dasharray="null" stroke-width="2" stroke="#808080" fill="#808080"/>',
         '</g>',
         '</svg>',
         '</div>',
@@ -285,7 +286,8 @@
       windowControlsEl.style.visibility = 'visible';
       windowControlsCloseEl = windowControlsEl
         .querySelector('.thr0w_windows_window__bar__controls__control--close');
-      windowControlsCloseEl.addEventListener('click', closeSelf);
+      windowControlsCloseEl.addEventListener('mousedown', closeSelf);
+      windowControlsCloseEl.addEventListener('touchstart', closeSelf);
       windowContentEl = windowEl
         .querySelector('.thr0w_windows_window__content');
       windowContentEl.addEventListener('load', contentLoaded);
@@ -315,15 +317,14 @@
         y = data.y;
         scrollX = data.scrollX;
         scrollY = data.scrollY;
-        windowEl.style.left = x + 'px';
-        windowEl.style.top = y + 'px';
-        windowContentEl.contentWindow.document.body.scrollTop = scrollX;
-        windowContentEl.contentWindow.document.body.scrollLeft = scrollY;
+        positionWindow(x, y, scrollX, scrollY);
       }
-      function sendSelfToTop() {
+      function sendSelfToTop(e) {
+        e.preventDefault();
         sendToTop(id);
       }
       function startMoving(e) {
+        e.preventDefault();
         moving = true;
         if (e.type === 'mousedown') {
           lastX = e.pageX - offsetLeft;
@@ -351,8 +352,7 @@
         x = Math.max(x, 0);
         y = Math.min(y + currentY - lastY, grid.getHeight() - height);
         y = Math.max(y, 0);
-        windowEl.style.left = x + 'px';
-        windowEl.style.top = y + 'px';
+        positionWindow(x, y, scrollX, scrollY);
         lastX = currentX;
         lastY = currentY;
         windowSync.update();
@@ -361,7 +361,8 @@
         moving = false;
         windowSync.idle();
       }
-      function closeSelf() {
+      function closeSelf(e) {
+        e.preventDefault();
         closeWindow(id);
       }
       function contentLoaded() {
@@ -417,14 +418,15 @@
         windowBarEl.removeEventListener('mouseleave', endMoving);
         windowBarEl.removeEventListener('touchend', endMoving);
         windowBarEl.removeEventListener('touchcancel', endMoving);
-        windowControlsCloseEl.removeEventListener('click', closeSelf);
+        windowControlsCloseEl.removeEventListener('mousedown', closeSelf);
+        windowControlsCloseEl.removeEventListener('touchstart', closeSelf);
         windowContentEl.contentWindow.location.href = 'about:blank';
         contentEl.removeChild(windowEl);
         windowSync.destroy();
       }
       function scrolling() {
         if (!startScrolling) {
-          window.setTimeout(checkScrolling, 1000);
+          window.setTimeout(checkScrolling, 100);
           startScrolling = true;
         }
         endScrolling = false;
@@ -437,8 +439,17 @@
             windowSync.idle();
           } else {
             endScrolling = true;
-            window.setTimeout(checkScrolling, 1000);
+            window.setTimeout(checkScrolling, 100);
           }
+        }
+      }
+      function positionWindow(newX, newY, newScrollX, newScrollY) {
+        window.requestAnimationFrame(animation);
+        function animation() {
+          windowEl.style.left = newX + 'px';
+          windowEl.style.top = newY + 'px';
+          windowContentEl.contentWindow.document.body.scrollTop = newScrollX;
+          windowContentEl.contentWindow.document.body.scrollLeft = newScrollY;
         }
       }
     }

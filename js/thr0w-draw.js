@@ -96,6 +96,7 @@
       receive
       );
     function startPainting(e) {
+      e.preventDefault();
       if (e.type === 'mousedown') {
         lastX = e.pageX - offsetLeft;
         lastY = e.pageY - offsetTop;
@@ -117,16 +118,12 @@
           x = Math.floor(e.changedTouches[0].pageX) - offsetLeft;
           y = Math.floor(e.changedTouches[0].pageY) - offsetTop;
         }
-
-        context.moveTo(lastX, lastY);
-        context.lineTo(x, y);
-        context.stroke();
+        drawLine(lastX, lastY, x, y);
         lastX = x;
         lastY = y;
       }
     }
-    function endPainting(e) {
-      e.preventDefault(); // USED TO PREVENT INTERPRET AS CLICK
+    function endPainting() {
       if (paint) {
         paint = false;
         context.closePath();
@@ -187,6 +184,14 @@
     function sendUpdate() {
       sync.update();
       sync.idle();
+    }
+    function drawLine(startX, startY, finishX, finishY) {
+      window.requestAnimationFrame(animation);
+      function animation() {
+        context.moveTo(startX, startY);
+        context.lineTo(finishX, finishY);
+        context.stroke();
+      }
     }
   }
 })();
