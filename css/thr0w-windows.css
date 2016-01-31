@@ -1,5 +1,6 @@
 .thr0w_windows_window {
   position: absolute;
+  box-sizing: border-box;
   border: 1px solid rgb(0,0,0);
 }
 .thr0w_windows_window__bar {
@@ -24,8 +25,12 @@
 }
 .thr0w_windows_window__content {
   position: absolute;
+  box-sizing: border-box;
   left: 0px;
   top: 50px;
+  border-left: 3px solid rgb(128,128,128);
+  border-right: 3px solid rgb(128,128,128);
+  border-bottom: 3px solid rgb(128,128,128);
 }
 .thr0w_windows_window__cover {
   position: absolute;

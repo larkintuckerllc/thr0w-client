@@ -6,8 +6,6 @@
   */
   // jscs:enable
   'use strict';
-  var BAR_HEIGHT = 50;
-  var BASE_Z = 800;
   if (window.thr0w === undefined) {
     throw 400;
   }
@@ -83,7 +81,7 @@
       // DATA NOT IN WINDOWS
       for (i = 0; i < data.length; i++) {
         if (windowIds.indexOf(data[i].id) === -1) {
-          windows.push(new WindowFrame(data[i].id, data[i].x,
+          windows.push(new Window(data[i].id, data[i].x,
             data[i].y, data[i].width, data[i].height, data[i].src));
         }
       }
@@ -128,9 +126,9 @@
     * @method openWindow
     * @param id {String} The id.
     * @param x {Integer} The horizontal position; min = 0, max = grid content width - width.
-    * @param y {Integer} The vertical position; min = 50px, max = grid content height - height.
+    * @param y {Integer} The vertical position; min = 0, max = grid content height - height.
     * @param width {Integer} The width; min = 140px.
-    * @param height {Integer} The height.
+    * @param height {Integer} The height; min = 55px.
     * @param src {String} The source url.
     */
     // jscs:enable
@@ -147,14 +145,14 @@
       if (x === undefined || typeof x !== 'number' || x < 0) {
         throw 400;
       }
-      if (y === undefined || typeof y !== 'number') {
+      if (y === undefined || typeof y !== 'number' || y < 0) {
         throw 400;
       }
       if (width === undefined || typeof width !== 'number' || width < 140) {
         throw 400;
       }
       if (height === undefined || typeof height !== 'number' ||
-        height < BAR_HEIGHT) {
+        height < 55) {
         throw 400;
       }
       if (src === undefined || typeof src !== 'string') {
@@ -163,15 +161,15 @@
       if (x + width > grid.getWidth()) {
         throw 400;
       }
-      if (y + height + BAR_HEIGHT > grid.getHeight()) {
+      if (y + height > grid.getHeight()) {
         throw 400;
       }
       var i;
       for (i = 0; i < windows.length; i++) {
         windows[i].deactivate();
       }
-      windows.push(new WindowFrame(id, x, y - BAR_HEIGHT, width,
-        height + BAR_HEIGHT, src));
+      windows.push(new Window(id, x, y, width,
+        height, src));
       stackWindows();
       sync.update();
       sync.idle();
@@ -215,14 +213,14 @@
     function stackWindows() {
       var i;
       for (i = 0; i < windows.length; i++) {
-        windows[i].setZ(BASE_Z + i);
+        windows[i].setZ(800 + i);
       }
       i = windows.length - 1;
       if (i !== -1) {
         windows[i].activate();
       }
     }
-    function WindowFrame(id, x, y, width, height, src) {
+    function Window(id, x, y, width, height, src) {
       var frameEl = grid.getFrame();
       var offsetLeft = frameEl.offsetLeft + contentEl.offsetLeft;
       var offsetTop = frameEl.offsetTop + contentEl.offsetTop;
@@ -265,9 +263,9 @@
         '</svg>',
         '</div>',
         '</div>',
-        '<iframe src="' + src + '" width="' + width + '" height="' + (height - BAR_HEIGHT) + '" frameborder="0" class="thr0w_windows_window__content">',
+        '<iframe src="' + src + '" width="' + (width - 2) + '" height="' + (height - 52) + '" frameborder="0" class="thr0w_windows_window__content">',
         '</iframe>',
-        '<div style="width: '  + width + 'px; height: ' + (height - BAR_HEIGHT) +'px;" class="thr0w_windows_window__cover"></div>',
+        '<div style="width: '  + (width - 2) + 'px; height: ' + (height - 52) +'px;" class="thr0w_windows_window__cover"></div>',
       ].join('\n');
       // jscs:enable
       windowEl.addEventListener('mousedown', sendSelfToTop);
