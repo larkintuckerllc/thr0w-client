@@ -450,9 +450,14 @@
   */
   // jscs:enable
   function thr0wChannel(channels, data) {
-    // RELYING ON SERVER FOR PARAMETER VALIDATION FOR PERFORMANCE
     if (!socket) {
       throw 400;
+    }
+    if (channels === undefined || !Array.isArray(channels)) {
+      throw 400;
+    }
+    if (channels.length === 0) {
+      return;
     }
     socket.emit(&#x27;thr0w&#x27;, JSON.stringify({channels: channels, message: data}));
   }
@@ -464,7 +469,7 @@
   * @constructor
   * @param {Object} frameEl The frame DOM element.
   * @param {Object} contentEl The content DOM element.
-  * @param {Array} matrix An array of arrays of integers defining the channels for the grid.
+  * @param {Array} matrix An array of arrays of integers defining the channels for the grid; an array of a single empty array for single screen.
   */
   // jscs:enable
   function Grid(frameEl, contentEl, matrix) {
@@ -480,8 +485,8 @@
     if (matrix === undefined || !Array.isArray(matrix)) {
       throw 400;
     }
-    var hpos;
-    var vpos;
+    var hpos = 0;
+    var vpos = 0;
     for (var i = 0; i &lt; matrix.length; i++) {
       for (var j = 0; j &lt; matrix[i].length; j++) {
         if (channel === matrix[i][j]) {
@@ -578,8 +583,8 @@
     }
     var i;
     var j;
-    var hpos;
-    var vpos;
+    var hpos = 0;
+    var vpos = 0;
     var width = 0;
     var height = 0;
     var shiftLeft = 0;
