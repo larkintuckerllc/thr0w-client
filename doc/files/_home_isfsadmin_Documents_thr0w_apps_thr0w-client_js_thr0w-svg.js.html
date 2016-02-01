@@ -188,6 +188,7 @@
     var mousePanning = false;
     var mouseLastX;
     var mouseLastY;
+    var handPanning = false;
     var sync = new window.thr0w.Sync(
       grid,
       &#x27;thr0w_svg_&#x27; + contentEl.id,
@@ -254,6 +255,9 @@
       e.preventDefault();
       touchOneLastX = e.touches[0].pageX;
       touchOneLastY = e.touches[0].pageY;
+      if (e.touches.length &gt; 2) {
+        handPanning = true;
+      }
       if (e.touches.length === 2) {
         touchStartRadius = Math.floor(Math.sqrt(
           Math.pow(touchOneLastX - e.touches[1].pageX, 2) +
@@ -271,13 +275,12 @@
       var touchCurrentRadius;
       var shiftX;
       var shiftY;
-      if (e.touches.length === 1) {
-        shiftX = -1 * (touchOneCurrentX - touchOneLastX) *
-          (scaledSvgWidth / svgElWidth) / zoomLevel;
-        shiftY = -1 * (touchOneCurrentY - touchOneLastY) *
-          (scaledSvgHeight / svgElHeight) / zoomLevel;
-        pan(shiftX, shiftY);
-      } else {
+      shiftX = -1 * (touchOneCurrentX - touchOneLastX) *
+        (scaledSvgWidth / svgElWidth) / zoomLevel;
+      shiftY = -1 * (touchOneCurrentY - touchOneLastY) *
+        (scaledSvgHeight / svgElHeight) / zoomLevel;
+      pan(shiftX, shiftY);
+      if (!handPanning &amp;&amp; e.touches.length === 2) {
         touchCurrentRadius = Math.floor(Math.sqrt(
           Math.pow(touchOneCurrentX - e.touches[1].pageX, 2) +
           Math.pow(touchOneCurrentY - e.touches[1].pageY, 2)
@@ -294,6 +297,7 @@
         touchOneLastY = e.touches[0].pageY;
       }
       if (e.touches.length === 0) {
+        handPanning = false;
         sync.idle();
       }
     }

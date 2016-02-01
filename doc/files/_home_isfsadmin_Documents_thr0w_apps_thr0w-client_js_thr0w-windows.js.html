@@ -116,8 +116,6 @@
   */
   // jscs:enable
   &#x27;use strict&#x27;;
-  var BAR_HEIGHT = 50;
-  var BASE_Z = 800;
   if (window.thr0w === undefined) {
     throw 400;
   }
@@ -193,7 +191,7 @@
       // DATA NOT IN WINDOWS
       for (i = 0; i &lt; data.length; i++) {
         if (windowIds.indexOf(data[i].id) === -1) {
-          windows.push(new WindowFrame(data[i].id, data[i].x,
+          windows.push(new Window(data[i].id, data[i].x,
             data[i].y, data[i].width, data[i].height, data[i].src));
         }
       }
@@ -238,9 +236,9 @@
     * @method openWindow
     * @param id {String} The id.
     * @param x {Integer} The horizontal position; min = 0, max = grid content width - width.
-    * @param y {Integer} The vertical position; min = 50px, max = grid content height - height.
+    * @param y {Integer} The vertical position; min = 0, max = grid content height - height.
     * @param width {Integer} The width; min = 140px.
-    * @param height {Integer} The height.
+    * @param height {Integer} The height; min = 55px.
     * @param src {String} The source url.
     */
     // jscs:enable
@@ -257,14 +255,14 @@
       if (x === undefined || typeof x !== &#x27;number&#x27; || x &lt; 0) {
         throw 400;
       }
-      if (y === undefined || typeof y !== &#x27;number&#x27;) {
+      if (y === undefined || typeof y !== &#x27;number&#x27; || y &lt; 0) {
         throw 400;
       }
       if (width === undefined || typeof width !== &#x27;number&#x27; || width &lt; 140) {
         throw 400;
       }
       if (height === undefined || typeof height !== &#x27;number&#x27; ||
-        height &lt; BAR_HEIGHT) {
+        height &lt; 55) {
         throw 400;
       }
       if (src === undefined || typeof src !== &#x27;string&#x27;) {
@@ -273,15 +271,15 @@
       if (x + width &gt; grid.getWidth()) {
         throw 400;
       }
-      if (y + height + BAR_HEIGHT &gt; grid.getHeight()) {
+      if (y + height &gt; grid.getHeight()) {
         throw 400;
       }
       var i;
       for (i = 0; i &lt; windows.length; i++) {
         windows[i].deactivate();
       }
-      windows.push(new WindowFrame(id, x, y - BAR_HEIGHT, width,
-        height + BAR_HEIGHT, src));
+      windows.push(new Window(id, x, y, width,
+        height, src));
       stackWindows();
       sync.update();
       sync.idle();
@@ -325,14 +323,14 @@
     function stackWindows() {
       var i;
       for (i = 0; i &lt; windows.length; i++) {
-        windows[i].setZ(BASE_Z + i);
+        windows[i].setZ(800 + i);
       }
       i = windows.length - 1;
       if (i !== -1) {
         windows[i].activate();
       }
     }
-    function WindowFrame(id, x, y, width, height, src) {
+    function Window(id, x, y, width, height, src) {
       var frameEl = grid.getFrame();
       var offsetLeft = frameEl.offsetLeft + contentEl.offsetLeft;
       var offsetTop = frameEl.offsetTop + contentEl.offsetTop;
@@ -375,9 +373,9 @@
         &#x27;&lt;/svg&gt;&#x27;,
         &#x27;&lt;/div&gt;&#x27;,
         &#x27;&lt;/div&gt;&#x27;,
-        &#x27;&lt;iframe src=&quot;&#x27; + src + &#x27;&quot; width=&quot;&#x27; + width + &#x27;&quot; height=&quot;&#x27; + (height - BAR_HEIGHT) + &#x27;&quot; frameborder=&quot;0&quot; class=&quot;thr0w_windows_window__content&quot;&gt;&#x27;,
+        &#x27;&lt;iframe src=&quot;&#x27; + src + &#x27;&quot; width=&quot;&#x27; + (width - 2) + &#x27;&quot; height=&quot;&#x27; + (height - 52) + &#x27;&quot; frameborder=&quot;0&quot; class=&quot;thr0w_windows_window__content&quot;&gt;&#x27;,
         &#x27;&lt;/iframe&gt;&#x27;,
-        &#x27;&lt;div style=&quot;width: &#x27;  + width + &#x27;px; height: &#x27; + (height - BAR_HEIGHT) +&#x27;px;&quot; class=&quot;thr0w_windows_window__cover&quot;&gt;&lt;/div&gt;&#x27;,
+        &#x27;&lt;div style=&quot;width: &#x27;  + (width - 2) + &#x27;px; height: &#x27; + (height - 52) +&#x27;px;&quot; class=&quot;thr0w_windows_window__cover&quot;&gt;&lt;/div&gt;&#x27;,
       ].join(&#x27;\n&#x27;);
       // jscs:enable
       windowEl.addEventListener(&#x27;mousedown&#x27;, sendSelfToTop);
