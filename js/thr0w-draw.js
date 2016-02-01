@@ -84,9 +84,11 @@
     canvasEl.addEventListener('touchend', endPainting);
     canvasEl.addEventListener('touchcancel', endPainting);
     contentEl.appendChild(canvasEl);
-    thumbEl.addEventListener('click', toggleOpen);
+    thumbEl.addEventListener('mousedown', toggleOpen);
+    thumbEl.addEventListener('touchstart', toggleOpen);
     for (i = 0; i < pickerEls.length; i++) {
-      pickerEls[i].addEventListener('click', pickColor); 
+      pickerEls[i].addEventListener('mousedown', pickColor); 
+      pickerEls[i].addEventListener('touchstart', pickColor); 
     }
     reset();
     var sync = new window.thr0w.Sync(
@@ -129,7 +131,8 @@
         context.closePath();
       }
     }
-    function toggleOpen() {
+    function toggleOpen(e) {
+      e.preventDefault();
       open = !open;
       sendUpdate();
       updateCanvasPalatte();
@@ -148,7 +151,8 @@
         thumbEl.classList.add('thr0w_draw_palatte__thumb--closed');
       }
     }
-    function pickColor() {
+    function pickColor(e) {
+      e.preventDefault();
       color = this.style.backgroundColor; // jshint ignore:line
       for (i = 0; i < pickerEls.length; i++) {
         pickerEls[i].classList.remove('thr0w_draw_palatte__color_picker--selected');

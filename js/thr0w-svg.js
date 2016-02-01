@@ -93,9 +93,13 @@
     svgEl.addEventListener('touchmove', handleTouchMove);
     svgEl.addEventListener('touchend', handleTouchEnd);
     palatteEl.querySelector('.thr0w_svg_palette__row__cell--plus')
-      .addEventListener('click', zoomIn);
+      .addEventListener('mousedown', zoomIn);
+    palatteEl.querySelector('.thr0w_svg_palette__row__cell--plus')
+      .addEventListener('touchstart', zoomIn);
     palatteEl.querySelector('.thr0w_svg_palette__row__cell--minus')
-      .addEventListener('click', zoomOut);
+      .addEventListener('mousedown', zoomOut);
+    palatteEl.querySelector('.thr0w_svg_palette__row__cell--minus')
+      .addEventListener('touchstart', zoomOut);
     setSVGViewBox(left, top, width, height);
     function message() {
       return {
@@ -191,12 +195,14 @@
         sync.idle();
       }
     }
-    function zoomIn() {
+    function zoomIn(e) {
+      e.preventDefault();
       zoom(zoomLevel + 0.5);
       sync.update();
       sync.idle();
     }
-    function zoomOut() {
+    function zoomOut(e) {
+      e.preventDefault();
       zoom(zoomLevel - 0.5);
       sync.update();
       sync.idle();
