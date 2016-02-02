@@ -393,15 +393,11 @@
     }
     contentEl.style.left = '-' + hpos * frameEl.clientWidth + 'px';
     contentEl.style.top = '-' + vpos * frameEl.clientHeight + 'px';
-    frameEl.addEventListener('touchstart', preventDefault);
     this.getFrame = getFrame;
     this.getContent = getContent;
     this.getMatrix = getMatrix;
     this.getWidth = getWidth;
     this.getHeight = getHeight;
-    function preventDefault(e) {
-      e.preventDefault();
-    }
     // jscs:disable
     /**
     * This function returns the grid's frame.
