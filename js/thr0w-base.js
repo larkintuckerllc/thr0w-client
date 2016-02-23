@@ -398,6 +398,7 @@
     this.getMatrix = getMatrix;
     this.getWidth = getWidth;
     this.getHeight = getHeight;
+    this.getRowScale = getRowScale;
     // jscs:disable
     /**
     * This function returns the grid's frame.
@@ -447,6 +448,16 @@
     // jscs:enable
     function getHeight() {
       return contentEl.offsetHeight;
+    }
+    // jscs:disable
+    /**
+    * This function returns the current row's scale.
+    * @method getRowScale
+    * @return {Integer} The scale of the current row.
+    */
+    // jscs:enable
+    function getRowScale() {
+      return 1;
     }
   }
   // jscs:disable
@@ -536,6 +547,7 @@
     this.getMatrix = getMatrix;
     this.getWidth = getWidth;
     this.getHeight = getHeight;
+    this.getRowScale = getRowScale;
     function preventDefault(e) {
       e.preventDefault();
     }
@@ -588,6 +600,16 @@
     // jscs:enable
     function getHeight() {
       return height;
+    }
+    // jscs:disable
+    /**
+    * This function returns the current row's scale.
+    * @method getRowScale
+    * @return {Integer} The scale of the current row.
+    */
+    // jscs:enable
+    function getRowScale() {
+      return dimensions[vpos].scale;
     }
   }
   // jscs:disable

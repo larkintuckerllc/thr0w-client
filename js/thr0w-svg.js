@@ -41,7 +41,17 @@
     if (max === undefined || typeof max !== 'number' || max < 1) {
       throw 400;
     }
+    var frameEl = grid.getFrame();
     var contentEl = grid.getContent();
+    var svgElWidth = grid.getWidth();
+    var svgElHeight = grid.getHeight();
+    var scale = grid.getRowScale();
+    var offsetLeft = frameEl.offsetLeft -
+      frameEl.offsetWidth / scale * (1 - scale) / 2 +
+      contentEl.offsetLeft;
+    var offsetTop = frameEl.offsetTop -
+      frameEl.offsetHeight / scale * (1 - scale) / 2 +
+      contentEl.offsetTop;
     var palatteEl = document.createElement('div');
     palatteEl.classList.add('thr0w_svg_palette');
     // jscs:disable
@@ -55,8 +65,6 @@
     ].join('\n');
     // jscs:enable
     contentEl.appendChild(palatteEl);
-    var svgElWidth = svgEl.offsetWidth;
-    var svgElHeight = svgEl.offsetHeight;
     var svgViewBox = svgEl.getAttribute('viewBox').split(' ');
     var svgWidth = svgViewBox[2];
     var svgHeight = svgViewBox[3];
@@ -73,8 +81,8 @@
     var zoomLevel = 1;
     var touchOneLastX;
     var touchOneLastY;
-    var touchStartRadius;
-    var touchStartZoomLevel;
+    var touchTwoLastX;
+    var touchTwoLastY;
     var mousePanning = false;
     var mouseLastX;
     var mouseLastY;
@@ -121,14 +129,14 @@
     function handleMouseDown(e) {
       e.preventDefault();
       mousePanning = true;
-      mouseLastX = e.pageX;
-      mouseLastY = e.pageY;
+      mouseLastX = e.pageX * scale - offsetLeft;
+      mouseLastY = e.pageY * scale - offsetTop;
       sync.update();
     }
     function handleMouseMove(e) {
       if (mousePanning) {
-        var mouseCurrentX = e.pageX;
-        var mouseCurrentY = e.pageY;
+        var mouseCurrentX = e.pageX * scale - offsetLeft;
+        var mouseCurrentY = e.pageY * scale - offsetTop;
         var shiftX;
         var shiftY;
         shiftX = -1 * (mouseCurrentX - mouseLastX) *
@@ -147,39 +155,113 @@
     }
     function handleTouchStart(e) {
       e.preventDefault();
-      touchOneLastX = e.touches[0].pageX;
-      touchOneLastY = e.touches[0].pageY;
+      touchOneLastX = e.touches[0].pageX * scale - offsetLeft;
+      touchOneLastY = e.touches[0].pageY * scale - offsetTop;
       if (e.touches.length > 2) {
         handPanning = true;
       }
       if (e.touches.length === 2) {
-        touchStartRadius = Math.floor(Math.sqrt(
-          Math.pow(touchOneLastX - e.touches[1].pageX, 2) +
-          Math.pow(touchOneLastY - e.touches[1].pageY, 2)
-        ));
-        touchStartZoomLevel = zoomLevel;
+        touchTwoLastX = e.touches[1].pageX * scale - offsetLeft;
+        touchTwoLastY = e.touches[1].pageY * scale - offsetTop;
       }
       if (e.touches.length === 1) {
         sync.update();
       }
     }
     function handleTouchMove(e) {
-      var touchOneCurrentX = e.touches[0].pageX;
-      var touchOneCurrentY = e.touches[0].pageY;
-      var touchCurrentRadius;
+      var touchOneCurrentX = e.touches[0].pageX * scale - offsetLeft;
+      var touchOneCurrentY = e.touches[0].pageY * scale - offsetTop;
+      var touchTwoCurrentX;
+      var touchTwoCurrentY;
+      var touchLeftLast;
+      var touchLeftCurrent;
+      var touchRightLast;
+      var touchRightCurrent;
+      var touchTopLast;
+      var touchTopCurrent;
+      var touchBottomLast;
+      var touchBottomCurrent;
       var shiftX;
       var shiftY;
-      shiftX = -1 * (touchOneCurrentX - touchOneLastX) *
-        (scaledSvgWidth / svgElWidth) / zoomLevel;
-      shiftY = -1 * (touchOneCurrentY - touchOneLastY) *
-        (scaledSvgHeight / svgElHeight) / zoomLevel;
-      pan(shiftX, shiftY);
+      var newWidth;
+      var newHeight;
+      var leftPosition;
+      var topPosition;
+      var touchRadiusCurrent;
+      var touchRadiusLast;
       if (!handPanning && e.touches.length === 2) {
-        touchCurrentRadius = Math.floor(Math.sqrt(
-          Math.pow(touchOneCurrentX - e.touches[1].pageX, 2) +
-          Math.pow(touchOneCurrentY - e.touches[1].pageY, 2)
+        touchTwoCurrentX = e.touches[1].pageX * scale - offsetLeft;
+        touchTwoCurrentY = e.touches[1].pageY * scale - offsetTop;
+        // DECIDING LEFT - RIGHT - TOP - BOTTOM
+        if (touchOneCurrentX < touchTwoCurrentX) {
+          touchLeftLast = touchOneLastX;
+          touchLeftCurrent = touchOneCurrentX;
+          touchRightLast = touchTwoLastX;
+          touchRightCurrent = touchTwoCurrentX;
+        } else {
+          touchLeftLast = touchTwoLastX;
+          touchLeftCurrent = touchTwoCurrentX;
+          touchRightLast = touchOneLastX;
+          touchRightCurrent = touchOneCurrentX;
+        }
+        if (touchOneCurrentY < touchTwoCurrentY) {
+          touchTopLast = touchOneLastY;
+          touchTopCurrent = touchOneCurrentY;
+          touchBottomLast = touchTwoLastY;
+          touchBottomCurrent = touchTwoCurrentY;
+        } else {
+          touchTopLast = touchTwoLastY;
+          touchTopCurrent = touchTwoCurrentY;
+          touchBottomLast = touchOneLastY;
+          touchBottomCurrent = touchOneCurrentY;
+        }
+        // SHIFTING LEFT AND TOP BASED ON LAST ZOOM
+        shiftX = -1 * (touchLeftCurrent - touchLeftLast) *
+          (scaledSvgWidth / svgElWidth) / zoomLevel;
+        shiftY = -1 * (touchTopCurrent - touchTopLast) *
+          (scaledSvgWidth / svgElWidth) / zoomLevel;
+        left += shiftX;
+        top += shiftY;
+        // CALCULATING ZOOM
+        touchRadiusLast = Math.floor(Math.sqrt(
+          Math.pow(touchLeftLast - touchRightLast, 2) +
+          Math.pow(touchTopLast - touchBottomLast, 2)
         ));
-        zoom(touchStartZoomLevel * touchCurrentRadius / touchStartRadius);
+        touchRadiusCurrent = Math.floor(Math.sqrt(
+          Math.pow(touchLeftCurrent - touchRightCurrent, 2) +
+          Math.pow(touchTopCurrent - touchBottomCurrent, 2)
+        ));
+        zoomLevel = Math.max(
+          Math.min(
+            zoomLevel * touchRadiusCurrent / touchRadiusLast,
+            max
+          ),
+          1
+        );
+        newWidth = scaledSvgWidth / zoomLevel;
+        newHeight = scaledSvgHeight / zoomLevel;
+        // SHIFTING LEFT AND TOP BASED ON CURRENT ZOOM
+        leftPosition = touchLeftCurrent / svgElWidth * width;
+        left = leftPosition + left - leftPosition * newWidth / width;
+        topPosition = touchTopCurrent / svgElHeight * height;
+        top = topPosition + top - topPosition * newHeight / height;
+        width = newWidth;
+        height = newHeight;
+        // KEEPING LEFT AND TOP IN BOUNDS
+        left = Math.max(left, 0);
+        left = Math.min(left, scaledSvgWidth - width);
+        top = Math.max(top, 0);
+        top = Math.min(top, scaledSvgHeight - height);
+        // FINISH
+        setSVGViewBox(left, top, width, height);
+        touchTwoLastX = touchTwoCurrentX;
+        touchTwoLastY = touchTwoCurrentY;
+      } else {
+        shiftX = -1 * (touchOneCurrentX - touchOneLastX) *
+          (scaledSvgWidth / svgElWidth) / zoomLevel;
+        shiftY = -1 * (touchOneCurrentY - touchOneLastY) *
+          (scaledSvgHeight / svgElHeight) / zoomLevel;
+        pan(shiftX, shiftY);
       }
       touchOneLastX = touchOneCurrentX;
       touchOneLastY = touchOneCurrentY;
@@ -187,8 +269,8 @@
     }
     function handleTouchEnd(e) {
       if (e.touches.length === 1) {
-        touchOneLastX = e.touches[0].pageX;
-        touchOneLastY = e.touches[0].pageY;
+        touchOneLastX = e.touches[0].pageX * scale - offsetLeft;
+        touchOneLastY = e.touches[0].pageY * scale - offsetTop;
       }
       if (e.touches.length === 0) {
         handPanning = false;
