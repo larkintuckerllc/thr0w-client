@@ -1,10 +1,9 @@
 .thr0w_svg_palette {
-  display: table;
-  border-collapse: collapse;
-  z-index: 998;
   position: absolute;
+  display: table;
   right: 20px;
   bottom: 20px;
+  border-collapse: collapse;
   width: 32px;
   background-color: rgb(221,221,211);
 }
