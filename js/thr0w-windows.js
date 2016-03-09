@@ -67,15 +67,18 @@
       var dataIds = data.map(getDataId);
       var windowIds = windows.map(getWindowId);
       var i;
+      var id;
       var j;
       var w;
       var orderedWindows = [];
       // WINDOW NOT IN DATA
       for (i = 0; i < windows.length; i++) {
         w = windows[i];
-        if (dataIds.indexOf(w.getId()) === -1) {
+        id = w.getId();
+        if (dataIds.indexOf(id) === -1) {
           windows.splice(i, 1);
           w.destroy();
+          closeWindowEvent(id);
         }
       }
       // DATA NOT IN WINDOWS
@@ -102,23 +105,6 @@
       function getDataId(obj) {
         return obj.id;
       }
-    }
-    function sendToTop(id) {
-      var i;
-      var j;
-      var w;
-      for (i = 0; i < windows.length; i++) {
-        windows[i].deactivate();
-        if (windows[i].getId() === id) {
-          j = i;
-          w = windows[i];
-        }
-      }
-      windows.splice(j, 1);
-      windows.push(w);
-      stackWindows();
-      sync.update();
-      sync.idle();
     }
     // jscs:disable
     /**
@@ -195,17 +181,7 @@
       stackWindows();
       sync.update();
       sync.idle();
-      // jscs:disable
-      /**
-      * Window closed.
-      *
-      * @event thr0w_windows_close_window 
-      * @param {String} wmid The {{#crossLink "thr0w.windows.WindowManager"}}thr0w.windows.WindowManager{{/crossLink}} object's id.
-      * @param {String} id The window's id.
-      */
-      // jscs:enable
-      document.dispatchEvent(new CustomEvent('thr0w_windows_close_window',
-        {detail: {wmid: wmId, id: id}}));
+      closeWindowEvent(id);
     }
     function getWindowId(obj) {
       return obj.getId();
@@ -219,6 +195,19 @@
       if (i !== -1) {
         windows[i].activate();
       }
+    }
+    function closeWindowEvent(id) {
+      // jscs:disable
+      /**
+      * Window closed.
+      *
+      * @event thr0w_windows_close_window 
+      * @param {String} wmid The {{#crossLink "thr0w.windows.WindowManager"}}thr0w.windows.WindowManager{{/crossLink}} object's id.
+      * @param {String} id The window's id.
+      */
+      // jscs:enable
+      document.dispatchEvent(new CustomEvent('thr0w_windows_close_window',
+        {detail: {wmid: wmId, id: id}}));
     }
     function Window(id, x, y, width, height, src) {
       var frameEl = grid.getFrame();
@@ -318,8 +307,22 @@
         positionWindow(x, y, scrollX, scrollY);
       }
       function sendSelfToTop(e) {
+        var i;
+        var j;
+        var w;
         e.preventDefault();
-        sendToTop(id);
+        for (i = 0; i < windows.length; i++) {
+          windows[i].deactivate();
+          if (windows[i].getId() === id) {
+            j = i;
+            w = windows[i];
+          }
+        }
+        windows.splice(j, 1);
+        windows.push(w);
+        stackWindows();
+        sync.update();
+        sync.idle();
       }
       function startMoving(e) {
         e.preventDefault();
