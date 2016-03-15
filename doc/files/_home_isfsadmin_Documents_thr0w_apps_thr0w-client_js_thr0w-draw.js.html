@@ -158,24 +158,15 @@
     palatteEl.classList.add(&#x27;thr0w_draw_palatte--closed&#x27;);
     // jscs:disable
     palatteEl.innerHTML = [
-      &#x27;&lt;div class=&quot;thr0w_draw_palatte__color_picker--default thr0w_draw_palatte__color_picker&quot; style=&quot;background: black;&quot;&gt;&#x27;,
-      &#x27;&lt;/div&gt;&#x27;,
-      &#x27;&lt;div class=&quot;thr0w_draw_palatte__color_picker&quot; style=&quot;background: white;&quot;&gt;&#x27;,
-      &#x27;&lt;/div&gt;&#x27;,
-      &#x27;&lt;div class=&quot;thr0w_draw_palatte__color_picker&quot; style=&quot;background: red;&quot;&gt;&#x27;,
-      &#x27;&lt;/div&gt;&#x27;,
-      &#x27;&lt;div class=&quot;thr0w_draw_palatte__color_picker&quot; style=&quot;background: orange;&quot;&gt;&#x27;,
-      &#x27;&lt;/div&gt;&#x27;,
-      &#x27;&lt;div class=&quot;thr0w_draw_palatte__color_picker&quot; style=&quot;background: yellow;&quot;&gt;&#x27;,
-      &#x27;&lt;/div&gt;&#x27;,
-      &#x27;&lt;div class=&quot;thr0w_draw_palatte__color_picker&quot; style=&quot;background: green;&quot;&gt;&#x27;,
-      &#x27;&lt;/div&gt;&#x27;,
-      &#x27;&lt;div class=&quot;thr0w_draw_palatte__color_picker&quot; style=&quot;background: blue;&quot;&gt;&#x27;,
-      &#x27;&lt;/div&gt;&#x27;,
-      &#x27;&lt;div class=&quot;thr0w_draw_palatte__color_picker&quot; style=&quot;background: purple;&quot;&gt;&#x27;,
-      &#x27;&lt;/div&gt;&#x27;,
-      &#x27;&lt;div class=&quot;thr0w_draw_palatte__thumb thr0w_draw_palatte__thumb--closed&quot;&gt;&#x27;,
-      &#x27;&lt;/div&gt;&#x27;].join(&#x27;\n&#x27;);
+      &#x27;&lt;div class=&quot;thr0w_draw_palatte__color_picker--default thr0w_draw_palatte__color_picker&quot; style=&quot;background: black;&quot;&gt;&lt;/div&gt;&#x27;,
+      &#x27;&lt;div class=&quot;thr0w_draw_palatte__color_picker&quot; style=&quot;background: white;&quot;&gt;&lt;/div&gt;&#x27;,
+      &#x27;&lt;div class=&quot;thr0w_draw_palatte__color_picker&quot; style=&quot;background: red;&quot;&gt;&lt;/div&gt;&#x27;,
+      &#x27;&lt;div class=&quot;thr0w_draw_palatte__color_picker&quot; style=&quot;background: orange;&quot;&gt;&lt;/div&gt;&#x27;,
+      &#x27;&lt;div class=&quot;thr0w_draw_palatte__color_picker&quot; style=&quot;background: yellow;&quot;&gt;&lt;/div&gt;&#x27;,
+      &#x27;&lt;div class=&quot;thr0w_draw_palatte__color_picker&quot; style=&quot;background: green;&quot;&gt;&lt;/div&gt;&#x27;,
+      &#x27;&lt;div class=&quot;thr0w_draw_palatte__color_picker&quot; style=&quot;background: blue;&quot;&gt;&lt;/div&gt;&#x27;,
+      &#x27;&lt;div class=&quot;thr0w_draw_palatte__color_picker&quot; style=&quot;background: purple;&quot;&gt;&lt;/div&gt;&#x27;,
+      &#x27;&lt;div class=&quot;thr0w_draw_palatte__thumb thr0w_draw_palatte__thumb--closed&quot;&gt;&lt;/div&gt;&#x27;].join(&#x27;\n&#x27;);
     // jscs:disable
     contentEl.appendChild(palatteEl);
     var thumbEl = palatteEl.querySelector(&#x27;.thr0w_draw_palatte__thumb&#x27;);
@@ -206,7 +197,6 @@
       receive
       );
     function startPainting(e) {
-      e.preventDefault();
       if (e.type === &#x27;mousedown&#x27;) {
         lastX = e.pageX - offsetLeft;
         lastY = e.pageY - offsetTop;

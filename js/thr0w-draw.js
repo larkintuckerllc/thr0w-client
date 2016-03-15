@@ -48,24 +48,15 @@
     palatteEl.classList.add('thr0w_draw_palatte--closed');
     // jscs:disable
     palatteEl.innerHTML = [
-      '<div class="thr0w_draw_palatte__color_picker--default thr0w_draw_palatte__color_picker" style="background: black;">',
-      '</div>',
-      '<div class="thr0w_draw_palatte__color_picker" style="background: white;">',
-      '</div>',
-      '<div class="thr0w_draw_palatte__color_picker" style="background: red;">',
-      '</div>',
-      '<div class="thr0w_draw_palatte__color_picker" style="background: orange;">',
-      '</div>',
-      '<div class="thr0w_draw_palatte__color_picker" style="background: yellow;">',
-      '</div>',
-      '<div class="thr0w_draw_palatte__color_picker" style="background: green;">',
-      '</div>',
-      '<div class="thr0w_draw_palatte__color_picker" style="background: blue;">',
-      '</div>',
-      '<div class="thr0w_draw_palatte__color_picker" style="background: purple;">',
-      '</div>',
-      '<div class="thr0w_draw_palatte__thumb thr0w_draw_palatte__thumb--closed">',
-      '</div>'].join('\n');
+      '<div class="thr0w_draw_palatte__color_picker--default thr0w_draw_palatte__color_picker" style="background: black;"></div>',
+      '<div class="thr0w_draw_palatte__color_picker" style="background: white;"></div>',
+      '<div class="thr0w_draw_palatte__color_picker" style="background: red;"></div>',
+      '<div class="thr0w_draw_palatte__color_picker" style="background: orange;"></div>',
+      '<div class="thr0w_draw_palatte__color_picker" style="background: yellow;"></div>',
+      '<div class="thr0w_draw_palatte__color_picker" style="background: green;"></div>',
+      '<div class="thr0w_draw_palatte__color_picker" style="background: blue;"></div>',
+      '<div class="thr0w_draw_palatte__color_picker" style="background: purple;"></div>',
+      '<div class="thr0w_draw_palatte__thumb thr0w_draw_palatte__thumb--closed"></div>'].join('\n');
     // jscs:disable
     contentEl.appendChild(palatteEl);
     var thumbEl = palatteEl.querySelector('.thr0w_draw_palatte__thumb');
@@ -84,11 +75,9 @@
     canvasEl.addEventListener('touchend', endPainting);
     canvasEl.addEventListener('touchcancel', endPainting);
     contentEl.appendChild(canvasEl);
-    thumbEl.addEventListener('mousedown', toggleOpen);
-    thumbEl.addEventListener('touchstart', toggleOpen);
+    thumbEl.addEventListener('click', toggleOpen);
     for (i = 0; i < pickerEls.length; i++) {
-      pickerEls[i].addEventListener('mousedown', pickColor); 
-      pickerEls[i].addEventListener('touchstart', pickColor); 
+      pickerEls[i].addEventListener('click', pickColor); 
     }
     reset();
     var sync = new window.thr0w.Sync(
@@ -98,7 +87,6 @@
       receive
       );
     function startPainting(e) {
-      e.preventDefault();
       if (e.type === 'mousedown') {
         lastX = e.pageX - offsetLeft;
         lastY = e.pageY - offsetTop;
@@ -131,8 +119,7 @@
         context.closePath();
       }
     }
-    function toggleOpen(e) {
-      e.preventDefault();
+    function toggleOpen() {
       open = !open;
       sendUpdate();
       updateCanvasPalatte();
@@ -151,8 +138,7 @@
         thumbEl.classList.add('thr0w_draw_palatte__thumb--closed');
       }
     }
-    function pickColor(e) {
-      e.preventDefault();
+    function pickColor() {
       color = this.style.backgroundColor; // jshint ignore:line
       for (i = 0; i < pickerEls.length; i++) {
         pickerEls[i].classList.remove('thr0w_draw_palatte__color_picker--selected');

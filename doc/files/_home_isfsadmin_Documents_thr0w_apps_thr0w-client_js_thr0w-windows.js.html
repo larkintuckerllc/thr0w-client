@@ -177,15 +177,18 @@
       var dataIds = data.map(getDataId);
       var windowIds = windows.map(getWindowId);
       var i;
+      var id;
       var j;
       var w;
       var orderedWindows = [];
       // WINDOW NOT IN DATA
       for (i = 0; i &lt; windows.length; i++) {
         w = windows[i];
-        if (dataIds.indexOf(w.getId()) === -1) {
+        id = w.getId();
+        if (dataIds.indexOf(id) === -1) {
           windows.splice(i, 1);
           w.destroy();
+          closeWindowEvent(id);
         }
       }
       // DATA NOT IN WINDOWS
@@ -212,23 +215,6 @@
       function getDataId(obj) {
         return obj.id;
       }
-    }
-    function sendToTop(id) {
-      var i;
-      var j;
-      var w;
-      for (i = 0; i &lt; windows.length; i++) {
-        windows[i].deactivate();
-        if (windows[i].getId() === id) {
-          j = i;
-          w = windows[i];
-        }
-      }
-      windows.splice(j, 1);
-      windows.push(w);
-      stackWindows();
-      sync.update();
-      sync.idle();
     }
     // jscs:disable
     /**
@@ -305,17 +291,7 @@
       stackWindows();
       sync.update();
       sync.idle();
-      // jscs:disable
-      /**
-      * Window closed.
-      *
-      * @event thr0w_windows_close_window 
-      * @param {String} wmid The {{#crossLink &quot;thr0w.windows.WindowManager&quot;}}thr0w.windows.WindowManager{{/crossLink}} object&#x27;s id.
-      * @param {String} id The window&#x27;s id.
-      */
-      // jscs:enable
-      document.dispatchEvent(new CustomEvent(&#x27;thr0w_windows_close_window&#x27;,
-        {detail: {wmid: wmId, id: id}}));
+      closeWindowEvent(id);
     }
     function getWindowId(obj) {
       return obj.getId();
@@ -329,6 +305,19 @@
       if (i !== -1) {
         windows[i].activate();
       }
+    }
+    function closeWindowEvent(id) {
+      // jscs:disable
+      /**
+      * Window closed.
+      *
+      * @event thr0w_windows_close_window 
+      * @param {String} wmid The {{#crossLink &quot;thr0w.windows.WindowManager&quot;}}thr0w.windows.WindowManager{{/crossLink}} object&#x27;s id.
+      * @param {String} id The window&#x27;s id.
+      */
+      // jscs:enable
+      document.dispatchEvent(new CustomEvent(&#x27;thr0w_windows_close_window&#x27;,
+        {detail: {wmid: wmId, id: id}}));
     }
     function Window(id, x, y, width, height, src) {
       var frameEl = grid.getFrame();
@@ -394,8 +383,7 @@
       windowControlsEl.style.visibility = &#x27;visible&#x27;;
       windowControlsCloseEl = windowControlsEl
         .querySelector(&#x27;.thr0w_windows_window__bar__controls__control--close&#x27;);
-      windowControlsCloseEl.addEventListener(&#x27;mousedown&#x27;, closeSelf);
-      windowControlsCloseEl.addEventListener(&#x27;touchstart&#x27;, closeSelf);
+      windowControlsCloseEl.addEventListener(&#x27;click&#x27;, closeSelf);
       windowContentEl = windowEl
         .querySelector(&#x27;.thr0w_windows_window__content&#x27;);
       windowContentEl.addEventListener(&#x27;load&#x27;, contentLoaded);
@@ -427,12 +415,24 @@
         scrollY = data.scrollY;
         positionWindow(x, y, scrollX, scrollY);
       }
-      function sendSelfToTop(e) {
-        e.preventDefault();
-        sendToTop(id);
+      function sendSelfToTop() {
+        var i;
+        var j;
+        var w;
+        for (i = 0; i &lt; windows.length; i++) {
+          windows[i].deactivate();
+          if (windows[i].getId() === id) {
+            j = i;
+            w = windows[i];
+          }
+        }
+        windows.splice(j, 1);
+        windows.push(w);
+        stackWindows();
+        sync.update();
+        sync.idle();
       }
       function startMoving(e) {
-        e.preventDefault();
         moving = true;
         if (e.type === &#x27;mousedown&#x27;) {
           lastX = e.pageX - offsetLeft;
@@ -469,8 +469,7 @@
         moving = false;
         windowSync.idle();
       }
-      function closeSelf(e) {
-        e.preventDefault();
+      function closeSelf() {
         closeWindow(id);
       }
       function contentLoaded() {

@@ -3,6 +3,7 @@
   position: absolute;
   top: 0px;
   left: 0px;
+  -webkit-user-select: none;
 }
 .thr0w_draw_canvas--closed {
   visibility: hidden;
@@ -16,6 +17,7 @@
   border-bottom-left-radius: 8px;
   border-bottom-right-radius: 8px;
   transition: transform 1s;
+  -webkit-user-select: none;
 }
 .thr0w_draw_palatte--closed {
   transform: translateY(-292px);

@@ -101,13 +101,9 @@
     svgEl.addEventListener('touchmove', handleTouchMove);
     svgEl.addEventListener('touchend', handleTouchEnd);
     palatteEl.querySelector('.thr0w_svg_palette__row__cell--plus')
-      .addEventListener('mousedown', zoomIn);
-    palatteEl.querySelector('.thr0w_svg_palette__row__cell--plus')
-      .addEventListener('touchstart', zoomIn);
+      .addEventListener('click', zoomIn);
     palatteEl.querySelector('.thr0w_svg_palette__row__cell--minus')
-      .addEventListener('mousedown', zoomOut);
-    palatteEl.querySelector('.thr0w_svg_palette__row__cell--minus')
-      .addEventListener('touchstart', zoomOut);
+      .addEventListener('click', zoomOut);
     setSVGViewBox(left, top, width, height);
     function message() {
       return {
@@ -127,7 +123,6 @@
       setSVGViewBox(left, top, width, height);
     }
     function handleMouseDown(e) {
-      e.preventDefault();
       mousePanning = true;
       mouseLastX = e.pageX * scale - offsetLeft;
       mouseLastY = e.pageY * scale - offsetTop;
@@ -154,7 +149,6 @@
       sync.idle();
     }
     function handleTouchStart(e) {
-      e.preventDefault();
       touchOneLastX = e.touches[0].pageX * scale - offsetLeft;
       touchOneLastY = e.touches[0].pageY * scale - offsetTop;
       if (e.touches.length > 2) {
@@ -277,14 +271,12 @@
         sync.idle();
       }
     }
-    function zoomIn(e) {
-      e.preventDefault();
+    function zoomIn() {
       zoom(zoomLevel + 0.5);
       sync.update();
       sync.idle();
     }
-    function zoomOut(e) {
-      e.preventDefault();
+    function zoomOut() {
       zoom(zoomLevel - 0.5);
       sync.update();
       sync.idle();

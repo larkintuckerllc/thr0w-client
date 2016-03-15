@@ -111,18 +111,14 @@
         '<button id="thr0w_base_connect__logout">Logout</button>'
       ].join('\n');
       connectEl.querySelector('#thr0w_base_connect__logout')
-        .addEventListener('mousedown', handleLogout);
-      connectEl.querySelector('#thr0w_base_connect__logout')
-        .addEventListener('touchstart', handleLogout);
+        .addEventListener('click', handleLogout);
       connectEl.querySelector('#thr0w_base_connect__connect')
         .addEventListener('submit', connectConnectElSubmit);
       frameEl.appendChild(connectEl);
-      function handleLogout(e) {
-        e.preventDefault();
+      function handleLogout() {
         logout();
       }
-      function connectConnectElSubmit(e) {
-        e.preventDefault();
+      function connectConnectElSubmit() {
         connectEl.style.display = 'none';
         channel = parseInt(connectEl
           .querySelector('#thr0w_base_connect__connect__channel').value);
@@ -144,8 +140,7 @@
       // jscs:enable
       loginEl.addEventListener('submit', loginElSubmit);
       frameEl.appendChild(loginEl);
-      function loginElSubmit(e) {
-        e.preventDefault();
+      function loginElSubmit() {
         var username = loginEl
           .querySelector('#thr0w_base_login__username').value;
         var password = loginEl
@@ -541,16 +536,12 @@
     shiftLeft = shiftLeftPadding + shiftLeftWindows + shiftLeftSpacing;
     contentEl.style.left = '-' + shiftLeft + 'px';
     contentEl.style.top = '-' + shiftTop + 'px';
-    frameEl.addEventListener('touchstart', preventDefault);
     this.getFrame = getFrame;
     this.getContent = getContent;
     this.getMatrix = getMatrix;
     this.getWidth = getWidth;
     this.getHeight = getHeight;
     this.getRowScale = getRowScale;
-    function preventDefault(e) {
-      e.preventDefault();
-    }
     // jscs:disable
     /**
     * This function returns the grid's frame.

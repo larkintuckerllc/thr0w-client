@@ -6,6 +6,7 @@
   border-collapse: collapse;
   width: 32px;
   background-color: rgb(221,221,211);
+  -webkit-user-select: none;
 }
 .thr0w_svg_palette__row {
   display: table-row;

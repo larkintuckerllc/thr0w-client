@@ -273,8 +273,7 @@
       windowControlsEl.style.visibility = 'visible';
       windowControlsCloseEl = windowControlsEl
         .querySelector('.thr0w_windows_window__bar__controls__control--close');
-      windowControlsCloseEl.addEventListener('mousedown', closeSelf);
-      windowControlsCloseEl.addEventListener('touchstart', closeSelf);
+      windowControlsCloseEl.addEventListener('click', closeSelf);
       windowContentEl = windowEl
         .querySelector('.thr0w_windows_window__content');
       windowContentEl.addEventListener('load', contentLoaded);
@@ -306,11 +305,10 @@
         scrollY = data.scrollY;
         positionWindow(x, y, scrollX, scrollY);
       }
-      function sendSelfToTop(e) {
+      function sendSelfToTop() {
         var i;
         var j;
         var w;
-        e.preventDefault();
         for (i = 0; i < windows.length; i++) {
           windows[i].deactivate();
           if (windows[i].getId() === id) {
@@ -325,7 +323,6 @@
         sync.idle();
       }
       function startMoving(e) {
-        e.preventDefault();
         moving = true;
         if (e.type === 'mousedown') {
           lastX = e.pageX - offsetLeft;
@@ -362,8 +359,7 @@
         moving = false;
         windowSync.idle();
       }
-      function closeSelf(e) {
-        e.preventDefault();
+      function closeSelf() {
         closeWindow(id);
       }
       function contentLoaded() {
