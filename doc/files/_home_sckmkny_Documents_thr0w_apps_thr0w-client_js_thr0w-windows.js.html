@@ -383,8 +383,7 @@
       windowControlsEl.style.visibility = &#x27;visible&#x27;;
       windowControlsCloseEl = windowControlsEl
         .querySelector(&#x27;.thr0w_windows_window__bar__controls__control--close&#x27;);
-      windowControlsCloseEl.addEventListener(&#x27;mousedown&#x27;, closeSelf);
-      windowControlsCloseEl.addEventListener(&#x27;touchstart&#x27;, closeSelf);
+      windowControlsCloseEl.addEventListener(&#x27;click&#x27;, closeSelf);
       windowContentEl = windowEl
         .querySelector(&#x27;.thr0w_windows_window__content&#x27;);
       windowContentEl.addEventListener(&#x27;load&#x27;, contentLoaded);
@@ -416,11 +415,10 @@
         scrollY = data.scrollY;
         positionWindow(x, y, scrollX, scrollY);
       }
-      function sendSelfToTop(e) {
+      function sendSelfToTop() {
         var i;
         var j;
         var w;
-        e.preventDefault();
         for (i = 0; i &lt; windows.length; i++) {
           windows[i].deactivate();
           if (windows[i].getId() === id) {
@@ -435,7 +433,6 @@
         sync.idle();
       }
       function startMoving(e) {
-        e.preventDefault();
         moving = true;
         if (e.type === &#x27;mousedown&#x27;) {
           lastX = e.pageX - offsetLeft;
@@ -472,8 +469,7 @@
         moving = false;
         windowSync.idle();
       }
-      function closeSelf(e) {
-        e.preventDefault();
+      function closeSelf() {
         closeWindow(id);
       }
       function contentLoaded() {

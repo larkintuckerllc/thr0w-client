@@ -118,7 +118,8 @@
       function handleLogout() {
         logout();
       }
-      function connectConnectElSubmit() {
+      function connectConnectElSubmit(e) {
+        e.preventDefault();
         connectEl.style.display = 'none';
         channel = parseInt(connectEl
           .querySelector('#thr0w_base_connect__connect__channel').value);
@@ -140,7 +141,8 @@
       // jscs:enable
       loginEl.addEventListener('submit', loginElSubmit);
       frameEl.appendChild(loginEl);
-      function loginElSubmit() {
+      function loginElSubmit(e) {
+        e.preventDefault();
         var username = loginEl
           .querySelector('#thr0w_base_login__username').value;
         var password = loginEl
