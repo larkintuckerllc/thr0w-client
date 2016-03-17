@@ -118,7 +118,7 @@
     /**
     * This method will animate zoom and then move the SVG.
     * @method moveTo
-    * @param duration {Integer} The maximum number of seconds for each zoom / move.
+    * @param duration {Integer} The maximum number of milliseconds for each zoom / move.
     * @param x {Number} The horizontal center position.
     * @param y {Number} The vertical center position.
     * @param z {Number} Optional zoom level.
