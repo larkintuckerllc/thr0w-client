@@ -6,6 +6,7 @@
   */
   // jscs:enable
   'use strict';
+  var io = window.io;
   var baseref;
   var socket = null;
   var channel = null;
@@ -35,7 +36,7 @@
   * This function is used to set the base URI for the thr0w service.
   * @method setBase
   * @static
-  * @param base {String} The URI. 
+  * @param base {String} The URI.
   */
   // jscs:enable
   function setBase(base) {
@@ -56,7 +57,7 @@
   * function(data)
   *
   * Parameters:
-  * 
+  *
   * data Object
   * The message data.
   * ```
@@ -180,7 +181,7 @@
   * @param callback {Function} The function callback.
   * ```
   * function(error)
-  * 
+  *
   * Parameters:
   *
   * error Integer
@@ -285,7 +286,7 @@
   * function(data)
   *
   * Parameters:
-  * 
+  *
   * data Object
   * The message data.
   * ```
@@ -314,7 +315,7 @@
     channel = chn;
     token = window.localStorage.getItem('thr0w_token');
     authTimeout = window.setTimeout(fail, 5000);
-    socket = window.io(baseref + ':3001');
+    socket = io(baseref + ':3001');
     socket.on('authenticated', success);
     socket.emit('authenticate',
       JSON.stringify({token: token, channel: channel})
@@ -466,7 +467,7 @@
   * @param {Object} frameEl The frame DOM element.
   * @param {Object} contentEl The content DOM element.
   * @param {Array} matrix An array of arrays of integers defining the channels for the grid.
-  * @param {Array} dimensions An array of objects consisting of width and height (and optional scale, spacing, padding, and bottom margin) of the frames in each row. 
+  * @param {Array} dimensions An array of objects consisting of width and height (and optional scale, spacing, padding, and bottom margin) of the frames in each row.
   */
   // jscs:enable
   function FlexGrid(frameEl, contentEl, matrix, dimensions) {
@@ -614,11 +615,12 @@
   * @param {Object} grid The grid, {{#crossLink "thr0w.Grid"}}thr0w.Grid{{/crossLink}} or {{#crossLink "thr0w.FlexGrid"}}thr0w.FlexGrid{{/crossLink}} object.
   * @param {String} _id The identifier for the sync.
   * @param {Function} message The function that generates the message.
+  * @param {Boolean} automated Optional flag to prevent interaction on all screens.
   * ```
   * function()
   *
-  * Returns: 
-  * Object 
+  * Returns:
+  * Object
   * The message data.
   * ```
   * @param {Function} receive The function that handles received messages.
@@ -632,7 +634,7 @@
   * ```
   */
   // jscs:enable
-  function Sync(grid, _id, message, receive) {
+  function Sync(grid, _id, message, receive, automated) {
     if (grid === undefined || typeof grid !== 'object') {
       throw 400;
     }
@@ -643,6 +645,9 @@
       throw 400;
     }
     if (receive === undefined || typeof receive !== 'function') {
+      throw 400;
+    }
+    if (automated !== undefined && typeof automated !== 'boolean') {
       throw 400;
     }
     var channels = [];
@@ -683,6 +688,9 @@
       if (!active) {
         active = true;
         lastActive = true;
+        if (automated) {
+          coverEl.style.visibility = 'visible';
+        }
         thr0wChannel(channels, {thr0w: {type: 'sync', _id: _id, lock: true}});
       }
       thr0wChannel(channels, {thr0w: {type: 'sync',
@@ -699,6 +707,9 @@
         return;
       }
       active = false;
+      if (automated) {
+        coverEl.style.visibility = 'hidden';
+      }
       thr0wChannel(channels, {thr0w: {type: 'sync', _id: _id, unlock: true}});
     }
     function syncMessageCallback(rawMsg) {

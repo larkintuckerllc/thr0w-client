@@ -116,6 +116,7 @@
   */
   // jscs:enable
   &#x27;use strict&#x27;;
+  var io = window.io;
   var baseref;
   var socket = null;
   var channel = null;
@@ -145,7 +146,7 @@
   * This function is used to set the base URI for the thr0w service.
   * @method setBase
   * @static
-  * @param base {String} The URI. 
+  * @param base {String} The URI.
   */
   // jscs:enable
   function setBase(base) {
@@ -166,7 +167,7 @@
   * function(data)
   *
   * Parameters:
-  * 
+  *
   * data Object
   * The message data.
   * &#x60;&#x60;&#x60;
@@ -290,7 +291,7 @@
   * @param callback {Function} The function callback.
   * &#x60;&#x60;&#x60;
   * function(error)
-  * 
+  *
   * Parameters:
   *
   * error Integer
@@ -395,7 +396,7 @@
   * function(data)
   *
   * Parameters:
-  * 
+  *
   * data Object
   * The message data.
   * &#x60;&#x60;&#x60;
@@ -424,7 +425,7 @@
     channel = chn;
     token = window.localStorage.getItem(&#x27;thr0w_token&#x27;);
     authTimeout = window.setTimeout(fail, 5000);
-    socket = window.io(baseref + &#x27;:3001&#x27;);
+    socket = io(baseref + &#x27;:3001&#x27;);
     socket.on(&#x27;authenticated&#x27;, success);
     socket.emit(&#x27;authenticate&#x27;,
       JSON.stringify({token: token, channel: channel})
@@ -576,7 +577,7 @@
   * @param {Object} frameEl The frame DOM element.
   * @param {Object} contentEl The content DOM element.
   * @param {Array} matrix An array of arrays of integers defining the channels for the grid.
-  * @param {Array} dimensions An array of objects consisting of width and height (and optional scale, spacing, padding, and bottom margin) of the frames in each row. 
+  * @param {Array} dimensions An array of objects consisting of width and height (and optional scale, spacing, padding, and bottom margin) of the frames in each row.
   */
   // jscs:enable
   function FlexGrid(frameEl, contentEl, matrix, dimensions) {
@@ -724,11 +725,12 @@
   * @param {Object} grid The grid, {{#crossLink &quot;thr0w.Grid&quot;}}thr0w.Grid{{/crossLink}} or {{#crossLink &quot;thr0w.FlexGrid&quot;}}thr0w.FlexGrid{{/crossLink}} object.
   * @param {String} _id The identifier for the sync.
   * @param {Function} message The function that generates the message.
+  * @param {Boolean} automated Optional flag to prevent interaction on all screens.
   * &#x60;&#x60;&#x60;
   * function()
   *
-  * Returns: 
-  * Object 
+  * Returns:
+  * Object
   * The message data.
   * &#x60;&#x60;&#x60;
   * @param {Function} receive The function that handles received messages.
@@ -742,7 +744,7 @@
   * &#x60;&#x60;&#x60;
   */
   // jscs:enable
-  function Sync(grid, _id, message, receive) {
+  function Sync(grid, _id, message, receive, automated) {
     if (grid === undefined || typeof grid !== &#x27;object&#x27;) {
       throw 400;
     }
@@ -753,6 +755,9 @@
       throw 400;
     }
     if (receive === undefined || typeof receive !== &#x27;function&#x27;) {
+      throw 400;
+    }
+    if (automated !== undefined &amp;&amp; typeof automated !== &#x27;boolean&#x27;) {
       throw 400;
     }
     var channels = [];
@@ -793,6 +798,9 @@
       if (!active) {
         active = true;
         lastActive = true;
+        if (automated) {
+          coverEl.style.visibility = &#x27;visible&#x27;;
+        }
         thr0wChannel(channels, {thr0w: {type: &#x27;sync&#x27;, _id: _id, lock: true}});
       }
       thr0wChannel(channels, {thr0w: {type: &#x27;sync&#x27;,
@@ -809,6 +817,9 @@
         return;
       }
       active = false;
+      if (automated) {
+        coverEl.style.visibility = &#x27;hidden&#x27;;
+      }
       thr0wChannel(channels, {thr0w: {type: &#x27;sync&#x27;, _id: _id, unlock: true}});
     }
     function syncMessageCallback(rawMsg) {
