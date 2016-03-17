@@ -9,8 +9,9 @@
   if (window.thr0w === undefined) {
     throw 400;
   }
+  var INTERVAL = 33;
   var service = {};
-  service.manage = manage;
+  service.Svg = Svg;
   // jscs:disable
   /**
   * This object provides SVG management functionality.
@@ -22,16 +23,16 @@
   window.thr0w.svg = service;
   // jscs:disable
   /**
-  * This function manages a SVG; initially scales them to fit and then
-  * handles panning and zooming.
-  * @method manage
-  * @static
+  * This class is used to create window managers.
+  * @namespace thr0w.svg
+  * @class Svg
+  * @constructor
   * @param grid {Object} The grid, {{#crossLink "thr0w.Grid"}}thr0w.Grid{{/crossLink}}, object.
   * @param svg {Object} The SVG DOM object.
   * @param max {Integer} The maximum zoom factor.
   */
   // jscs:enable
-  function manage(grid, svgEl, max) {
+  function Svg(grid, svgEl, max) {
     if (!grid || typeof grid !== 'object') {
       throw 400;
     }
@@ -53,6 +54,7 @@
       frameEl.offsetHeight / scale * (1 - scale) / 2 +
       contentEl.offsetTop;
     var palatteEl = document.createElement('div');
+    this.moveTo = moveTo;
     palatteEl.classList.add('thr0w_svg_palette');
     // jscs:disable
     palatteEl.innerHTML = [
@@ -92,7 +94,14 @@
       'thr0w_svg_' + contentEl.id,
       message,
       receive
-      );
+    );
+    var animationSync = new window.thr0w.Sync(
+      grid,
+      'thr0w_svg_animation_' + contentEl.id,
+      message,
+      receive,
+      true
+    );
     svgEl.addEventListener('mousedown', handleMouseDown);
     svgEl.addEventListener('mousemove', handleMouseMove);
     svgEl.addEventListener('mouseup', handleMouseEnd);
@@ -105,6 +114,100 @@
     palatteEl.querySelector('.thr0w_svg_palette__row__cell--minus')
       .addEventListener('click', zoomOut);
     setSVGViewBox(left, top, width, height);
+    // jscs:disable
+    /**
+    * This method will animate zoom and then move the SVG.
+    * @method moveTo
+    * @param duration {Integer} The maximum number of seconds for each zoom / move.
+    * @param x {Number} The horizontal center position.
+    * @param y {Number} The vertical center position.
+    * @param z {Number} Optional zoom level.
+    */
+    // jscs:enable
+    function moveTo(duration, x, y, z) {
+      if (duration !== parseInt(duration)) {
+        throw 400;
+      }
+      if (x === undefined || typeof x !== 'number') {
+        throw 400;
+      }
+      if (y === undefined || typeof y !== 'number') {
+        throw 400;
+      }
+      if (z === undefined) {
+        z = zoomLevel;
+      }
+      if (typeof z !== 'number') {
+        throw 400;
+      }
+      var zoomIncrement;
+      var zoomTime;
+      var zoomAnimationTime = 0;
+      var zoomAnimationInterval;
+      z = Math.max(Math.min(z, max), 1);
+      zoomTime = Math.floor(duration *
+        Math.abs(z - zoomLevel) / (max - 1));
+      zoomIncrement = zoomTime !== 0 ?
+        (z - zoomLevel) / (zoomTime / INTERVAL) : 0;
+      zoomAnimationInterval = window.setInterval(zoomAnimation, INTERVAL);
+      function zoomAnimation() {
+        zoomAnimationTime += INTERVAL;
+        if (zoomAnimationTime > zoomTime) {
+          window.clearInterval(zoomAnimationInterval);
+          zoom(z);
+          animationSync.update();
+          move();
+        } else {
+          zoom(zoomLevel + zoomIncrement);
+          animationSync.update();
+        }
+      }
+      function move() {
+        var newLeft;
+        var newTop;
+        var moveTimeLeft;
+        var moveTimeTop;
+        var moveTime;
+        var moveIncrementLeft;
+        var moveIncrementTop;
+        var moveAnimationInterval;
+        var moveAnimationTime = 0;
+        newLeft = x - width / 2;
+        newLeft = newLeft >= 0 ? newLeft : 0;
+        newLeft = newLeft <= scaledSvgWidth - width ?
+          newLeft : scaledSvgWidth - width;
+        newTop = y - height / 2;
+        newTop = newTop >= 0 ? newTop : 0;
+        newTop = newTop <= scaledSvgHeight - height ?
+          newTop : scaledSvgHeight - height;
+        moveTimeLeft = scaledSvgWidth - width !== 0 ? Math.floor(duration *
+          Math.abs(newLeft - left) / (scaledSvgWidth - width)) : 0;
+        moveTimeTop = scaledSvgHeight - height !== 0 ? Math.floor(duration *
+          Math.abs(newTop - top) / (scaledSvgHeight - height)) : 0;
+        moveTime = Math.max(moveTimeLeft, moveTimeTop);
+        moveIncrementLeft = moveTime !== 0 ?
+          (newLeft - left) / (moveTime / INTERVAL) : 0;
+        moveIncrementTop = moveTime !== 0 ?
+          (newTop - top) / (moveTime / INTERVAL) : 0;
+        moveAnimationInterval = window.setInterval(moveAnimation, INTERVAL);
+        function moveAnimation() {
+          moveAnimationTime += INTERVAL;
+          if (moveAnimationTime > moveTime) {
+            window.clearInterval(moveAnimationInterval);
+            left = newLeft;
+            top = newTop;
+            setSVGViewBox(left, top, width, height);
+            animationSync.update();
+            animationSync.idle();
+          } else {
+            left += moveIncrementLeft;
+            top += moveIncrementTop;
+            setSVGViewBox(left, top, width, height);
+            animationSync.update();
+          }
+        }
+      }
+    }
     function message() {
       return {
         left: left,
@@ -145,8 +248,10 @@
       }
     }
     function handleMouseEnd() {
-      mousePanning = false;
-      sync.idle();
+      if (mousePanning) {
+        mousePanning = false;
+        sync.idle();
+      }
     }
     function handleTouchStart(e) {
       touchOneLastX = e.touches[0].pageX * scale - offsetLeft;
@@ -297,9 +402,9 @@
       setSVGViewBox(left, top, width, height);
     }
     function zoom(factor) {
-      zoomLevel = Math.max(Math.min(factor, max), 1);
       var centerX = left + width / 2;
       var centerY = top + height / 2;
+      zoomLevel = Math.max(Math.min(factor, max), 1);
       width = scaledSvgWidth / zoomLevel;
       height = scaledSvgHeight / zoomLevel;
       left = Math.max(centerX - width / 2, 0);
@@ -309,6 +414,7 @@
       setSVGViewBox(left, top, width, height);
     }
     function setSVGViewBox(newLeft, newTop, newWidth, newHeight) {
+      //window.console.log('SETSVGVIEWBOX');
       window.requestAnimationFrame(animation);
       function animation() {
         svgEl.setAttribute('viewBox', newLeft + ' ' + newTop +
