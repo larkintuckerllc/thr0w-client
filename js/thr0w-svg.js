@@ -23,7 +23,7 @@
   window.thr0w.svg = service;
   // jscs:disable
   /**
-  * This class is used to create window managers.
+  * This class is used to manage SVGs.
   * @namespace thr0w.svg
   * @class Svg
   * @constructor
@@ -54,7 +54,10 @@
       frameEl.offsetHeight / scale * (1 - scale) / 2 +
       contentEl.offsetTop;
     var palatteEl = document.createElement('div');
+    var zoomAnimationInterval = null;
+    var moveAnimationInterval = null;
     this.moveTo = moveTo;
+    this.moveStop = moveStop;
     palatteEl.classList.add('thr0w_svg_palette');
     // jscs:disable
     palatteEl.innerHTML = [
@@ -143,7 +146,14 @@
       var zoomIncrement;
       var zoomTime;
       var zoomAnimationTime = 0;
-      var zoomAnimationInterval;
+      if (zoomAnimationInterval) {
+        window.clearInterval(zoomAnimationInterval);
+        zoomAnimationInterval = null;
+      }
+      if (moveAnimationInterval) {
+        window.clearInterval(moveAnimationInterval);
+        moveAnimationInterval = null;
+      }
       z = Math.max(Math.min(z, max), 1);
       zoomTime = Math.floor(duration *
         Math.abs(z - zoomLevel) / (max - 1));
@@ -154,6 +164,7 @@
         zoomAnimationTime += INTERVAL;
         if (zoomAnimationTime > zoomTime) {
           window.clearInterval(zoomAnimationInterval);
+          zoomAnimationInterval = null;
           zoom(z);
           animationSync.update();
           move();
@@ -170,7 +181,6 @@
         var moveTime;
         var moveIncrementLeft;
         var moveIncrementTop;
-        var moveAnimationInterval;
         var moveAnimationTime = 0;
         newLeft = x - width / 2;
         newLeft = newLeft >= 0 ? newLeft : 0;
@@ -194,6 +204,7 @@
           moveAnimationTime += INTERVAL;
           if (moveAnimationTime > moveTime) {
             window.clearInterval(moveAnimationInterval);
+            moveAnimationInterval = null;
             left = newLeft;
             top = newTop;
             setSVGViewBox(left, top, width, height);
@@ -207,6 +218,23 @@
           }
         }
       }
+    }
+    // jscs:disable
+    /**
+    * This method will stop active SVG animations.
+    * @method moveStop
+    */
+    // jscs:enable
+    function moveStop() {
+      if (zoomAnimationInterval) {
+        window.clearInterval(zoomAnimationInterval);
+        zoomAnimationInterval = null;
+      }
+      if (moveAnimationInterval) {
+        window.clearInterval(moveAnimationInterval);
+        moveAnimationInterval = null;
+      }
+      animationSync.idle();
     }
     function message() {
       return {
