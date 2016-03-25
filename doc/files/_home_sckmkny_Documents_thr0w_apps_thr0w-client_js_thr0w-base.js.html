@@ -727,7 +727,6 @@
   * @param {Object} grid The grid, {{#crossLink &quot;thr0w.Grid&quot;}}thr0w.Grid{{/crossLink}} or {{#crossLink &quot;thr0w.FlexGrid&quot;}}thr0w.FlexGrid{{/crossLink}} object.
   * @param {String} _id The identifier for the sync.
   * @param {Function} message The function that generates the message.
-  * @param {Boolean} automated Optional flag to prevent interaction on all screens.
   * &#x60;&#x60;&#x60;
   * function()
   *
@@ -744,6 +743,7 @@
   * data Object
   * The message data.
   * &#x60;&#x60;&#x60;
+  * @param {Boolean} automated Optional flag to prevent interaction on all screens.
   */
   // jscs:enable
   function Sync(grid, _id, message, receive, automated) {
