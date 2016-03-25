@@ -658,9 +658,10 @@
     var lastActive = false;
     var matrix = grid.getMatrix();
     var coverEl = document.createElement('div');
+    var frameEl = grid.getFrame();
     coverEl.classList.add('thr0w_base_cover');
     coverEl.style.visibility = 'hidden';
-    grid.getFrame().appendChild(coverEl);
+    frameEl.appendChild(coverEl);
     for (var i = 0; i < matrix.length; i++) {
       for (var j = 0; j < matrix[i].length; j++) {
         channels.push(matrix[i][j]);
@@ -749,6 +750,7 @@
       receive(thr0wMsg.message);
     }
     function destroy() {
+      frameEl.removeChild(coverEl);
       socket.off('message', syncMessageCallback);
     }
   }
