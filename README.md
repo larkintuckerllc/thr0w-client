@@ -10,7 +10,7 @@ software. The key to this solution is having one computer behind each screen
 networked to a single computer acting as a server. With this design, the
 splitting and synchronization of content is accomplished through software.
 
-This repository provides the project's Thr0w API for the project's
+This repository provides the project's Thr0w (Client) API for the project's
 required Thr0w Server implementation available at:
 
 <https://github.com/larkintuckerllc/thr0w-server>
