@@ -1,11 +1,11 @@
 {
   "name": "thr0w-client",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "authors": [
     "John Tucker <john@larkintuckerllc.com>"
   ],
   "main": "dist/thr0w-client.js",
-  "license": "MIT",
+  "license": "GPL",
   "ignore": [],
   "dependencies": {
   }

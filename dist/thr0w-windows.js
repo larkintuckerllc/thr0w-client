@@ -47,6 +47,8 @@
       );
     this.openWindow = openWindow;
     this.closeWindow = closeWindow;
+    this.addEventListener = addEventListener;
+    this.removeEventListener = removeEventListener;
     function message() {
       var data = [];
       var i;
@@ -183,6 +185,34 @@
       sync.idle();
       closeWindowEvent(id);
     }
+    // jscs:disable
+    /**
+    * This method is used to register listeners
+    * @method addEventListener
+    * @param type {String} Name of the event.
+    * @param listener {Function} Listening function.
+    */
+    // jscs:enable
+    function addEventListener(type, listener) {
+      document.addEventListener(
+        'thr0w_windows_' + type,
+        listener
+      );
+    }
+    // jscs:disable
+    /**
+    * This method is used to deregister listeners
+    * @method removeEventListener
+    * @param type {String} Name of the event.
+    * @param listener {Function} Listening function.
+    */
+    // jscs:enable
+    function removeEventListener(type, listener) {
+      document.removeEventListener(
+        'thr0w_windows_' + type,
+        listener
+      );
+    }
     function getWindowId(obj) {
       return obj.getId();
     }
@@ -201,12 +231,12 @@
       /**
       * Window closed.
       *
-      * @event thr0w_windows_close_window 
+      * @event window_closed
       * @param {String} wmid The {{#crossLink "thr0w.windows.WindowManager"}}thr0w.windows.WindowManager{{/crossLink}} object's id.
       * @param {String} id The window's id.
       */
       // jscs:enable
-      document.dispatchEvent(new CustomEvent('thr0w_windows_close_window',
+      document.dispatchEvent(new CustomEvent('thr0w_windows_window_closed',
         {detail: {wmid: wmId, id: id}}));
     }
     function Window(id, x, y, width, height, src) {
@@ -452,4 +482,3 @@
     }
   }
 })();
-
