@@ -10,21 +10,21 @@ software. The key to this solution is having one computer behind each screen
 networked to a single computer acting as a server. With this design, the
 splitting and synchronization of content is accomplished through software.
 
-This repository provides the project's client-side API for the project's
-required server implementation available at:
+This repository provides the project's Thr0w API for the project's
+required Thr0w Server implementation available at:
 
-https://github.com/larkintuckerllc/thr0w-server
+<https://github.com/larkintuckerllc/thr0w-server>
 
-The Thr0w client-side API has only been tested against modern versions of
+The Thr0w API has only been tested against modern versions of
 Chrome Browser.
 
 ## Installation
 
 Download the latest version:
 
-https://github.com/larkintuckerllc/thr0w-client/releases
+<https://github.com/larkintuckerllc/thr0w-client/releases>
 
-The Thr0w client-side API consists of the following modules:
+The Thr0w API consists of the following modules:
 
 * Base: Provides core functionality.
 * Draw: Used to create a drawing layer.
@@ -32,7 +32,7 @@ The Thr0w client-side API consists of the following modules:
 * Windows: Used to manage windows.
 
 The Base module is required and it is dependent on the *socket.io.js*
-library provided by the Thr0w server implementation.
+library provided by the Thr0w Server implementation.
 
 To install a module, simply add the module's CSS library to the HTML *head*,
 e.g.:
@@ -51,7 +51,38 @@ where *ROOT* is the URL path to the root folder of the download.
 
 ## Usage
 
-TODO
+Thr0w Examples, with the latest version available at:
+
+<https://github.com/larkintuckerllc/thr0w-examples/releases>
+
+provides inline documentation on using the Thr0w API.
+
+The API reference is available at:
+
+<http://rawgit.com/larkintuckerllc/thr0w-client/master/doc/index.html>
+
+**Image**
+
+This simple example takes a large image and splits it across three screens; it
+has no interactivity.
+
+**Animation**
+
+This example introduces a simple interaction where-by the the left-most screen
+(channel 0) animates the scene and sends update messages to the
+other screens.
+
+**Draw**
+
+This example uses the Draw module to add a drawing overlay.
+
+**SVG**
+
+This example uses the SVG module to create an interactive SVG.
+
+**Windows**
+
+This example uses the Windows module to manage two windows.
 
 ## Contributing
 
@@ -63,7 +94,7 @@ TODO
 
 ## Contact
 
-TODO
+General questions and comments can be directed to <mailto:john@larkintuckerllc.com>.
 
 ## License
 
