@@ -47,6 +47,7 @@
       );
     this.openWindow = openWindow;
     this.closeWindow = closeWindow;
+    this.closeAllWindows = closeAllWindows;
     this.addEventListener = addEventListener;
     this.removeEventListener = removeEventListener;
     function message() {
@@ -184,6 +185,18 @@
       sync.update();
       sync.idle();
       closeWindowEvent(id);
+    }
+    // jscs:disable
+    /**
+    * This method is used to close all windows.
+    * @method closeAllWindows
+    */
+    // jscs:enable
+    function closeAllWindows() {
+      var i;
+      for (i = windows.length - 1; i >= 0; i--) {
+        closeWindow(windows[i].getId());
+      }
     }
     // jscs:disable
     /**
