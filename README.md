@@ -86,7 +86,50 @@ This example uses the Windows module to manage two windows.
 
 ## Contributing
 
-TODO
+Submit bug or enhancement requests using the Github *Issues* feature. Submit
+bug fixes or enhancements as pull requests. Specifically, follow GitHub's
+document *Contributing to Open Source on GitHub*.
+
+<https://guides.github.com/activities/contributing-to-open-source/>
+
+New features are to be implemented as modules, i.e., in a single CSS and
+single JavaScript file. The single CSS file is to be placed in the *css*
+directory named as *thr0w-MODULE.css* and the single JavaScript file is to be
+placed in the *js* directory named as *thr0w-MODULE.js* replacing *MODULE*
+with the name of the module.
+
+The CSS and JavaScript need only be tested against the latest version of
+Chrome Browser.
+
+To compile, install the development dependencies using *npm* and compile with
+*gulp*.
+
+Where possible, the CSS and JavaScript is not to require any third-party
+libraries (outside of the *socket.io.js* client library).
+
+The CSS is to follow the BEM naming convention.
+
+<https://css-tricks.com/bem-101/>
+
+The JavaScript is to pass JSHint with the default configuration. The JavaScript
+is to pass JSCS with the Google preset.
+
+* <http://jshint.com/>
+* <http://jscs.info/>
+
+The JavaScript is to comply with the following style guide.
+
+* Modules are to be wrapped in an Immediately Invoked Function Expression
+(IIFE); no globals.
+* Modules' expose their functionality as an appropriately named property on
+the global *thr0w* object, e.g., *thr0w.windows* for the Windows module.
+* Use named functions instead of passing an anonymous function in as a callback.
+* Define functions in the scope where they are used.
+* Place functions declarations at the end of the scope; rely on hoisting.
+
+The exposed JavaScript classes (or objects) are to be documented using YUIDoc.
+
+<http://yui.github.io/yuidoc/>
 
 ## Credits
 
