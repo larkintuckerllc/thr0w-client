@@ -60,9 +60,9 @@ where *ROOT* is the URL path to the root folder of the download.
 
 ## Usage
 
-Thr0w Examples, with the latest version available at:
+Thr0w Examples
 
-<https://github.com/larkintuckerllc/thr0w-examples/releases>
+<https://github.com/larkintuckerllc/thr0w-examples>
 
 provides inline documentation on using the Thr0w API.
 
