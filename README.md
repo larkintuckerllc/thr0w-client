@@ -20,9 +20,18 @@ Chrome Browser.
 
 ## Installation
 
-Download the latest version:
+Download the latest version and serve as static files from a web server:
 
 <https://github.com/larkintuckerllc/thr0w-client/releases>
+
+For local development, one can use one of the following to spin up a
+lightweight development server.
+
+* Python: python -m SimpleHTTPServer 8888 &
+* Python 3+: python3 -m http.server 8888 &
+* PHP: php -S localhost:8888
+* Ruby: ruby -run -e httpd . -p 8888
+* Node.js: npm install http-server -g; http-server
 
 The Thr0w API consists of the following modules:
 
