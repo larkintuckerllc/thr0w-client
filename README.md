@@ -70,29 +70,6 @@ The API reference is available at:
 
 <http://rawgit.com/larkintuckerllc/thr0w-client/master/doc/index.html>
 
-**Image**
-
-This simple example takes a large image and splits it across three screens; it
-has no interactivity.
-
-**Animation**
-
-This example introduces a simple interaction where-by the the left-most screen
-(channel 0) animates the scene and sends update messages to the
-other screens.
-
-**Draw**
-
-This example uses the Draw module to add a drawing overlay.
-
-**SVG**
-
-This example uses the SVG module to create an interactive SVG.
-
-**Windows**
-
-This example uses the Windows module to manage two windows.
-
 ## Contributing
 
 Submit bug or enhancement requests using the Github *Issues* feature. Submit
