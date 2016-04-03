@@ -316,6 +316,23 @@
       windowControlsEl.style.visibility = 'visible';
       windowControlsCloseEl = windowControlsEl
         .querySelector('.thr0w_windows_window__bar__controls__control--close');
+      // FIX
+      windowControlsCloseEl.addEventListener('mousedown',
+        closeStopPropagation);
+      windowControlsCloseEl.addEventListener('touchstart',
+        closeStopPropagation);
+      windowControlsCloseEl.addEventListener('mousemove',
+        closeStopPropagation);
+      windowControlsCloseEl.addEventListener('touchmove',
+        closeStopPropagation);
+      windowControlsCloseEl.addEventListener('mouseup',
+        closeStopPropagation);
+      windowControlsCloseEl.addEventListener('mouseleave',
+        closeStopPropagation);
+      windowControlsCloseEl.addEventListener('touchend',
+        closeStopPropagation);
+      windowControlsCloseEl.addEventListener('touchcancel',
+        closeStopPropagation);
       windowControlsCloseEl.addEventListener('click', closeSelf);
       windowContentEl = windowEl
         .querySelector('.thr0w_windows_window__content');
@@ -349,6 +366,9 @@
         positionWindow(x, y, scrollX, scrollY);
       }
       function sendSelfToTop() {
+        if (active) {
+          return;
+        }
         var i;
         var j;
         var w;
@@ -401,6 +421,9 @@
       function endMoving() {
         moving = false;
         windowSync.idle();
+      }
+      function closeStopPropagation(e) {
+        e.stopPropagation();
       }
       function closeSelf() {
         closeWindow(id);
@@ -458,8 +481,23 @@
         windowBarEl.removeEventListener('mouseleave', endMoving);
         windowBarEl.removeEventListener('touchend', endMoving);
         windowBarEl.removeEventListener('touchcancel', endMoving);
-        windowControlsCloseEl.removeEventListener('mousedown', closeSelf);
-        windowControlsCloseEl.removeEventListener('touchstart', closeSelf);
+        windowControlsCloseEl.removeEventListener('mousedown',
+          closeStopPropagation);
+        windowControlsCloseEl.removeEventListener('touchstart',
+          closeStopPropagation);
+        windowControlsCloseEl.removeEventListener('mousemove',
+          closeStopPropagation);
+        windowControlsCloseEl.removeEventListener('touchmove',
+          closeStopPropagation);
+        windowControlsCloseEl.removeEventListener('mouseup',
+          closeStopPropagation);
+        windowControlsCloseEl.removeEventListener('mouseleave',
+          closeStopPropagation);
+        windowControlsCloseEl.removeEventListener('touchend',
+          closeStopPropagation);
+        windowControlsCloseEl.removeEventListener('touchcancel',
+          closeStopPropagation);
+        windowControlsCloseEl.removeEventListener('click', closeSelf);
         windowContentEl.contentWindow.location.href = 'about:blank';
         contentEl.removeChild(windowEl);
         windowSync.destroy();
