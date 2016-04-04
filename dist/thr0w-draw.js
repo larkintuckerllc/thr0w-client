@@ -34,7 +34,7 @@
     }
     var open = false;
     var color = null;
-    var paint = false;
+    var mousePanning = false;
     var lastX;
     var lastY;
     var frameEl = grid.getFrame();
@@ -66,18 +66,18 @@
     canvasEl.classList.add('thr0w_draw_canvas--closed');
     canvasEl.width = grid.getWidth();
     canvasEl.height = grid.getHeight();
-    canvasEl.addEventListener('mousedown', startPainting);
-    canvasEl.addEventListener('mousemove', layPaint);
-    canvasEl.addEventListener('mouseup', endPainting);
-    canvasEl.addEventListener('mouseleave', endPainting);
-    canvasEl.addEventListener('touchstart', startPainting);
-    canvasEl.addEventListener('touchmove', layPaint);
-    canvasEl.addEventListener('touchend', endPainting);
-    canvasEl.addEventListener('touchcancel', endPainting);
+    canvasEl.addEventListener('mousedown', handleMouseDown);
+    canvasEl.addEventListener('mousemove', handleMouseMove);
+    canvasEl.addEventListener('mouseup', handleMouseEnd);
+    canvasEl.addEventListener('mouseleave', handleMouseEnd);
+    canvasEl.addEventListener('touchstart', handleTouchStart);
+    canvasEl.addEventListener('touchmove', handleTouchMove);
+    canvasEl.addEventListener('touchend', handleTouchEnd);
+    canvasEl.addEventListener('touchcancel', handleTouchEnd);
     contentEl.appendChild(canvasEl);
     thumbEl.addEventListener('click', toggleOpen);
     for (i = 0; i < pickerEls.length; i++) {
-      pickerEls[i].addEventListener('click', pickColor); 
+      pickerEls[i].addEventListener('click', pickColor);
     }
     reset();
     var sync = new window.thr0w.Sync(
@@ -85,37 +85,51 @@
       'thr0w_draw_' + contentEl.id,
       message,
       receive
-      );
-    function startPainting(e) {
-      if (e.type === 'mousedown') {
-        lastX = e.pageX - offsetLeft;
-        lastY = e.pageY - offsetTop;
-      } else {
-        lastX = Math.floor(e.changedTouches[0].pageX) - offsetLeft;
-        lastY = Math.floor(e.changedTouches[0].pageY) - offsetTop;
-      }
-      paint = true;
+    );
+    function handleMouseDown(e) {
+      mousePanning = true;
+      lastX = e.pageX - offsetLeft;
+      lastY = e.pageY - offsetTop;
       context.beginPath();
     }
-    function layPaint(e) {
+    function handleMouseMove(e) {
       var x;
       var y;
-      if (paint) {
-        if (e.type === 'mousemove') {
-          x = e.pageX - offsetLeft;
-          y = e.pageY - offsetTop;
-        } else {
-          x = Math.floor(e.changedTouches[0].pageX) - offsetLeft;
-          y = Math.floor(e.changedTouches[0].pageY) - offsetTop;
-        }
+      if (mousePanning) {
+        x = e.pageX - offsetLeft;
+        y = e.pageY - offsetTop;
         drawLine(lastX, lastY, x, y);
         lastX = x;
         lastY = y;
       }
     }
-    function endPainting() {
-      if (paint) {
-        paint = false;
+    function handleMouseEnd() {
+      if (mousePanning) {
+        mousePanning = false;
+        context.closePath();
+      }
+    }
+    function handleTouchStart(e) {
+      if (e.touches.length === 1) {
+        lastX = e.touches[0].pageX - offsetLeft;
+        lastY = e.touches[0].pageY - offsetTop;
+        context.beginPath();
+      }
+    }
+    function handleTouchMove(e) {
+      var x;
+      var y;
+      x = e.touches[0].pageX - offsetLeft;
+      y = e.touches[0].pageY - offsetTop;
+      if ((x === lastX) && (y === lastY)) {
+        return;
+      }
+      drawLine(lastX, lastY, x, y);
+      lastX = x;
+      lastY = y;
+    }
+    function handleTouchEnd(e) {
+      if (e.touches.length === 0) {
         context.closePath();
       }
     }
@@ -123,18 +137,18 @@
       open = !open;
       sendUpdate();
       updateCanvasPalatte();
-    } 
+    }
     function updateCanvasPalatte() {
       if (open) {
         canvasEl.classList.remove('thr0w_draw_canvas--closed');
         palatteEl.classList.remove('thr0w_draw_palatte--closed');
-        thumbEl.classList.remove('thr0w_draw_palatte__thumb--closed'); 
+        thumbEl.classList.remove('thr0w_draw_palatte__thumb--closed');
         thumbEl.classList.add('thr0w_draw_palatte__thumb--open');
       } else {
         reset();
         canvasEl.classList.add('thr0w_draw_canvas--closed');
         palatteEl.classList.add('thr0w_draw_palatte--closed');
-        thumbEl.classList.remove('thr0w_draw_palatte__thumb--open'); 
+        thumbEl.classList.remove('thr0w_draw_palatte__thumb--open');
         thumbEl.classList.add('thr0w_draw_palatte__thumb--closed');
       }
     }

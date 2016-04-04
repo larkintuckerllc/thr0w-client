@@ -369,9 +369,10 @@
       var offsetLeft = frameEl.offsetLeft + contentEl.offsetLeft;
       var offsetTop = frameEl.offsetTop + contentEl.offsetTop;
       var active = true;
+      var closing = false;
       var lastX;
       var lastY;
-      var moving = false;
+      var mousePanning = false;
       var scrollX = 0;
       var scrollY = 0;
       var startScrolling = false;
@@ -415,37 +416,22 @@
       windowEl.addEventListener(&#x27;mousedown&#x27;, sendSelfToTop);
       windowEl.addEventListener(&#x27;touchstart&#x27;, sendSelfToTop);
       windowBarEl = windowEl.querySelector(&#x27;.thr0w_windows_window__bar&#x27;);
-      windowBarEl.addEventListener(&#x27;mousedown&#x27;, startMoving);
-      windowBarEl.addEventListener(&#x27;touchstart&#x27;, startMoving);
-      windowBarEl.addEventListener(&#x27;mousemove&#x27;, move);
-      windowBarEl.addEventListener(&#x27;touchmove&#x27;, move);
-      windowBarEl.addEventListener(&#x27;mouseup&#x27;, endMoving);
-      windowBarEl.addEventListener(&#x27;mouseleave&#x27;, endMoving);
-      windowBarEl.addEventListener(&#x27;touchend&#x27;, endMoving);
-      windowBarEl.addEventListener(&#x27;touchcancel&#x27;, endMoving);
+      windowBarEl.addEventListener(&#x27;mousedown&#x27;, handleMouseDown);
+      windowBarEl.addEventListener(&#x27;mousemove&#x27;, handleMouseMove);
+      windowBarEl.addEventListener(&#x27;mouseup&#x27;, handleMouseEnd);
+      windowBarEl.addEventListener(&#x27;mouseleave&#x27;, handleMouseEnd);
+      windowBarEl.addEventListener(&#x27;touchstart&#x27;, handleTouchStart);
+      windowBarEl.addEventListener(&#x27;touchmove&#x27;, handleTouchMove);
+      windowBarEl.addEventListener(&#x27;touchend&#x27;, handleTouchEnd);
       windowControlsEl = windowEl
         .querySelector(&#x27;.thr0w_windows_window__bar__controls&#x27;);
       windowControlsEl.style.visibility = &#x27;visible&#x27;;
       windowControlsCloseEl = windowControlsEl
         .querySelector(&#x27;.thr0w_windows_window__bar__controls__control--close&#x27;);
-      // FIX
       windowControlsCloseEl.addEventListener(&#x27;mousedown&#x27;,
-        closeStopPropagation);
+        handleCloseMouseDown, true);
       windowControlsCloseEl.addEventListener(&#x27;touchstart&#x27;,
-        closeStopPropagation);
-      windowControlsCloseEl.addEventListener(&#x27;mousemove&#x27;,
-        closeStopPropagation);
-      windowControlsCloseEl.addEventListener(&#x27;touchmove&#x27;,
-        closeStopPropagation);
-      windowControlsCloseEl.addEventListener(&#x27;mouseup&#x27;,
-        closeStopPropagation);
-      windowControlsCloseEl.addEventListener(&#x27;mouseleave&#x27;,
-        closeStopPropagation);
-      windowControlsCloseEl.addEventListener(&#x27;touchend&#x27;,
-        closeStopPropagation);
-      windowControlsCloseEl.addEventListener(&#x27;touchcancel&#x27;,
-        closeStopPropagation);
-      windowControlsCloseEl.addEventListener(&#x27;click&#x27;, closeSelf);
+        handleCloseTouchStart, true);
       windowContentEl = windowEl
         .querySelector(&#x27;.thr0w_windows_window__content&#x27;);
       windowContentEl.addEventListener(&#x27;load&#x27;, contentLoaded);
@@ -497,30 +483,23 @@
         sync.update();
         sync.idle();
       }
-      function startMoving(e) {
-        moving = true;
-        if (e.type === &#x27;mousedown&#x27;) {
-          lastX = e.pageX - offsetLeft;
-          lastY = e.pageY - offsetTop;
-        } else {
-          lastX = Math.floor(e.changedTouches[0].pageX) - offsetLeft;
-          lastY = Math.floor(e.changedTouches[0].pageY) - offsetTop;
+      function handleMouseDown(e) {
+        if (closing) {
+          return;
         }
+        mousePanning = true;
+        lastX = e.pageX - offsetLeft;
+        lastY = e.pageY - offsetTop;
         windowSync.update();
       }
-      function move(e) {
-        if (!moving) {
+      function handleMouseMove(e) {
+        if (!mousePanning) {
           return;
         }
         var currentX;
         var currentY;
-        if (e.type === &#x27;mousemove&#x27;) {
-          currentX = e.pageX - offsetLeft;
-          currentY = e.pageY - offsetTop;
-        } else {
-          currentX = Math.floor(e.changedTouches[0].pageX) - offsetLeft;
-          currentY = Math.floor(e.changedTouches[0].pageY) - offsetTop;
-        }
+        currentX = e.pageX - offsetLeft;
+        currentY = e.pageY - offsetTop;
         x = Math.min(x + currentX - lastX, grid.getWidth() - width);
         x = Math.max(x, 0);
         y = Math.min(y + currentY - lastY, grid.getHeight() - height);
@@ -530,15 +509,62 @@
         lastY = currentY;
         windowSync.update();
       }
-      function endMoving() {
-        moving = false;
+      function handleMouseEnd() {
+        if (!mousePanning) {
+          return;
+        }
+        mousePanning = false;
         windowSync.idle();
       }
-      function closeStopPropagation(e) {
-        e.stopPropagation();
+      function handleTouchStart(e) {
+        e.preventDefault();
+        if (closing) {
+          return;
+        }
+        if (e.touches.length === 1) {
+          lastX = e.touches[0].pageX - offsetLeft;
+          lastY = e.touches[0].pageY - offsetTop;
+          windowSync.update();
+        }
       }
-      function closeSelf() {
+      function handleTouchMove(e) {
+        if (closing) {
+          return;
+        }
+        var currentX;
+        var currentY;
+        currentX = e.touches[0].pageX - offsetLeft;
+        currentY = e.touches[0].pageY - offsetTop;
+        x = Math.min(x + currentX - lastX, grid.getWidth() - width);
+        x = Math.max(x, 0);
+        y = Math.min(y + currentY - lastY, grid.getHeight() - height);
+        y = Math.max(y, 0);
+        positionWindow(x, y, scrollX, scrollY);
+        lastX = currentX;
+        lastY = currentY;
+        windowSync.update();
+      }
+      function handleTouchEnd(e) {
+        if (closing) {
+          return;
+        }
+        if (e.touches.length === 0) {
+          windowSync.idle();
+        }
+      }
+      function handleCloseMouseDown(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        closing = true;
         closeWindow(id);
+      }
+      function handleCloseTouchStart(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        if (e.touches.length === 1) {
+          closing = true;
+          closeWindow(id);
+        }
       }
       function contentLoaded() {
         windowContentEl.removeEventListener(&#x27;load&#x27;, contentLoaded);
@@ -585,31 +611,17 @@
       function destroy() {
         windowEl.removeEventListener(&#x27;mousedown&#x27;, sendSelfToTop);
         windowEl.removeEventListener(&#x27;touchstart&#x27;, sendSelfToTop);
-        windowBarEl.removeEventListener(&#x27;mousedown&#x27;, startMoving);
-        windowBarEl.removeEventListener(&#x27;touchstart&#x27;, startMoving);
-        windowBarEl.removeEventListener(&#x27;mousemove&#x27;, move);
-        windowBarEl.removeEventListener(&#x27;touchmove&#x27;, move);
-        windowBarEl.removeEventListener(&#x27;mouseup&#x27;, endMoving);
-        windowBarEl.removeEventListener(&#x27;mouseleave&#x27;, endMoving);
-        windowBarEl.removeEventListener(&#x27;touchend&#x27;, endMoving);
-        windowBarEl.removeEventListener(&#x27;touchcancel&#x27;, endMoving);
-        windowControlsCloseEl.removeEventListener(&#x27;mousedown&#x27;,
-          closeStopPropagation);
-        windowControlsCloseEl.removeEventListener(&#x27;touchstart&#x27;,
-          closeStopPropagation);
-        windowControlsCloseEl.removeEventListener(&#x27;mousemove&#x27;,
-          closeStopPropagation);
-        windowControlsCloseEl.removeEventListener(&#x27;touchmove&#x27;,
-          closeStopPropagation);
-        windowControlsCloseEl.removeEventListener(&#x27;mouseup&#x27;,
-          closeStopPropagation);
-        windowControlsCloseEl.removeEventListener(&#x27;mouseleave&#x27;,
-          closeStopPropagation);
-        windowControlsCloseEl.removeEventListener(&#x27;touchend&#x27;,
-          closeStopPropagation);
-        windowControlsCloseEl.removeEventListener(&#x27;touchcancel&#x27;,
-          closeStopPropagation);
-        windowControlsCloseEl.removeEventListener(&#x27;click&#x27;, closeSelf);
+        windowBarEl.removeEventListener(&#x27;mousedown&#x27;, handleMouseDown);
+        windowBarEl.removeEventListener(&#x27;mousemove&#x27;, handleMouseMove);
+        windowBarEl.removeEventListener(&#x27;mouseup&#x27;, handleMouseEnd);
+        windowBarEl.removeEventListener(&#x27;mouseleave&#x27;, handleMouseEnd);
+        windowBarEl.removeEventListener(&#x27;touchstart&#x27;, handleTouchStart);
+        windowBarEl.removeEventListener(&#x27;touchmove&#x27;, handleTouchMove);
+        windowBarEl.removeEventListener(&#x27;touchend&#x27;, handleTouchEnd);
+        windowControlsCloseEl
+          .removeEventListener(&#x27;mousedown&#x27;, handleCloseMouseDown);
+        windowControlsCloseEl
+          .removeEventListener(&#x27;touchstart&#x27;, handleCloseTouchStart);
         windowContentEl.contentWindow.location.href = &#x27;about:blank&#x27;;
         contentEl.removeChild(windowEl);
         windowSync.destroy();

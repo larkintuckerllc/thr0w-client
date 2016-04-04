@@ -146,7 +146,7 @@
     }
     var open = false;
     var color = null;
-    var paint = false;
+    var mousePanning = false;
     var lastX;
     var lastY;
     var frameEl = grid.getFrame();
@@ -178,18 +178,18 @@
     canvasEl.classList.add(&#x27;thr0w_draw_canvas--closed&#x27;);
     canvasEl.width = grid.getWidth();
     canvasEl.height = grid.getHeight();
-    canvasEl.addEventListener(&#x27;mousedown&#x27;, startPainting);
-    canvasEl.addEventListener(&#x27;mousemove&#x27;, layPaint);
-    canvasEl.addEventListener(&#x27;mouseup&#x27;, endPainting);
-    canvasEl.addEventListener(&#x27;mouseleave&#x27;, endPainting);
-    canvasEl.addEventListener(&#x27;touchstart&#x27;, startPainting);
-    canvasEl.addEventListener(&#x27;touchmove&#x27;, layPaint);
-    canvasEl.addEventListener(&#x27;touchend&#x27;, endPainting);
-    canvasEl.addEventListener(&#x27;touchcancel&#x27;, endPainting);
+    canvasEl.addEventListener(&#x27;mousedown&#x27;, handleMouseDown);
+    canvasEl.addEventListener(&#x27;mousemove&#x27;, handleMouseMove);
+    canvasEl.addEventListener(&#x27;mouseup&#x27;, handleMouseEnd);
+    canvasEl.addEventListener(&#x27;mouseleave&#x27;, handleMouseEnd);
+    canvasEl.addEventListener(&#x27;touchstart&#x27;, handleTouchStart);
+    canvasEl.addEventListener(&#x27;touchmove&#x27;, handleTouchMove);
+    canvasEl.addEventListener(&#x27;touchend&#x27;, handleTouchEnd);
+    canvasEl.addEventListener(&#x27;touchcancel&#x27;, handleTouchEnd);
     contentEl.appendChild(canvasEl);
     thumbEl.addEventListener(&#x27;click&#x27;, toggleOpen);
     for (i = 0; i &lt; pickerEls.length; i++) {
-      pickerEls[i].addEventListener(&#x27;click&#x27;, pickColor); 
+      pickerEls[i].addEventListener(&#x27;click&#x27;, pickColor);
     }
     reset();
     var sync = new window.thr0w.Sync(
@@ -197,37 +197,51 @@
       &#x27;thr0w_draw_&#x27; + contentEl.id,
       message,
       receive
-      );
-    function startPainting(e) {
-      if (e.type === &#x27;mousedown&#x27;) {
-        lastX = e.pageX - offsetLeft;
-        lastY = e.pageY - offsetTop;
-      } else {
-        lastX = Math.floor(e.changedTouches[0].pageX) - offsetLeft;
-        lastY = Math.floor(e.changedTouches[0].pageY) - offsetTop;
-      }
-      paint = true;
+    );
+    function handleMouseDown(e) {
+      mousePanning = true;
+      lastX = e.pageX - offsetLeft;
+      lastY = e.pageY - offsetTop;
       context.beginPath();
     }
-    function layPaint(e) {
+    function handleMouseMove(e) {
       var x;
       var y;
-      if (paint) {
-        if (e.type === &#x27;mousemove&#x27;) {
-          x = e.pageX - offsetLeft;
-          y = e.pageY - offsetTop;
-        } else {
-          x = Math.floor(e.changedTouches[0].pageX) - offsetLeft;
-          y = Math.floor(e.changedTouches[0].pageY) - offsetTop;
-        }
+      if (mousePanning) {
+        x = e.pageX - offsetLeft;
+        y = e.pageY - offsetTop;
         drawLine(lastX, lastY, x, y);
         lastX = x;
         lastY = y;
       }
     }
-    function endPainting() {
-      if (paint) {
-        paint = false;
+    function handleMouseEnd() {
+      if (mousePanning) {
+        mousePanning = false;
+        context.closePath();
+      }
+    }
+    function handleTouchStart(e) {
+      if (e.touches.length === 1) {
+        lastX = e.touches[0].pageX - offsetLeft;
+        lastY = e.touches[0].pageY - offsetTop;
+        context.beginPath();
+      }
+    }
+    function handleTouchMove(e) {
+      var x;
+      var y;
+      x = e.touches[0].pageX - offsetLeft;
+      y = e.touches[0].pageY - offsetTop;
+      if ((x === lastX) &amp;&amp; (y === lastY)) {
+        return;
+      }
+      drawLine(lastX, lastY, x, y);
+      lastX = x;
+      lastY = y;
+    }
+    function handleTouchEnd(e) {
+      if (e.touches.length === 0) {
         context.closePath();
       }
     }
@@ -235,18 +249,18 @@
       open = !open;
       sendUpdate();
       updateCanvasPalatte();
-    } 
+    }
     function updateCanvasPalatte() {
       if (open) {
         canvasEl.classList.remove(&#x27;thr0w_draw_canvas--closed&#x27;);
         palatteEl.classList.remove(&#x27;thr0w_draw_palatte--closed&#x27;);
-        thumbEl.classList.remove(&#x27;thr0w_draw_palatte__thumb--closed&#x27;); 
+        thumbEl.classList.remove(&#x27;thr0w_draw_palatte__thumb--closed&#x27;);
         thumbEl.classList.add(&#x27;thr0w_draw_palatte__thumb--open&#x27;);
       } else {
         reset();
         canvasEl.classList.add(&#x27;thr0w_draw_canvas--closed&#x27;);
         palatteEl.classList.add(&#x27;thr0w_draw_palatte--closed&#x27;);
-        thumbEl.classList.remove(&#x27;thr0w_draw_palatte__thumb--open&#x27;); 
+        thumbEl.classList.remove(&#x27;thr0w_draw_palatte__thumb--open&#x27;);
         thumbEl.classList.add(&#x27;thr0w_draw_palatte__thumb--closed&#x27;);
       }
     }
