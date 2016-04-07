@@ -397,6 +397,7 @@
     this.getWidth = getWidth;
     this.getHeight = getHeight;
     this.getRowScale = getRowScale;
+    this.frameXYToContentXY = frameXYToContentXY;
     // jscs:disable
     /**
     * This function returns the grid's frame.
@@ -456,6 +457,30 @@
     // jscs:enable
     function getRowScale() {
       return 1;
+    }
+    // jscs:disable
+    /**
+    * This function, given xy coordinates in the frame, returns the xy coordinates in the content.
+    * @method frameXYToContentXY
+    * @param {Array} coordinates The frame xy coordinates.
+    * @return {Array} The content xy coordinates.
+    */
+    // jscs:enable
+    function frameXYToContentXY(coordinates) {
+      if (coordinates === undefined ||
+        !Array.isArray(coordinates) ||
+        coordinates.length !== 2 ||
+        coordinates[0] === undefined ||
+        coordinates[1] === undefined ||
+        typeof coordinates[0] !== 'number' ||
+        typeof coordinates[1] !== 'number'
+      ) {
+        throw 400;
+      }
+      return [
+        coordinates[0] + hpos * frameEl.clientWidth,
+        coordinates[1] + vpos * frameEl.clientHeight
+      ];
     }
   }
   // jscs:disable
@@ -545,6 +570,7 @@
     this.getWidth = getWidth;
     this.getHeight = getHeight;
     this.getRowScale = getRowScale;
+    this.frameXYToContentXY = frameXYToContentXY;
     // jscs:disable
     /**
     * This function returns the grid's frame.
@@ -604,6 +630,30 @@
     // jscs:enable
     function getRowScale() {
       return dimensions[vpos].scale;
+    }
+    // jscs:disable
+    /**
+    * This function, given xy coordinates in the frame, returns the xy coordinates in the content.
+    * @method frameXYToContentXY
+    * @param {Array} coordinates The frame xy coordinates.
+    * @return {Array} The content xy coordinates.
+    */
+    // jscs:enable
+    function frameXYToContentXY(coordinates) {
+      if (coordinates === undefined ||
+        !Array.isArray(coordinates) ||
+        coordinates.length !== 2 ||
+        coordinates[0] === undefined ||
+        coordinates[1] === undefined ||
+        typeof coordinates[0] !== 'number' ||
+        typeof coordinates[1] !== 'number'
+      ) {
+        throw 400;
+      }
+      return [
+        coordinates[0] * dimensions[vpos].scale + shiftLeft,
+        coordinates[1] * dimensions[vpos].scale + shiftTop
+      ];
     }
   }
   // jscs:disable
