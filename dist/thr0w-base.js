@@ -543,11 +543,14 @@
       dimensions[vpos].width) + 'px';
     frameEl.style.height = (dimensions[vpos].scale *
       dimensions[vpos].height) + 'px';
-    frameEl.style.left = dimensions[vpos].width *
-      (1 - dimensions[vpos].scale) / 2 + 'px';
-    frameEl.style.top = dimensions[vpos].height *
-      (1 - dimensions[vpos].scale) / 2 + 'px';
-    frameEl.style.transform = 'scale(' + (1 / dimensions[vpos].scale) +
+    frameEl.style.transform =
+      'translate(' +
+      (dimensions[vpos].width * (1 - dimensions[vpos].scale) / 2) + 'px' +
+      ',' +
+      (dimensions[vpos].height * (1 - dimensions[vpos].scale) / 2) + 'px' +
+      ')' +
+      ' ' +
+      'scale(' + (1 / dimensions[vpos].scale) +
       ', ' + (1 / dimensions[vpos].scale) + ')';
     contentEl.style.width = width + 'px';
     contentEl.style.height = height + 'px';

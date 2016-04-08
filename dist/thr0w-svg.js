@@ -47,12 +47,10 @@
     var svgElWidth = grid.getWidth();
     var svgElHeight = grid.getHeight();
     var scale = grid.getRowScale();
-    var offsetLeft = frameEl.offsetLeft -
-      frameEl.offsetWidth / scale * (1 - scale) / 2 +
-      contentEl.offsetLeft;
-    var offsetTop = frameEl.offsetTop -
-      frameEl.offsetHeight / scale * (1 - scale) / 2 +
-      contentEl.offsetTop;
+    var frameOffsetLeft = frameEl.offsetLeft;
+    var contentLeft = grid.frameXYToContentXY([0,0])[0];
+    var frameOffsetTop = frameEl.offsetTop;
+    var contentTop = grid.frameXYToContentXY([0,0])[1];
     var palatteEl = document.createElement('div');
     var zoomAnimationInterval = null;
     var moveAnimationInterval = null;
@@ -322,8 +320,8 @@
     }
     function handleMouseDown(e) {
       mousePanning = true;
-      mouseLastX = e.pageX * scale - offsetLeft;
-      mouseLastY = e.pageY * scale - offsetTop;
+      mouseLastX = (e.pageX - frameOffsetLeft) * scale + contentLeft;
+      mouseLastY = (e.pageY - frameOffsetTop) * scale + contentTop;
       sync.update();
       iAmSyncing = true;
       syncing = true;
@@ -332,8 +330,8 @@
     }
     function handleMouseMove(e) {
       if (iAmSyncing && mousePanning) {
-        var mouseCurrentX = e.pageX * scale - offsetLeft;
-        var mouseCurrentY = e.pageY * scale - offsetTop;
+        var mouseCurrentX = (e.pageX - frameOffsetLeft) * scale + contentLeft;
+        var mouseCurrentY = (e.pageY - frameOffsetTop) * scale + contentTop;
         var shiftX;
         var shiftY;
         shiftX = -1 * (mouseCurrentX - mouseLastX) *
@@ -356,14 +354,18 @@
       }
     }
     function handleTouchStart(e) {
-      touchOneLastX = e.touches[0].pageX * scale - offsetLeft;
-      touchOneLastY = e.touches[0].pageY * scale - offsetTop;
+      touchOneLastX = (e.touches[0].pageX - frameOffsetLeft) *
+        scale + contentLeft;
+      touchOneLastY = (e.touches[0].pageY - frameOffsetTop) *
+        scale + contentTop;
       if (e.touches.length > 2) {
         handPanning = true;
       }
       if (e.touches.length === 2) {
-        touchTwoLastX = e.touches[1].pageX * scale - offsetLeft;
-        touchTwoLastY = e.touches[1].pageY * scale - offsetTop;
+        touchTwoLastX = (e.touches[1].pageX - frameOffsetLeft) *
+          scale + contentLeft;
+        touchTwoLastY = (e.touches[1].pageY - frameOffsetTop) *
+          scale + contentTop;
       }
       if (e.touches.length === 1) {
         handPanning = false;
@@ -375,8 +377,10 @@
       }
     }
     function handleTouchMove(e) {
-      var touchOneCurrentX = e.touches[0].pageX * scale - offsetLeft;
-      var touchOneCurrentY = e.touches[0].pageY * scale - offsetTop;
+      var touchOneCurrentX = (e.touches[0].pageX - frameOffsetLeft) *
+        scale + contentLeft;
+      var touchOneCurrentY = (e.touches[0].pageY - frameOffsetTop) *
+        scale + contentTop;
       var touchTwoCurrentX;
       var touchTwoCurrentY;
       var touchLeftLast;
@@ -397,8 +401,10 @@
       var touchRadiusLast;
       if (iAmSyncing) {
         if (!handPanning && e.touches.length === 2) {
-          touchTwoCurrentX = e.touches[1].pageX * scale - offsetLeft;
-          touchTwoCurrentY = e.touches[1].pageY * scale - offsetTop;
+          touchTwoCurrentX = (e.touches[1].pageX - frameOffsetLeft) *
+            scale + contentLeft;
+          touchTwoCurrentY = (e.touches[1].pageY - frameOffsetTop) *
+            scale + contentTop;
           // DECIDING LEFT - RIGHT - TOP - BOTTOM
           if (touchOneCurrentX < touchTwoCurrentX) {
             touchLeftLast = touchOneLastX;
@@ -478,8 +484,10 @@
     function handleTouchEnd(e) {
       if (iAmSyncing) {
         if (e.touches.length === 1) {
-          touchOneLastX = e.touches[0].pageX * scale - offsetLeft;
-          touchOneLastY = e.touches[0].pageY * scale - offsetTop;
+          touchOneLastX = (e.touches[0].pageX - frameOffsetLeft) *
+            scale + contentLeft;
+          touchOneLastY = (e.touches[0].pageY - frameOffsetTop) *
+            scale + contentTop;
         }
         if (e.touches.length === 0) {
           sync.idle();
