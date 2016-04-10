@@ -125,6 +125,7 @@
     svgEl.addEventListener('touchstart', handleTouchStart);
     svgEl.addEventListener('touchmove', handleTouchMove);
     svgEl.addEventListener('touchend', handleTouchEnd);
+    svgEl.addEventListener('touchcancel', handleTouchEnd);
     palatteEl.querySelector('.thr0w_svg_palette__row__cell--plus')
       .addEventListener('click', zoomIn);
     palatteEl.querySelector('.thr0w_svg_palette__row__cell--minus')

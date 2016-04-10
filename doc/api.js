@@ -6,6 +6,8 @@ YUI.add("yuidoc-meta", function(Y) {
         "thr0w.Grid",
         "thr0w.Sync",
         "thr0w.draw",
+        "thr0w.leaflet",
+        "thr0w.leaflet.Map",
         "thr0w.svg",
         "thr0w.svg.Svg",
         "thr0w.windows",
@@ -14,6 +16,7 @@ YUI.add("yuidoc-meta", function(Y) {
     "modules": [
         "thr0w-base",
         "thr0w-draw",
+        "thr0w-leaflet",
         "thr0w-svg",
         "thr0w-windows"
     ],
@@ -27,6 +30,11 @@ YUI.add("yuidoc-meta", function(Y) {
             "displayName": "thr0w-draw",
             "name": "thr0w-draw",
             "description": "This module provides a drawing tool."
+        },
+        {
+            "displayName": "thr0w-leaflet",
+            "name": "thr0w-leaflet",
+            "description": "This module provides tools to manage Leaflet maps."
         },
         {
             "displayName": "thr0w-svg",
