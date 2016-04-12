@@ -127,6 +127,9 @@
   if (window.thr0w === undefined) {
     throw 400;
   }
+  var MAX_LAT = 80;
+  var MIN_LAT = -80;
+  var INTERVAL = 33;
   var L = window.L;
   var service = {};
   // jscs:disable
@@ -172,6 +175,16 @@
     var touchEndCenterX;
     var touchEndCenterY;
     var handPanning = false;
+    var syncing = false;
+    var iAmSyncing = false;
+    var animationSyncing = false;
+    var iAmAnimationSyncing = false;
+    var nextMove = false;
+    var nextMoveDuration;
+    var nextMoveLat;
+    var nextMoveLng;
+    var nextMoveZ;
+    var moveAnimationInterval = null;
     var scale = grid.getRowScale();
     var frameOffsetLeft = frameEl.offsetLeft;
     var contentLeft = grid.frameXYToContentXY([0,0])[0];
@@ -188,10 +201,25 @@
     var palatteEl = document.createElement(&#x27;div&#x27;);
     var sync = new window.thr0w.Sync(
       grid,
-      &#x27;thr0w_svg_&#x27; + contentEl.id,
+      &#x27;thr0w_leaflet_&#x27; + contentEl.id,
       message,
       receive
     );
+    var animationSync = new window.thr0w.Sync(
+      grid,
+      &#x27;thr0w_leaflet_animation_&#x27; + contentEl.id,
+      message,
+      receive,
+      true
+    );
+    var oobSync = new window.thr0w.Sync(
+      grid,
+      &#x27;thr0w_leaflet_oob_&#x27; + contentEl.id,
+      messageOob,
+      receiveOob
+    );
+    this.moveTo = moveTo;
+    this.moveStop = moveStop;
     palatteEl.classList.add(&#x27;thr0w_leaflet_palette&#x27;);
     // jscs:disable
     palatteEl.innerHTML = [
@@ -208,14 +236,14 @@
       .addEventListener(&#x27;click&#x27;, zoomIn);
     palatteEl.querySelector(&#x27;.thr0w_leaflet_palette__row__cell--minus&#x27;)
       .addEventListener(&#x27;click&#x27;, zoomOut);
-    frameEl.addEventListener(&#x27;mousedown&#x27;, handleMouseDown, true);
-    frameEl.addEventListener(&#x27;mousemove&#x27;, handleMouseMove, true);
-    frameEl.addEventListener(&#x27;mouseup&#x27;, handleMouseEnd, true);
+    contentEl.addEventListener(&#x27;mousedown&#x27;, handleMouseDown, true);
+    contentEl.addEventListener(&#x27;mousemove&#x27;, handleMouseMove, true);
+    contentEl.addEventListener(&#x27;mouseup&#x27;, handleMouseEnd, true);
     // MOUSELEAVE NOT USED AS LEAFLET HAS LAYERS
-    frameEl.addEventListener(&#x27;touchstart&#x27;, handleTouchStart, true);
-    frameEl.addEventListener(&#x27;touchmove&#x27;, handleTouchMove, true);
-    frameEl.addEventListener(&#x27;touchend&#x27;, handleTouchEnd, true);
-    frameEl.addEventListener(&#x27;touchcancel&#x27;, handleTouchEnd, true);
+    contentEl.addEventListener(&#x27;touchstart&#x27;, handleTouchStart, true);
+    contentEl.addEventListener(&#x27;touchmove&#x27;, handleTouchMove, true);
+    contentEl.addEventListener(&#x27;touchend&#x27;, handleTouchEnd, true);
+    contentEl.addEventListener(&#x27;touchcancel&#x27;, handleTouchEnd, true);
     function message() {
       return {
         lat: centerLatLng.lat,
@@ -231,6 +259,137 @@
         zoomLevel,
         {animate: false}
       );
+    }
+    function messageOob() {
+      return {
+        syncing: syncing,
+        animationSyncing: animationSyncing,
+        nextMove: nextMove,
+        nextMoveDuration: nextMoveDuration,
+        nextMoveLat: nextMoveLat,
+        nextMoveLng: nextMoveLng,
+        nextMoveZ: nextMoveZ
+      };
+    }
+    function receiveOob(data) {
+      syncing = data.syncing;
+      animationSyncing = data.animationSyncing;
+      if (iAmSyncing &amp;&amp; !syncing) {
+        iAmSyncing = false;
+        sync.idle();
+      }
+      if (iAmAnimationSyncing &amp;&amp; !animationSyncing) {
+        iAmAnimationSyncing = false;
+        clearAnimation();
+        animationSync.idle();
+      }
+      if (iAmAnimationSyncing &amp;&amp; data.nextMove) {
+        moveTo(data.nextMoveDuration, data.nextMoveLat,
+          data.nextMoveLng, data.netMoveZ);
+      }
+    }
+    // jscs:disable
+    /**
+    * This method will animate zoom and then move the map.
+    * @method moveTo
+    * @param duration {Integer} The maximum number of milliseconds for move.
+    * @param lat {Number} The center latitute; -80 &lt;= lat &lt;= 80.
+    * @param lng {Number} The center longitude.
+    * @param z {Number} Optional zoom level.
+    */
+    // jscs:enable
+    function moveTo(duration, lat, lng, z) {
+      if (duration !== parseInt(duration)) {
+        throw 400;
+      }
+      if (lat  === undefined ||
+        typeof lat !== &#x27;number&#x27; ||
+        lat &gt; MAX_LAT ||
+        lat &lt; MIN_LAT) {
+        throw 400;
+      }
+      if (lng === undefined || typeof lng !== &#x27;number&#x27;) {
+        throw 400;
+      }
+      if (z === undefined) {
+        z = zoomLevel;
+      }
+      if (typeof z !== &#x27;number&#x27;) {
+        throw 400;
+      }
+      var moveAnimationTime = 0;
+      if (syncing) {
+        if (iAmSyncing) {
+          iAmSyncing = false;
+          sync.idle();
+        }
+        syncing = false;
+        oobSync.update();
+        oobSync.idle();
+      }
+      if (animationSyncing) {
+        if (iAmAnimationSyncing) {
+          clearAnimation();
+        } else {
+          nextMove = true;
+          nextMoveDuration = duration;
+          nextMoveLat = lat;
+          nextMoveLng = lng;
+          nextMoveZ = z;
+          oobSync.update();
+          oobSync.idle();
+          return;
+        }
+      }
+      iAmAnimationSyncing = true;
+      animationSyncing = true;
+      oobSync.update();
+      oobSync.idle();
+      zoom(z);
+      animationSync.update();
+      moveAnimationInterval = window.setInterval(moveAnimation, INTERVAL);
+      function moveAnimation() {
+        moveAnimationTime += INTERVAL;
+        // TODO: IMPLEMENT ANIMATION
+        if (moveAnimationTime &gt; duration) {
+          window.clearInterval(moveAnimationInterval);
+          moveAnimationInterval = null;
+          // TODO: DO SOMETHING AT END
+          centerLatLng = L.latLng(lat,lng);
+          map.setView(
+            centerLatLng,
+            zoomLevel,
+            {animate: false}
+          );
+          animationSync.update();
+          animationSync.idle();
+          iAmAnimationSyncing = false;
+          animationSyncing = false;
+          oobSync.update();
+          oobSync.idle();
+        } else {
+          // TODO: DO SOMETHING DURING
+          animationSync.update();
+        }
+      }
+    }
+    // jscs:disable
+    /**
+    * This method will stop active map animations.
+    * @method moveStop
+    */
+    // jscs:enable
+    function moveStop() {
+      if (animationSyncing) {
+        if (iAmAnimationSyncing) {
+          iAmAnimationSyncing = false;
+          clearAnimation();
+          animationSync.idle();
+        }
+        animationSyncing = false;
+        oobSync.update();
+        oobSync.idle();
+      }
     }
     function zoomIn() {
       zoom(zoomLevel + 1);
@@ -248,10 +407,14 @@
       mouseLastX = (e.pageX - frameOffsetLeft) * scale + contentLeft;
       mouseLastY = (e.pageY - frameOffsetTop) * scale + contentTop;
       sync.update();
+      iAmSyncing = true;
+      syncing = true;
+      oobSync.update();
+      oobSync.idle();
     }
     function handleMouseMove(e) {
       e.stopPropagation();
-      if (mousePanning) {
+      if (iAmSyncing &amp;&amp; mousePanning) {
         var mouseCurrentX = (e.pageX - frameOffsetLeft) * scale + contentLeft;
         var mouseCurrentY = (e.pageY - frameOffsetTop) * scale + contentTop;
         pan(
@@ -265,9 +428,13 @@
     }
     function handleMouseEnd(e) {
       e.stopPropagation();
-      if (mousePanning) {
+      if (iAmSyncing &amp;&amp; mousePanning) {
         mousePanning = false;
         sync.idle();
+        iAmSyncing = false;
+        syncing = false;
+        oobSync.update();
+        oobSync.idle();
       }
     }
     function handleTouchStart(e) {
@@ -302,6 +469,10 @@
         handPanning = false;
         zoomed = false;
         sync.update();
+        iAmSyncing = true;
+        syncing = true;
+        oobSync.update();
+        oobSync.idle();
       }
     }
     function handleTouchMove(e) {
@@ -313,61 +484,73 @@
       var touchTwoX;
       var touchTwoY;
       e.stopPropagation();
-      touchOneX = (e.touches[0].pageX - frameOffsetLeft) *
-        scale + contentLeft;
-      touchOneY = (e.touches[0].pageY - frameOffsetTop) *
-        scale + contentTop;
-      if (!handPanning &amp;&amp; e.touches.length === 2) {
-        touchTwoX = (e.touches[1].pageX - frameOffsetLeft) *
+      if (iAmSyncing) {
+        touchOneX = (e.touches[0].pageX - frameOffsetLeft) *
           scale + contentLeft;
-        touchTwoY = (e.touches[1].pageY - frameOffsetTop) *
+        touchOneY = (e.touches[0].pageY - frameOffsetTop) *
           scale + contentTop;
-        touchEndRadius = Math.floor(Math.sqrt(
-          Math.pow(touchOneX - touchTwoX, 2) +
-          Math.pow(touchOneY - touchTwoY, 2)
-        ));
-        touchEndCenterX = (touchOneX + touchTwoX) / 2;
-        touchEndCenterY = (touchOneY + touchTwoY) / 2;
-      } else {
-        pan(
-          touchOneLastX - touchOneX,
-          touchOneLastY - touchOneY
-        );
-        sync.update();
+        if (!handPanning &amp;&amp; e.touches.length === 2) {
+          touchTwoX = (e.touches[1].pageX - frameOffsetLeft) *
+            scale + contentLeft;
+          touchTwoY = (e.touches[1].pageY - frameOffsetTop) *
+            scale + contentTop;
+          touchEndRadius = Math.floor(Math.sqrt(
+            Math.pow(touchOneX - touchTwoX, 2) +
+            Math.pow(touchOneY - touchTwoY, 2)
+          ));
+          touchEndCenterX = (touchOneX + touchTwoX) / 2;
+          touchEndCenterY = (touchOneY + touchTwoY) / 2;
+        } else {
+          pan(
+            touchOneLastX - touchOneX,
+            touchOneLastY - touchOneY
+          );
+          sync.update();
+        }
+        touchOneLastX = touchOneX;
+        touchOneLastY = touchOneY;
       }
-      touchOneLastX = touchOneX;
-      touchOneLastY = touchOneY;
     }
     function handleTouchEnd(e) {
       e.stopPropagation();
       if (zoomed) {
         return;
       }
-      if (e.touches.length === 1) {
-        if (!handPanning) {
-          zoomed = true;
-          centerLatLng = map.containerPointToLatLng(
-            L.point(touchEndCenterX, touchEndCenterY)
-          );
-          if (touchEndRadius &gt; touchStartRadius) {
-            zoom(zoomLevel + 1);
-          } else {
-            zoom(zoomLevel - 1);
+      if (iAmSyncing) {
+        if (e.touches.length === 1) {
+          if (!handPanning) {
+            zoomed = true;
+            centerLatLng = map.containerPointToLatLng(
+              L.point(touchEndCenterX, touchEndCenterY)
+            );
+            if (touchEndRadius &gt; touchStartRadius) {
+              zoom(zoomLevel + 1);
+            } else {
+              zoom(zoomLevel - 1);
+            }
+            sync.update();
+            sync.idle();
+            iAmSyncing = false;
+            syncing = false;
+            oobSync.update();
+            oobSync.idle();
           }
-          sync.update();
-          sync.idle();
         }
-      }
-      if (e.touches.length === 0) {
-        sync.idle();
+        if (e.touches.length === 0) {
+          sync.idle();
+          iAmSyncing = false;
+          syncing = false;
+          oobSync.update();
+          oobSync.idle();
+        }
       }
     }
     function pan(shiftX, shiftY) {
       var lat = centerLatLng.lat;
-      if (lat &gt; 80 &amp;&amp; shiftY &lt; 0) {
+      if (lat &gt; MAX_LAT &amp;&amp; shiftY &lt; 0) {
         return;
       }
-      if (lat &lt; -80 &amp;&amp; shiftY &gt; 0) {
+      if (lat &lt; MIN_LAT &amp;&amp; shiftY &gt; 0) {
         return;
       }
       centerLatLng = map.containerPointToLatLng(
@@ -391,6 +574,12 @@
         zoomLevel,
         {animate: false}
       );
+    }
+    function clearAnimation() {
+      if (moveAnimationInterval) {
+        window.clearInterval(moveAnimationInterval);
+        moveAnimationInterval = null;
+      }
     }
   }
 })();
