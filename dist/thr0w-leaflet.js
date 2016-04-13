@@ -181,6 +181,12 @@
     */
     // jscs:enable
     function moveTo(duration, lat, lng, z) {
+      var moveTimeLat;
+      var moveTimeLng;
+      var moveTime;
+      var moveIncrementLat;
+      var moveIncrementLng;
+      var newLng;
       if (duration !== parseInt(duration)) {
         throw 400;
       }
@@ -229,14 +235,34 @@
       oobSync.idle();
       zoom(z);
       animationSync.update();
+      moveTimeLat = Math.abs(duration * (lat - centerLatLng.lat) / 180);
+      if (Math.abs(lng - centerLatLng.lng) <= 180) {
+        moveTimeLng = Math.abs(duration * (lng - centerLatLng.lng) / 180);
+        moveTime = Math.max(moveTimeLat, moveTimeLng);
+        moveIncrementLng = moveTime !== 0 ?
+          (lng - centerLatLng.lng) / (moveTime / INTERVAL) : 0;
+      } else {
+        if (centerLatLng.lng >= 0) {
+          moveTimeLng = duration * (180 - centerLatLng.lng + 180 + lng) / 180;
+          moveTime = Math.max(moveTimeLat, moveTimeLng);
+          moveIncrementLng = moveTime !== 0 ?
+            (180 - centerLatLng.lng + 180 + lng) / (moveTime / INTERVAL) : 0;
+        } else {
+          moveTimeLng = duration * (180 + centerLatLng.lng + 180 - lng) / 180;
+          moveTime = Math.max(moveTimeLat, moveTimeLng);
+          moveIncrementLng = moveTime !== 0 ?
+            -1 * (180 + centerLatLng.lng + 180 - lng) /
+            (moveTime / INTERVAL) : 0;
+        }
+      }
+      moveIncrementLat = moveTime !== 0 ?
+        (lat - centerLatLng.lat) / (moveTime / INTERVAL) : 0;
       moveAnimationInterval = window.setInterval(moveAnimation, INTERVAL);
       function moveAnimation() {
         moveAnimationTime += INTERVAL;
-        // TODO: IMPLEMENT ANIMATION
-        if (moveAnimationTime > duration) {
+        if (moveAnimationTime > moveTime) {
           window.clearInterval(moveAnimationInterval);
           moveAnimationInterval = null;
-          // TODO: DO SOMETHING AT END
           centerLatLng = L.latLng(lat,lng);
           map.setView(
             centerLatLng,
@@ -250,7 +276,22 @@
           oobSync.update();
           oobSync.idle();
         } else {
-          // TODO: DO SOMETHING DURING
+          if (moveIncrementLng >= 0) {
+            newLng = centerLatLng.lng + moveIncrementLng <= 180 ?
+              centerLatLng.lng + moveIncrementLng : -180;
+          } else {
+            newLng = centerLatLng.lng + moveIncrementLng >= -180 ?
+              centerLatLng.lng + moveIncrementLng : 180;
+          }
+          centerLatLng = L.latLng(
+            centerLatLng.lat + moveIncrementLat,
+            newLng
+          );
+          map.setView(
+            centerLatLng,
+            zoomLevel,
+            {animate: false}
+          );
           animationSync.update();
         }
       }
