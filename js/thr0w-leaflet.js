@@ -189,7 +189,7 @@
     // EXPORTS
     this.moveTo = moveTo;
     this.moveStop = moveStop;
-    this.leafletMap = map;
+    this.getLeafletMap = getLeafletMap;
     // FUNCTIONS
     function message() {
       return {
@@ -368,6 +368,16 @@
         oobSync.update();
         oobSync.idle();
       }
+    }
+    // jscs:disable
+    /**
+    * This method will return the Leaflet map.
+    * @method getLeafletMap
+    * @return {Object} The Leaflet map.
+    */
+    // jscs:enable
+    function getLeafletMap() {
+      return map;
     }
     function zoomIn() {
       zoom(zoomLevel + 1);
