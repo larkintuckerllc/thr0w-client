@@ -35,31 +35,35 @@
   */
   // jscs:enable
   // TODO: DOCUMENT OPTIONS
-  function Map(grid, mapid, lat, lng, zoomLevel, options) {
+  function Map(grid, lat, lng, zoomLevel, options) {
     if (!grid || typeof grid !== 'object') {
       throw 400;
     }
-    if (!mapid || typeof mapid !== 'string') {
-      throw 400;
-    }
     var contentEl = grid.getContent();
+    var containerEl = document.createElement('div');
+    containerEl.classList.add('thr0w_leaflet_container');
+    contentEl.appendChild(containerEl);
     var visibleBounds = grid.getVisibleBounds();
     var visibleBoundsCenterX = (visibleBounds[0] + visibleBounds[2]) / 2;
     var visibleBoundsCenterY = (visibleBounds[1] + visibleBounds[3]) / 2;
-    var mapContainerEl = document.getElementById(mapid);
+    var mapContainerEl = document.createElement('div');
+    mapContainerEl.id = 'thr0w_leaflet_' +
+      contentEl.id;
+    mapContainerEl.style.position = 'absolute';
     mapContainerEl.style.left = visibleBounds[0] + 'px';
     mapContainerEl.style.top = visibleBounds[1] + 'px';
     mapContainerEl.style.width = (visibleBounds[2] - visibleBounds[0]) + 'px';
     mapContainerEl.style.height = (visibleBounds[3] - visibleBounds[1]) + 'px';
-    var map = L.map(mapid, options);
+    containerEl.appendChild(mapContainerEl);
+    var map = L.map('thr0w_leaflet_' + contentEl.id, options);
     var positioningMapContainerEl = document.createElement('div');
-    positioningMapContainerEl.id = 'thr0w_leaflet_' +
+    positioningMapContainerEl.id = 'thr0w_leaflet_positioning_' +
       mapContainerEl.id;
     positioningMapContainerEl.style.width = '100%';
     positioningMapContainerEl.style.height = '100%';
     positioningMapContainerEl.style.visibility = 'hidden';
-    contentEl.appendChild(positioningMapContainerEl);
-    var positioningMap = L.map('thr0w_leaflet_' +
+    containerEl.appendChild(positioningMapContainerEl);
+    var positioningMap = L.map('thr0w_leaflet_positioning_' +
       mapContainerEl.id
     );
     var centerLatLng = L.latLng(
@@ -137,14 +141,14 @@
       .addEventListener('click', zoomIn);
     palatteEl.querySelector('.thr0w_leaflet_palette__row__cell--minus')
       .addEventListener('click', zoomOut);
-    contentEl.addEventListener('mousedown', handleMouseDown, true);
-    contentEl.addEventListener('mousemove', handleMouseMove, true);
-    contentEl.addEventListener('mouseup', handleMouseEnd, true);
+    containerEl.addEventListener('mousedown', handleMouseDown, true);
+    containerEl.addEventListener('mousemove', handleMouseMove, true);
+    containerEl.addEventListener('mouseup', handleMouseEnd, true);
     // MOUSELEAVE NOT USED AS LEAFLET HAS LAYERS
-    contentEl.addEventListener('touchstart', handleTouchStart, true);
-    contentEl.addEventListener('touchmove', handleTouchMove, true);
-    contentEl.addEventListener('touchend', handleTouchEnd, true);
-    contentEl.addEventListener('touchcancel', handleTouchEnd, true);
+    containerEl.addEventListener('touchstart', handleTouchStart, true);
+    containerEl.addEventListener('touchmove', handleTouchMove, true);
+    containerEl.addEventListener('touchend', handleTouchEnd, true);
+    containerEl.addEventListener('touchcancel', handleTouchEnd, true);
     function message() {
       return {
         lat: centerLatLng.lat,
