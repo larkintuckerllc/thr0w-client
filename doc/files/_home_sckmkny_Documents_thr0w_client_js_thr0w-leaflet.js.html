@@ -152,18 +152,42 @@
   * @param map {Object} The Leaflet map object.
   */
   // jscs:enable
-  function Map(grid, map) {
+  // TODO: DOCUMENT OPTIONS
+  function Map(grid, mapid, lat, lng, zoomLevel, options) {
     if (!grid || typeof grid !== &#x27;object&#x27;) {
       throw 400;
     }
-    if (!map || typeof map !== &#x27;object&#x27;) {
+    if (!mapid || typeof mapid !== &#x27;string&#x27;) {
       throw 400;
     }
-    var zoomLevel = map.getZoom();
+    var contentEl = grid.getContent();
+    var visibleBounds = grid.getVisibleBounds();
+    var visibleBoundsCenterX = (visibleBounds[0] + visibleBounds[2]) / 2;
+    var visibleBoundsCenterY = (visibleBounds[1] + visibleBounds[3]) / 2;
+    var mapContainerEl = document.getElementById(mapid);
+    mapContainerEl.style.left = visibleBounds[0] + &#x27;px&#x27;;
+    mapContainerEl.style.top = visibleBounds[1] + &#x27;px&#x27;;
+    mapContainerEl.style.width = (visibleBounds[2] - visibleBounds[0]) + &#x27;px&#x27;;
+    mapContainerEl.style.height = (visibleBounds[3] - visibleBounds[1]) + &#x27;px&#x27;;
+    var map = L.map(mapid, options);
+    var positioningMapContainerEl = document.createElement(&#x27;div&#x27;);
+    positioningMapContainerEl.id = &#x27;thr0w_leaflet_&#x27; +
+      mapContainerEl.id;
+    positioningMapContainerEl.style.width = &#x27;100%&#x27;;
+    positioningMapContainerEl.style.height = &#x27;100%&#x27;;
+    positioningMapContainerEl.style.visibility = &#x27;hidden&#x27;;
+    contentEl.appendChild(positioningMapContainerEl);
+    var positioningMap = L.map(&#x27;thr0w_leaflet_&#x27; +
+      mapContainerEl.id
+    );
+    var centerLatLng = L.latLng(
+      lat,
+      lng
+    );
+    setView();
     var minZoom = map.getMinZoom();
     var maxZoom = map.getMaxZoom();
     var frameEl = grid.getFrame();
-    var contentEl = grid.getContent();
     var mousePanning = false;
     var zoomed = false;
     var mouseLastX;
@@ -192,12 +216,6 @@
     var contentTop = grid.frameXYToContentXY([0,0])[1];
     var contentCenterX = grid.getWidth() / 2;
     var contentCenterY = grid.getHeight() / 2;
-    var centerLatLng = map.containerPointToLatLng(
-      L.point(
-        contentCenterX,
-        contentCenterY
-      )
-    );
     var palatteEl = document.createElement(&#x27;div&#x27;);
     var sync = new window.thr0w.Sync(
       grid,
@@ -220,6 +238,7 @@
     );
     this.moveTo = moveTo;
     this.moveStop = moveStop;
+    this.leafletMap = map;
     palatteEl.classList.add(&#x27;thr0w_leaflet_palette&#x27;);
     // jscs:disable
     palatteEl.innerHTML = [
@@ -254,11 +273,7 @@
     function receive(data) {
       centerLatLng = L.latLng(data.lat, data.lng);
       zoomLevel = data.zoomLevel;
-      map.setView(
-        centerLatLng,
-        zoomLevel,
-        {animate: false}
-      );
+      setView();
     }
     function messageOob() {
       return {
@@ -382,11 +397,8 @@
           window.clearInterval(moveAnimationInterval);
           moveAnimationInterval = null;
           centerLatLng = L.latLng(lat,lng);
-          map.setView(
-            centerLatLng,
-            zoomLevel,
-            {animate: false}
-          );
+          // TODO: FIX
+          setView();
           animationSync.update();
           animationSync.idle();
           iAmAnimationSyncing = false;
@@ -405,11 +417,8 @@
             centerLatLng.lat + moveIncrementLat,
             newLng
           );
-          map.setView(
-            centerLatLng,
-            zoomLevel,
-            {animate: false}
-          );
+          // TODO: FIX
+          setView();
           animationSync.update();
         }
       }
@@ -561,7 +570,7 @@
         if (e.touches.length === 1) {
           if (!handPanning) {
             zoomed = true;
-            centerLatLng = map.containerPointToLatLng(
+            centerLatLng = positioningMap.containerPointToLatLng(
               L.point(touchEndCenterX, touchEndCenterY)
             );
             if (touchEndRadius &gt; touchStartRadius) {
@@ -594,33 +603,45 @@
       if (lat &lt; MIN_LAT &amp;&amp; shiftY &gt; 0) {
         return;
       }
-      centerLatLng = map.containerPointToLatLng(
+      centerLatLng = positioningMap.containerPointToLatLng(
         L.point(
           contentCenterX + shiftX,
           contentCenterY + shiftY
         )
       );
-      map.setView(
-        centerLatLng,
-        zoomLevel,
-        {animate: false}
-      );
+      setView();
     }
     function zoom(level) {
       level = level &lt;= maxZoom ? level : maxZoom;
       level = level &gt;= minZoom ? level : minZoom;
       zoomLevel = level;
-      map.setView(
-        centerLatLng,
-        zoomLevel,
-        {animate: false}
-      );
+      setView();
     }
     function clearAnimation() {
       if (moveAnimationInterval) {
         window.clearInterval(moveAnimationInterval);
         moveAnimationInterval = null;
       }
+    }
+    function setView() {
+      positioningMap.setView(
+        centerLatLng,
+        zoomLevel,
+        {animate: false}
+      );
+      map.setView(
+        positioningMap.containerPointToLatLng(
+          L.point(
+            visibleBoundsCenterX,
+            visibleBoundsCenterY
+          )
+        ),
+        /*
+        centerLatLng,
+        */
+        zoomLevel,
+        {animate: false}
+      );
     }
   }
 })();

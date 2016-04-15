@@ -398,6 +398,7 @@
     this.getHeight = getHeight;
     this.getRowScale = getRowScale;
     this.frameXYToContentXY = frameXYToContentXY;
+    this.getVisibleBounds = getVisibleBounds;
     // jscs:disable
     /**
     * This function returns the grid's frame.
@@ -480,6 +481,15 @@
       return [
         coordinates[0] + hpos * frameEl.clientWidth,
         coordinates[1] + vpos * frameEl.clientHeight
+      ];
+    }
+    // TODO: DOCUMENT
+    function getVisibleBounds() {
+      return [
+        hpos * frameEl.clientWidth,
+        vpos * frameEl.clientHeight,
+        hpos * frameEl.clientWidth + frameEl.clientWidth,
+        vpos * frameEl.clientHeight + frameEl.clientHeight
       ];
     }
   }
@@ -574,6 +584,7 @@
     this.getHeight = getHeight;
     this.getRowScale = getRowScale;
     this.frameXYToContentXY = frameXYToContentXY;
+    this.getVisibleBounds = getVisibleBounds;
     // jscs:disable
     /**
     * This function returns the grid's frame.
@@ -656,6 +667,14 @@
       return [
         coordinates[0] * dimensions[vpos].scale + shiftLeft,
         coordinates[1] * dimensions[vpos].scale + shiftTop
+      ];
+    }
+    function getVisibleBounds() {
+      return [
+        shiftLeft,
+        shiftTop,
+        shiftLeft + frameEl.clientWidth,
+        shiftTop + frameEl.clientHeight
       ];
     }
   }
