@@ -1,4 +1,4 @@
-README v1.2.0 / 31 MARCH 2016
+README v1.4.0 / 15 APRIL 2016
 
 # Thr0w Client
 
@@ -37,6 +37,7 @@ The Thr0w API consists of the following modules:
 
 * Base: Provides core functionality.
 * Draw: Used to create a drawing layer.
+* Leaflet: Used to create interactive maps using the Leaflet library.
 * SVG: Used to create interactive SVGs.
 * Windows: Used to manage windows.
 

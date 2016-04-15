@@ -149,45 +149,62 @@
   * @class Map
   * @constructor
   * @param grid {Object} The grid, {{#crossLink &quot;thr0w.Grid&quot;}}thr0w.Grid{{/crossLink}}, object.
-  * @param map {Object} The Leaflet map object.
+  * @param lat {Number} The center latitute; -80 &lt;= lat &lt;= 80.
+  * @param lng {Number} The center longitude.
+  * @param zoomLevel {Number} Zoom level.
+  * @param options {Object} Leaflet options.
   */
   // jscs:enable
-  // TODO: DOCUMENT OPTIONS
-  function Map(grid, mapid, lat, lng, zoomLevel, options) {
+  function Map(grid, lat, lng, zoomLevel, options) {
     if (!grid || typeof grid !== &#x27;object&#x27;) {
       throw 400;
     }
-    if (!mapid || typeof mapid !== &#x27;string&#x27;) {
+    if (lat  === undefined ||
+      typeof lat !== &#x27;number&#x27; ||
+      lat &gt; MAX_LAT ||
+      lat &lt; MIN_LAT) {
       throw 400;
     }
-    var contentEl = grid.getContent();
-    var visibleBounds = grid.getVisibleBounds();
-    var visibleBoundsCenterX = (visibleBounds[0] + visibleBounds[2]) / 2;
-    var visibleBoundsCenterY = (visibleBounds[1] + visibleBounds[3]) / 2;
-    var mapContainerEl = document.getElementById(mapid);
-    mapContainerEl.style.left = visibleBounds[0] + &#x27;px&#x27;;
-    mapContainerEl.style.top = visibleBounds[1] + &#x27;px&#x27;;
-    mapContainerEl.style.width = (visibleBounds[2] - visibleBounds[0]) + &#x27;px&#x27;;
-    mapContainerEl.style.height = (visibleBounds[3] - visibleBounds[1]) + &#x27;px&#x27;;
-    var map = L.map(mapid, options);
-    var positioningMapContainerEl = document.createElement(&#x27;div&#x27;);
-    positioningMapContainerEl.id = &#x27;thr0w_leaflet_&#x27; +
-      mapContainerEl.id;
-    positioningMapContainerEl.style.width = &#x27;100%&#x27;;
-    positioningMapContainerEl.style.height = &#x27;100%&#x27;;
-    positioningMapContainerEl.style.visibility = &#x27;hidden&#x27;;
-    contentEl.appendChild(positioningMapContainerEl);
-    var positioningMap = L.map(&#x27;thr0w_leaflet_&#x27; +
-      mapContainerEl.id
-    );
+    if (lng === undefined || typeof lng !== &#x27;number&#x27;) {
+      throw 400;
+    }
+    if (zoomLevel === undefined || typeof zoomLevel !== &#x27;number&#x27;) {
+      throw 400;
+    }
+    if (!options || typeof options !== &#x27;object&#x27;) {
+      throw 400;
+    }
     var centerLatLng = L.latLng(
       lat,
       lng
     );
-    setView();
-    var minZoom = map.getMinZoom();
-    var maxZoom = map.getMaxZoom();
     var frameEl = grid.getFrame();
+    var contentEl = grid.getContent();
+    var scale = grid.getRowScale();
+    var frameOffsetLeft = frameEl.offsetLeft;
+    var frameOffsetTop = frameEl.offsetTop;
+    var contentCenterX = grid.getWidth() / 2;
+    var contentCenterY = grid.getHeight() / 2;
+    var visibleContentLeft = grid.frameXYToContentXY([0,0])[0];
+    var visibleContentTop = grid.frameXYToContentXY([0,0])[1];
+    var visibleContentRight = grid.frameXYToContentXY([
+      frameEl.clientWidth / scale,
+      frameEl.clientHeight / scale
+    ])[0];
+    var visibleContentBottom = grid.frameXYToContentXY([
+      frameEl.clientWidth / scale,
+      frameEl.clientHeight / scale
+    ])[1];
+    var visibleContentCenterX = (visibleContentLeft +
+      visibleContentRight) / 2;
+    var visibleContentCenterY = (visibleContentTop +
+      visibleContentBottom) / 2;
+    var containerEl = document.createElement(&#x27;div&#x27;);
+    var mapContainerEl = document.createElement(&#x27;div&#x27;);
+    var positioningMapContainerEl = document.createElement(&#x27;div&#x27;);
+    var map;
+    var positioningMap;
+    var palatteEl = document.createElement(&#x27;div&#x27;);
     var mousePanning = false;
     var zoomed = false;
     var mouseLastX;
@@ -209,36 +226,35 @@
     var nextMoveLng;
     var nextMoveZ;
     var moveAnimationInterval = null;
-    var scale = grid.getRowScale();
-    var frameOffsetLeft = frameEl.offsetLeft;
-    var contentLeft = grid.frameXYToContentXY([0,0])[0];
-    var frameOffsetTop = frameEl.offsetTop;
-    var contentTop = grid.frameXYToContentXY([0,0])[1];
-    var contentCenterX = grid.getWidth() / 2;
-    var contentCenterY = grid.getHeight() / 2;
-    var palatteEl = document.createElement(&#x27;div&#x27;);
-    var sync = new window.thr0w.Sync(
-      grid,
-      &#x27;thr0w_leaflet_&#x27; + contentEl.id,
-      message,
-      receive
+    var minZoom;
+    var maxZoom;
+    var sync;
+    var animationSync;
+    var oobSync;
+    // DOM SETUP
+    containerEl.classList.add(&#x27;thr0w_leaflet_container&#x27;);
+    contentEl.appendChild(containerEl);
+    mapContainerEl.id = &#x27;thr0w_leaflet_&#x27; +
+      contentEl.id;
+    mapContainerEl.classList.add(&#x27;thr0w_leaflet_container__map&#x27;);
+    mapContainerEl.style.left = visibleContentLeft + &#x27;px&#x27;;
+    mapContainerEl.style.top = visibleContentTop + &#x27;px&#x27;;
+    mapContainerEl.style.width = (visibleContentRight -
+      visibleContentLeft) + &#x27;px&#x27;;
+    mapContainerEl.style.height = (visibleContentBottom -
+      visibleContentTop) + &#x27;px&#x27;;
+    containerEl.appendChild(mapContainerEl);
+    map = L.map(&#x27;thr0w_leaflet_&#x27; + contentEl.id, options);
+    positioningMapContainerEl.id = &#x27;thr0w_leaflet_positioning_&#x27; +
+      contentEl.id;
+    positioningMapContainerEl.classList
+      .add(&#x27;thr0w_leaflet_container__map&#x27;);
+    positioningMapContainerEl.classList
+      .add(&#x27;thr0w_leaflet_container__map--positioning&#x27;);
+    containerEl.appendChild(positioningMapContainerEl);
+    positioningMap = L.map(&#x27;thr0w_leaflet_positioning_&#x27; +
+      contentEl.id
     );
-    var animationSync = new window.thr0w.Sync(
-      grid,
-      &#x27;thr0w_leaflet_animation_&#x27; + contentEl.id,
-      message,
-      receive,
-      true
-    );
-    var oobSync = new window.thr0w.Sync(
-      grid,
-      &#x27;thr0w_leaflet_oob_&#x27; + contentEl.id,
-      messageOob,
-      receiveOob
-    );
-    this.moveTo = moveTo;
-    this.moveStop = moveStop;
-    this.leafletMap = map;
     palatteEl.classList.add(&#x27;thr0w_leaflet_palette&#x27;);
     // jscs:disable
     palatteEl.innerHTML = [
@@ -251,18 +267,48 @@
     ].join(&#x27;\n&#x27;);
     // jscs:enable
     contentEl.appendChild(palatteEl);
+    // FINALIZE MAPS
+    setView();
+    minZoom = map.getMinZoom();
+    maxZoom = map.getMaxZoom();
+    // SYNCS
+    sync = new window.thr0w.Sync(
+      grid,
+      &#x27;thr0w_leaflet_&#x27; + contentEl.id,
+      message,
+      receive
+    );
+    animationSync = new window.thr0w.Sync(
+      grid,
+      &#x27;thr0w_leaflet_animation_&#x27; + contentEl.id,
+      message,
+      receive,
+      true
+    );
+    oobSync = new window.thr0w.Sync(
+      grid,
+      &#x27;thr0w_leaflet_oob_&#x27; + contentEl.id,
+      messageOob,
+      receiveOob
+    );
+    // EVENT LISTENERS
+    containerEl.addEventListener(&#x27;mousedown&#x27;, handleMouseDown, true);
+    containerEl.addEventListener(&#x27;mousemove&#x27;, handleMouseMove, true);
+    containerEl.addEventListener(&#x27;mouseup&#x27;, handleMouseEnd, true);
+    // MOUSELEAVE NOT USED AS LEAFLET HAS LAYERS
+    containerEl.addEventListener(&#x27;touchstart&#x27;, handleTouchStart, true);
+    containerEl.addEventListener(&#x27;touchmove&#x27;, handleTouchMove, true);
+    containerEl.addEventListener(&#x27;touchend&#x27;, handleTouchEnd, true);
+    containerEl.addEventListener(&#x27;touchcancel&#x27;, handleTouchEnd, true);
     palatteEl.querySelector(&#x27;.thr0w_leaflet_palette__row__cell--plus&#x27;)
       .addEventListener(&#x27;click&#x27;, zoomIn);
     palatteEl.querySelector(&#x27;.thr0w_leaflet_palette__row__cell--minus&#x27;)
       .addEventListener(&#x27;click&#x27;, zoomOut);
-    contentEl.addEventListener(&#x27;mousedown&#x27;, handleMouseDown, true);
-    contentEl.addEventListener(&#x27;mousemove&#x27;, handleMouseMove, true);
-    contentEl.addEventListener(&#x27;mouseup&#x27;, handleMouseEnd, true);
-    // MOUSELEAVE NOT USED AS LEAFLET HAS LAYERS
-    contentEl.addEventListener(&#x27;touchstart&#x27;, handleTouchStart, true);
-    contentEl.addEventListener(&#x27;touchmove&#x27;, handleTouchMove, true);
-    contentEl.addEventListener(&#x27;touchend&#x27;, handleTouchEnd, true);
-    contentEl.addEventListener(&#x27;touchcancel&#x27;, handleTouchEnd, true);
+    // EXPORTS
+    this.moveTo = moveTo;
+    this.moveStop = moveStop;
+    this.leafletMap = map;
+    // FUNCTIONS
     function message() {
       return {
         lat: centerLatLng.lat,
@@ -314,12 +360,6 @@
     */
     // jscs:enable
     function moveTo(duration, lat, lng, z) {
-      var moveTimeLat;
-      var moveTimeLng;
-      var moveTime;
-      var moveIncrementLat;
-      var moveIncrementLng;
-      var newLng;
       if (duration !== parseInt(duration)) {
         throw 400;
       }
@@ -338,6 +378,12 @@
       if (typeof z !== &#x27;number&#x27;) {
         throw 400;
       }
+      var moveTimeLat;
+      var moveTimeLng;
+      var moveTime;
+      var moveIncrementLat;
+      var moveIncrementLng;
+      var newLng;
       var moveAnimationTime = 0;
       if (syncing) {
         if (iAmSyncing) {
@@ -454,8 +500,8 @@
     function handleMouseDown(e) {
       e.stopPropagation();
       mousePanning = true;
-      mouseLastX = (e.pageX - frameOffsetLeft) * scale + contentLeft;
-      mouseLastY = (e.pageY - frameOffsetTop) * scale + contentTop;
+      mouseLastX = (e.pageX - frameOffsetLeft) * scale + visibleContentLeft;
+      mouseLastY = (e.pageY - frameOffsetTop) * scale + visibleContentTop;
       sync.update();
       iAmSyncing = true;
       syncing = true;
@@ -465,8 +511,10 @@
     function handleMouseMove(e) {
       e.stopPropagation();
       if (iAmSyncing &amp;&amp; mousePanning) {
-        var mouseCurrentX = (e.pageX - frameOffsetLeft) * scale + contentLeft;
-        var mouseCurrentY = (e.pageY - frameOffsetTop) * scale + contentTop;
+        var mouseCurrentX = (e.pageX - frameOffsetLeft) * scale +
+          visibleContentLeft;
+        var mouseCurrentY = (e.pageY - frameOffsetTop) * scale +
+          visibleContentTop;
         pan(
           mouseLastX - mouseCurrentX,
           mouseLastY - mouseCurrentY
@@ -494,19 +542,19 @@
       var touchTwoY;
       e.stopPropagation();
       touchOneX = (e.touches[0].pageX - frameOffsetLeft) *
-        scale + contentLeft;
+        scale + visibleContentLeft;
       touchOneLastX = touchOneX;
       touchOneY = (e.touches[0].pageY - frameOffsetTop) *
-        scale + contentTop;
+        scale + visibleContentTop;
       touchOneLastY = touchOneY;
       if (e.touches.length &gt; 2) {
         handPanning = true;
       }
       if (e.touches.length === 2) {
         touchTwoX = (e.touches[1].pageX - frameOffsetLeft) *
-          scale + contentLeft;
+          scale + visibleContentLeft;
         touchTwoY = (e.touches[1].pageY - frameOffsetTop) *
-          scale + contentTop;
+          scale + visibleContentTop;
         touchStartRadius = Math.floor(Math.sqrt(
           Math.pow(touchOneX - touchTwoX, 2) +
           Math.pow(touchOneY - touchTwoY, 2)
@@ -536,14 +584,14 @@
       e.stopPropagation();
       if (iAmSyncing) {
         touchOneX = (e.touches[0].pageX - frameOffsetLeft) *
-          scale + contentLeft;
+          scale + visibleContentLeft;
         touchOneY = (e.touches[0].pageY - frameOffsetTop) *
-          scale + contentTop;
+          scale + visibleContentTop;
         if (!handPanning &amp;&amp; e.touches.length === 2) {
           touchTwoX = (e.touches[1].pageX - frameOffsetLeft) *
-            scale + contentLeft;
+            scale + visibleContentLeft;
           touchTwoY = (e.touches[1].pageY - frameOffsetTop) *
-            scale + contentTop;
+            scale + visibleContentTop;
           touchEndRadius = Math.floor(Math.sqrt(
             Math.pow(touchOneX - touchTwoX, 2) +
             Math.pow(touchOneY - touchTwoY, 2)
@@ -632,13 +680,10 @@
       map.setView(
         positioningMap.containerPointToLatLng(
           L.point(
-            visibleBoundsCenterX,
-            visibleBoundsCenterY
+            visibleContentCenterX,
+            visibleContentCenterY
           )
         ),
-        /*
-        centerLatLng,
-        */
         zoomLevel,
         {animate: false}
       );
