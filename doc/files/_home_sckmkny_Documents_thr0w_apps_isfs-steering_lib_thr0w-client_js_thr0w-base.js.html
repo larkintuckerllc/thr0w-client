@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>/home/sckmkny/Documents/thr0w/apps/thr0w-client/js/thr0w-base.js</title>
+    <title>/home/sckmkny/Documents/thr0w/apps/isfs-steering/lib/thr0w-client/js/thr0w-base.js</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -43,33 +43,17 @@
             
                 <li><a href="../classes/thr0w.html">thr0w</a></li>
             
-                <li><a href="../classes/thr0w.draw.html">thr0w.draw</a></li>
-            
                 <li><a href="../classes/thr0w.FlexGrid.html">thr0w.FlexGrid</a></li>
             
                 <li><a href="../classes/thr0w.Grid.html">thr0w.Grid</a></li>
             
-                <li><a href="../classes/thr0w.svg.html">thr0w.svg</a></li>
-            
-                <li><a href="../classes/thr0w.svg.Svg.html">thr0w.svg.Svg</a></li>
-            
                 <li><a href="../classes/thr0w.Sync.html">thr0w.Sync</a></li>
-            
-                <li><a href="../classes/thr0w.windows.html">thr0w.windows</a></li>
-            
-                <li><a href="../classes/thr0w.windows.WindowManager.html">thr0w.windows.WindowManager</a></li>
             
             </ul>
 
             <ul id="api-modules" class="apis modules">
             
                 <li><a href="../modules/thr0w-base.html">thr0w-base</a></li>
-            
-                <li><a href="../modules/thr0w-draw.html">thr0w-draw</a></li>
-            
-                <li><a href="../modules/thr0w-svg.html">thr0w-svg</a></li>
-            
-                <li><a href="../modules/thr0w-windows.html">thr0w-windows</a></li>
             
             </ul>
         </div>
@@ -106,7 +90,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: /home/sckmkny/Documents/thr0w/apps/thr0w-client/js/thr0w-base.js</h1>
+                        <h1 class="file-heading">File: /home/sckmkny/Documents/thr0w/apps/isfs-steering/lib/thr0w-client/js/thr0w-base.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
@@ -509,6 +493,7 @@
     this.getWidth = getWidth;
     this.getHeight = getHeight;
     this.getRowScale = getRowScale;
+    this.frameXYToContentXY = frameXYToContentXY;
     // jscs:disable
     /**
     * This function returns the grid&#x27;s frame.
@@ -568,6 +553,30 @@
     // jscs:enable
     function getRowScale() {
       return 1;
+    }
+    // jscs:disable
+    /**
+    * This function, given xy coordinates in the frame, returns the xy coordinates in the content.
+    * @method frameXYToContentXY
+    * @param {Array} coordinates The frame xy coordinates.
+    * @return {Array} The content xy coordinates.
+    */
+    // jscs:enable
+    function frameXYToContentXY(coordinates) {
+      if (coordinates === undefined ||
+        !Array.isArray(coordinates) ||
+        coordinates.length !== 2 ||
+        coordinates[0] === undefined ||
+        coordinates[1] === undefined ||
+        typeof coordinates[0] !== &#x27;number&#x27; ||
+        typeof coordinates[1] !== &#x27;number&#x27;
+      ) {
+        throw 400;
+      }
+      return [
+        coordinates[0] + hpos * frameEl.clientWidth,
+        coordinates[1] + vpos * frameEl.clientHeight
+      ];
     }
   }
   // jscs:disable
@@ -630,11 +639,14 @@
       dimensions[vpos].width) + &#x27;px&#x27;;
     frameEl.style.height = (dimensions[vpos].scale *
       dimensions[vpos].height) + &#x27;px&#x27;;
-    frameEl.style.left = dimensions[vpos].width *
-      (1 - dimensions[vpos].scale) / 2 + &#x27;px&#x27;;
-    frameEl.style.top = dimensions[vpos].height *
-      (1 - dimensions[vpos].scale) / 2 + &#x27;px&#x27;;
-    frameEl.style.transform = &#x27;scale(&#x27; + (1 / dimensions[vpos].scale) +
+    frameEl.style.transform =
+      &#x27;translate(&#x27; +
+      (dimensions[vpos].width * (1 - dimensions[vpos].scale) / 2) + &#x27;px&#x27; +
+      &#x27;,&#x27; +
+      (dimensions[vpos].height * (1 - dimensions[vpos].scale) / 2) + &#x27;px&#x27; +
+      &#x27;)&#x27; +
+      &#x27; &#x27; +
+      &#x27;scale(&#x27; + (1 / dimensions[vpos].scale) +
       &#x27;, &#x27; + (1 / dimensions[vpos].scale) + &#x27;)&#x27;;
     contentEl.style.width = width + &#x27;px&#x27;;
     contentEl.style.height = height + &#x27;px&#x27;;
@@ -657,6 +669,7 @@
     this.getWidth = getWidth;
     this.getHeight = getHeight;
     this.getRowScale = getRowScale;
+    this.frameXYToContentXY = frameXYToContentXY;
     // jscs:disable
     /**
     * This function returns the grid&#x27;s frame.
@@ -716,6 +729,30 @@
     // jscs:enable
     function getRowScale() {
       return dimensions[vpos].scale;
+    }
+    // jscs:disable
+    /**
+    * This function, given xy coordinates in the frame, returns the xy coordinates in the content.
+    * @method frameXYToContentXY
+    * @param {Array} coordinates The frame xy coordinates.
+    * @return {Array} The content xy coordinates.
+    */
+    // jscs:enable
+    function frameXYToContentXY(coordinates) {
+      if (coordinates === undefined ||
+        !Array.isArray(coordinates) ||
+        coordinates.length !== 2 ||
+        coordinates[0] === undefined ||
+        coordinates[1] === undefined ||
+        typeof coordinates[0] !== &#x27;number&#x27; ||
+        typeof coordinates[1] !== &#x27;number&#x27;
+      ) {
+        throw 400;
+      }
+      return [
+        coordinates[0] * dimensions[vpos].scale + shiftLeft,
+        coordinates[1] * dimensions[vpos].scale + shiftTop
+      ];
     }
   }
   // jscs:disable

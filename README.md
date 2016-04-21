@@ -1,11 +1,11 @@
-README v1.4.0 / 15 APRIL 2016
+README v2.0.0 / 21 APRIL 2016
 
 # Thr0w Client
 
 ## Introduction
 
 The Thr0w Project is about building inexpensive and manageable interactive (or
-not) video walls using commodity hardware, web technologies, and open source
+not) digital signage using commodity hardware, web technologies, and open source
 software. The key to this solution is having one computer behind each screen
 networked to a single computer acting as a server. With this design, the
 splitting and synchronization of content is accomplished through software.
@@ -33,15 +33,7 @@ lightweight development server.
 * Ruby: ruby -run -e httpd . -p 8888
 * Node.js: npm install http-server -g; http-server
 
-The Thr0w API consists of the following modules:
-
-* Base: Provides core functionality.
-* Draw: Used to create a drawing layer.
-* Leaflet: Used to create interactive maps using the Leaflet library.
-* SVG: Used to create interactive SVGs.
-* Windows: Used to manage windows.
-
-The Base module is required and it is dependent on the *socket.io.js*
+This library is dependent on the *socket.io.js*
 library provided by the Thr0w Server implementation.
 
 To install a module, simply add the module's CSS library to the HTML *head*,
@@ -51,7 +43,8 @@ e.g.:
 <link rel="stylesheet" type="text/css" href="ROOT/dist/thr0w-base.css">
 ```
 
-and the module's JavaScript library to the HTML *body*, e.g.,
+and the module's JavaScript library to the HTML *body*
+after the *socket.io.js* entry, e.g.,
 
 ```
 <script src="ROOT/dist/thr0w-base.min.js"></script>
@@ -61,11 +54,8 @@ where *ROOT* is the URL path to the root folder of the download.
 
 ## Usage
 
-Thr0w Examples
-
-<https://github.com/larkintuckerllc/thr0w-examples>
-
-provides inline documentation on using the Thr0w API.
+The examples provided in *ROOT/examples* provide inline documentation
+on using the API.
 
 The API reference is available at:
 
@@ -79,12 +69,6 @@ document *Contributing to Open Source on GitHub*.
 
 <https://guides.github.com/activities/contributing-to-open-source/>
 
-New features are to be implemented as modules, i.e., in a single CSS and
-single JavaScript file. The single CSS file is to be placed in the *css*
-directory named as *thr0w-MODULE.css* and the single JavaScript file is to be
-placed in the *js* directory named as *thr0w-MODULE.js* replacing *MODULE*
-with the name of the module.
-
 The CSS and JavaScript need only be tested against the latest version of
 Chrome Browser.
 
@@ -93,6 +77,8 @@ To compile, install the development dependencies using *npm* and compile with
 
 Where possible, the CSS and JavaScript is not to require any third-party
 libraries (outside of the *socket.io.js* client library).
+
+CSS entries are prefixed with *thr0w_base_*.
 
 The CSS is to follow the BEM naming convention.
 
@@ -106,13 +92,16 @@ is to pass JSCS with the Google preset.
 
 The JavaScript is to comply with the following style guide.
 
-* Modules are to be wrapped in an Immediately Invoked Function Expression
-(IIFE); no globals.
-* Modules' expose their functionality as an appropriately named property on
-the global *thr0w* object, e.g., *thr0w.windows* for the Windows module.
+* Code is to be wrapped in an Immediately Invoked Function Expression
+(IIFE); no globals (outside of *thr0w*).
+* Functionality is to be exposed as properties on the global *thr0w* object.
 * Use named functions instead of passing an anonymous function in as a callback.
 * Define functions in the scope where they are used.
 * Place functions declarations at the end of the scope; rely on hoisting.
+
+**note**: Unfortunately, care needs to be taken to avoid naming collisions
+between contributed module names and properties defined in
+this library on the *thr0w* object.
 
 The exposed JavaScript classes (or objects) are to be documented using YUIDoc.
 
