@@ -1,4 +1,4 @@
-README v2.0.0 / 21 APRIL 2016
+README v2.0.1 / 21 APRIL 2016
 
 # Thr0w Client
 
@@ -36,14 +36,14 @@ lightweight development server.
 This library is dependent on the *socket.io.js*
 library provided by the Thr0w Server implementation.
 
-To install a module, simply add the module's CSS library to the HTML *head*,
+To install, simply add the CSS library to the HTML *head*,
 e.g.:
 
 ```
 <link rel="stylesheet" type="text/css" href="ROOT/dist/thr0w-base.css">
 ```
 
-and the module's JavaScript library to the HTML *body*
+and the JavaScript library to the HTML *body*
 after the *socket.io.js* entry, e.g.,
 
 ```
