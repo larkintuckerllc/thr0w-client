@@ -1,3 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>/home/sckmkny/Documents/thr0w/apps/debug/lib/thr0w-client/js/thr0w-base.js</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="shortcut icon" type="image/png" href="../assets/favicon.png">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+            
+                <h1><img src="../assets/css/logo.png" title=""></h1>
+            
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: </em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+    <h2 class="off-left">APIs</h2>
+    <div id="api-tabview" class="tabview">
+        <ul class="tabs">
+            <li><a href="#api-classes">Classes</a></li>
+            <li><a href="#api-modules">Modules</a></li>
+        </ul>
+
+        <div id="api-tabview-filter">
+            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+        </div>
+
+        <div id="api-tabview-panel">
+            <ul id="api-classes" class="apis classes">
+            
+                <li><a href="../classes/thr0w.html">thr0w</a></li>
+            
+                <li><a href="../classes/thr0w.FlexGrid.html">thr0w.FlexGrid</a></li>
+            
+                <li><a href="../classes/thr0w.Grid.html">thr0w.Grid</a></li>
+            
+                <li><a href="../classes/thr0w.Sync.html">thr0w.Sync</a></li>
+            
+            </ul>
+
+            <ul id="api-modules" class="apis modules">
+            
+                <li><a href="../modules/thr0w-base.html">thr0w-base</a></li>
+            
+            </ul>
+        </div>
+    </div>
+</div>
+
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+        Show:
+        <label for="api-show-inherited">
+            <input type="checkbox" id="api-show-inherited" checked>
+            Inherited
+        </label>
+
+        <label for="api-show-protected">
+            <input type="checkbox" id="api-show-protected">
+            Protected
+        </label>
+
+        <label for="api-show-private">
+            <input type="checkbox" id="api-show-private">
+            Private
+        </label>
+        <label for="api-show-deprecated">
+            <input type="checkbox" id="api-show-deprecated">
+            Deprecated
+        </label>
+
+    </div>
+
+
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+                        <h1 class="file-heading">File: /home/sckmkny/Documents/thr0w/apps/debug/lib/thr0w-client/js/thr0w-base.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
 (function() {
   // jscs:disable
   /**
@@ -5,7 +101,7 @@
   * @module thr0w-base
   */
   // jscs:enable
-  'use strict';
+  &#x27;use strict&#x27;;
   var io = window.io;
   var baseref;
   var socket = null;
@@ -49,33 +145,33 @@
   * @static
   * @param base {Object} The frame DOM element.
   * @param connectCallback {Function} The callback function called when connected.
-  * ```
+  * &#x60;&#x60;&#x60;
   * function()
-  * ```
+  * &#x60;&#x60;&#x60;
   * @param messageCallback {Function} The callback function called for messages.
-  * ```
+  * &#x60;&#x60;&#x60;
   * function(data)
   *
   * Parameters:
   *
   * data Object
   * The message data.
-  * ```
+  * &#x60;&#x60;&#x60;
   */
   // jscs:enable
   function addAdminTools(frameEl, connectCallback, messageCallback) {
-    if (frameEl === undefined || typeof frameEl !== 'object') {
+    if (frameEl === undefined || typeof frameEl !== &#x27;object&#x27;) {
       throw 400;
     }
     if (connectCallback === undefined ||
-      typeof connectCallback !== 'function') {
+      typeof connectCallback !== &#x27;function&#x27;) {
       throw 400;
     }
     if (messageCallback === undefined ||
-      typeof messageCallback !== 'function') {
+      typeof messageCallback !== &#x27;function&#x27;) {
       throw 400;
     }
-    var channel = window.localStorage.getItem('thr0w_channel');
+    var channel = window.localStorage.getItem(&#x27;thr0w_channel&#x27;);
     if (channel !== null) {
       channel = parseInt(channel);
       adminToolsConnect();
@@ -88,8 +184,8 @@
       connect(channel, callback, messageCallback);
       function callback(error) {
         if (!error) {
-          window.localStorage.setItem('thr0w_channel', channel);
-          document.addEventListener('keydown', checkEsc);
+          window.localStorage.setItem(&#x27;thr0w_channel&#x27;, channel);
+          document.addEventListener(&#x27;keydown&#x27;, checkEsc);
           connectCallback();
         } else {
           abort();
@@ -102,58 +198,58 @@
       }
     }
     function addConnectTools() {
-      var connectEl = document.createElement('div');
-      connectEl.id = 'thr0w_base_connect';
+      var connectEl = document.createElement(&#x27;div&#x27;);
+      connectEl.id = &#x27;thr0w_base_connect&#x27;;
       connectEl.innerHTML = [
-        '<form id="thr0w_base_connect__connect">',
-        '<input id="thr0w_base_connect__connect__channel" type="number" />',
-        '<button type="submit">Connect</button>',
-        '</form>',
-        '<button id="thr0w_base_connect__logout">Logout</button>'
-      ].join('\n');
-      connectEl.querySelector('#thr0w_base_connect__logout')
-        .addEventListener('click', handleLogout);
-      connectEl.querySelector('#thr0w_base_connect__connect')
-        .addEventListener('submit', connectConnectElSubmit);
+        &#x27;&lt;form id=&quot;thr0w_base_connect__connect&quot;&gt;&#x27;,
+        &#x27;&lt;input id=&quot;thr0w_base_connect__connect__channel&quot; type=&quot;number&quot; /&gt;&#x27;,
+        &#x27;&lt;button type=&quot;submit&quot;&gt;Connect&lt;/button&gt;&#x27;,
+        &#x27;&lt;/form&gt;&#x27;,
+        &#x27;&lt;button id=&quot;thr0w_base_connect__logout&quot;&gt;Logout&lt;/button&gt;&#x27;
+      ].join(&#x27;\n&#x27;);
+      connectEl.querySelector(&#x27;#thr0w_base_connect__logout&#x27;)
+        .addEventListener(&#x27;click&#x27;, handleLogout);
+      connectEl.querySelector(&#x27;#thr0w_base_connect__connect&#x27;)
+        .addEventListener(&#x27;submit&#x27;, connectConnectElSubmit);
       frameEl.appendChild(connectEl);
       function handleLogout() {
         logout();
       }
       function connectConnectElSubmit(e) {
         e.preventDefault();
-        connectEl.style.display = 'none';
+        connectEl.style.display = &#x27;none&#x27;;
         channel = parseInt(connectEl
-          .querySelector('#thr0w_base_connect__connect__channel').value);
-        if (!channel || channel < 0) {
+          .querySelector(&#x27;#thr0w_base_connect__connect__channel&#x27;).value);
+        if (!channel || channel &lt; 0) {
           channel = 0;
         }
         adminToolsConnect();
       }
     }
     function addLoginTools() {
-      var loginEl = document.createElement('form');
-      loginEl.id = 'thr0w_base_login';
+      var loginEl = document.createElement(&#x27;form&#x27;);
+      loginEl.id = &#x27;thr0w_base_login&#x27;;
       // jscs:disable
       loginEl.innerHTML = [
-        '<input id="thr0w_base_login__username" type="text" placeholder="Username">',
-        '<input id="thr0w_base_login__password" type="password" placeholder="Password">',
-        '<button type="submit">Login</button>'
-      ].join('\n');
+        &#x27;&lt;input id=&quot;thr0w_base_login__username&quot; type=&quot;text&quot; placeholder=&quot;Username&quot;&gt;&#x27;,
+        &#x27;&lt;input id=&quot;thr0w_base_login__password&quot; type=&quot;password&quot; placeholder=&quot;Password&quot;&gt;&#x27;,
+        &#x27;&lt;button type=&quot;submit&quot;&gt;Login&lt;/button&gt;&#x27;
+      ].join(&#x27;\n&#x27;);
       // jscs:enable
-      loginEl.addEventListener('submit', loginElSubmit);
+      loginEl.addEventListener(&#x27;submit&#x27;, loginElSubmit);
       frameEl.appendChild(loginEl);
       function loginElSubmit(e) {
         e.preventDefault();
         var username = loginEl
-          .querySelector('#thr0w_base_login__username').value;
+          .querySelector(&#x27;#thr0w_base_login__username&#x27;).value;
         var password = loginEl
-          .querySelector('#thr0w_base_login__password').value;
-        if (username && password) {
+          .querySelector(&#x27;#thr0w_base_login__password&#x27;).value;
+        if (username &amp;&amp; password) {
           login(username, password, callback);
         }
         function callback(error) {
           if (!error) {
-            loginEl.style.display = 'none';
+            loginEl.style.display = &#x27;none&#x27;;
             addConnectTools();
           }
         }
@@ -176,35 +272,35 @@
   * This function logs in a user.
   * @method login
   * @static
-  * @param username {String} The user's name.
-  * @param password {String} The user's password.
+  * @param username {String} The user&#x27;s name.
+  * @param password {String} The user&#x27;s password.
   * @param callback {Function} The function callback.
-  * ```
+  * &#x60;&#x60;&#x60;
   * function(error)
   *
   * Parameters:
   *
   * error Integer
   * The error code; null is success.
-  * ```
+  * &#x60;&#x60;&#x60;
   */
   // jscs:enable
   function login(username, password, callback) {
-    if (username === undefined || typeof username !== 'string') {
+    if (username === undefined || typeof username !== &#x27;string&#x27;) {
       throw 400;
     }
-    if (password === undefined || typeof password !== 'string') {
+    if (password === undefined || typeof password !== &#x27;string&#x27;) {
       throw 400;
     }
-    if (callback === undefined || typeof callback !== 'function') {
+    if (callback === undefined || typeof callback !== &#x27;function&#x27;) {
       throw 400;
     }
-    var ref = baseref + ':3000/api/login';
-    var params = 'username=' + username + '&password=' + password;
+    var ref = baseref + &#x27;:3000/api/login&#x27;;
+    var params = &#x27;username=&#x27; + username + &#x27;&amp;password=&#x27; + password;
     var xmlhttp = new XMLHttpRequest();
-    xmlhttp.open('POST', ref, true);
-    xmlhttp.setRequestHeader('Content-type',
-      'application/x-www-form-urlencoded');
+    xmlhttp.open(&#x27;POST&#x27;, ref, true);
+    xmlhttp.setRequestHeader(&#x27;Content-type&#x27;,
+      &#x27;application/x-www-form-urlencoded&#x27;);
     xmlhttp.onreadystatechange = onChange;
     xmlhttp.send(params);
     function onChange() {
@@ -219,7 +315,7 @@
           if (!token) {
             return callback(500);
           }
-          window.localStorage.setItem('thr0w_token',
+          window.localStorage.setItem(&#x27;thr0w_token&#x27;,
             token);
           return callback(null);
         } else {
@@ -236,7 +332,7 @@
   */
   // jscs:enable
   function logout() {
-    window.localStorage.removeItem('thr0w_token');
+    window.localStorage.removeItem(&#x27;thr0w_token&#x27;);
     abort();
   }
   // jscs:disable
@@ -248,7 +344,7 @@
   */
   // jscs:enable
   function authenticated() {
-    return window.localStorage.getItem('thr0w_token') !== null;
+    return window.localStorage.getItem(&#x27;thr0w_token&#x27;) !== null;
   }
   // jscs:disable
   /**
@@ -261,14 +357,14 @@
   // jscs:enable
   function thr0w(channels, data) {
     // RELYING ON SERVER FOR PARAMETER VALIDATION FOR PERFORMANCE
-    var ref = baseref + ':3000/api/thr0w';
-    var token = window.localStorage.getItem('thr0w_token');
+    var ref = baseref + &#x27;:3000/api/thr0w&#x27;;
+    var token = window.localStorage.getItem(&#x27;thr0w_token&#x27;);
     var xmlhttp = new XMLHttpRequest();
-    xmlhttp.open('POST', ref, true);
-    xmlhttp.setRequestHeader('Authorization',
-      'bearer ' + token);
-    xmlhttp.setRequestHeader('Content-type',
-      'application/json');
+    xmlhttp.open(&#x27;POST&#x27;, ref, true);
+    xmlhttp.setRequestHeader(&#x27;Authorization&#x27;,
+      &#x27;bearer &#x27; + token);
+    xmlhttp.setRequestHeader(&#x27;Content-type&#x27;,
+      &#x27;application/json&#x27;);
     xmlhttp.send(JSON.stringify({channels: channels, message: data}));
   }
   // jscs:disable
@@ -278,18 +374,18 @@
   * @static
   * @param chn {Integer} The channel id.
   * @param connectCallback {Function} The callback function called when connected.
-  * ```
+  * &#x60;&#x60;&#x60;
   * function()
-  * ```
+  * &#x60;&#x60;&#x60;
   * @param messageCallback {Function} The callback function called for messages.
-  * ```
+  * &#x60;&#x60;&#x60;
   * function(data)
   *
   * Parameters:
   *
   * data Object
   * The message data.
-  * ```
+  * &#x60;&#x60;&#x60;
   */
   // jscs:enable
   function connect(chn, connectCallback, messageCallback) {
@@ -301,23 +397,23 @@
     if (!authenticated()) {
       throw 400;
     }
-    if (chn === undefined || typeof chn !== 'number') {
+    if (chn === undefined || typeof chn !== &#x27;number&#x27;) {
       throw 400;
     }
     if (connectCallback === undefined ||
-      typeof connectCallback !== 'function') {
+      typeof connectCallback !== &#x27;function&#x27;) {
       throw 400;
     }
     if (messageCallback === undefined ||
-      typeof messageCallback !== 'function') {
+      typeof messageCallback !== &#x27;function&#x27;) {
       throw 400;
     }
     channel = chn;
-    token = window.localStorage.getItem('thr0w_token');
+    token = window.localStorage.getItem(&#x27;thr0w_token&#x27;);
     authTimeout = window.setTimeout(fail, 5000);
-    socket = io(baseref + ':3001');
-    socket.on('authenticated', success);
-    socket.emit('authenticate',
+    socket = io(baseref + &#x27;:3001&#x27;);
+    socket.on(&#x27;authenticated&#x27;, success);
+    socket.emit(&#x27;authenticate&#x27;,
       JSON.stringify({token: token, channel: channel})
     );
     function fail() {
@@ -326,8 +422,8 @@
     }
     function success() {
       window.clearTimeout(authTimeout);
-      socket.on('message', messageCallback);
-      socket.on('duplicate', duplicateCallback);
+      socket.on(&#x27;message&#x27;, messageCallback);
+      socket.on(&#x27;duplicate&#x27;, duplicateCallback);
       connectCallback(null);
       function duplicateCallback() {
         abort();
@@ -353,7 +449,7 @@
     if (channels.length === 0) {
       return;
     }
-    socket.emit('thr0w', JSON.stringify({channels: channels, message: data}));
+    socket.emit(&#x27;thr0w&#x27;, JSON.stringify({channels: channels, message: data}));
   }
   // jscs:disable
   /**
@@ -370,10 +466,10 @@
     if (!socket) {
       throw 400;
     }
-    if (frameEl === undefined || typeof frameEl !== 'object') {
+    if (frameEl === undefined || typeof frameEl !== &#x27;object&#x27;) {
       throw 400;
     }
-    if (contentEl === undefined || typeof contentEl !== 'object') {
+    if (contentEl === undefined || typeof contentEl !== &#x27;object&#x27;) {
       throw 400;
     }
     if (matrix === undefined || !Array.isArray(matrix)) {
@@ -381,16 +477,16 @@
     }
     var hpos = 0;
     var vpos = 0;
-    for (var i = 0; i < matrix.length; i++) {
-      for (var j = 0; j < matrix[i].length; j++) {
+    for (var i = 0; i &lt; matrix.length; i++) {
+      for (var j = 0; j &lt; matrix[i].length; j++) {
         if (channel === matrix[i][j]) {
           hpos = j;
           vpos = i;
         }
       }
     }
-    contentEl.style.left = '-' + hpos * frameEl.clientWidth + 'px';
-    contentEl.style.top = '-' + vpos * frameEl.clientHeight + 'px';
+    contentEl.style.left = &#x27;-&#x27; + hpos * frameEl.clientWidth + &#x27;px&#x27;;
+    contentEl.style.top = &#x27;-&#x27; + vpos * frameEl.clientHeight + &#x27;px&#x27;;
     this.getFrame = getFrame;
     this.getContent = getContent;
     this.getMatrix = getMatrix;
@@ -400,9 +496,9 @@
     this.frameXYToContentXY = frameXYToContentXY;
     // jscs:disable
     /**
-    * This function returns the grid's frame.
+    * This function returns the grid&#x27;s frame.
     * @method getFrame
-    * @return {Object} The grid's frame DOM object.
+    * @return {Object} The grid&#x27;s frame DOM object.
     */
     // jscs:enable
     function getFrame() {
@@ -410,9 +506,9 @@
     }
     // jscs:disable
     /**
-    * This function returns the grid's content.
+    * This function returns the grid&#x27;s content.
     * @method getContent
-    * @return {Object} The grid's content DOM object.
+    * @return {Object} The grid&#x27;s content DOM object.
     */
     // jscs:enable
     function getContent() {
@@ -420,7 +516,7 @@
     }
     // jscs:disable
     /**
-    * This function returns the grid's matrix.
+    * This function returns the grid&#x27;s matrix.
     * @method getMatrix
     * @return {Array} An array of arrays of integers defining the channels for the grid.
     */
@@ -430,7 +526,7 @@
     }
     // jscs:disable
     /**
-    * This function returns the grid's width.
+    * This function returns the grid&#x27;s width.
     * @method getWidth
     * @return {Integer} The width of the grid.
     */
@@ -440,7 +536,7 @@
     }
     // jscs:disable
     /**
-    * This function returns the grid's height.
+    * This function returns the grid&#x27;s height.
     * @method getHeight
     * @return {Integer} The height of the grid.
     */
@@ -450,7 +546,7 @@
     }
     // jscs:disable
     /**
-    * This function returns the current row's scale.
+    * This function returns the current row&#x27;s scale.
     * @method getRowScale
     * @return {Integer} The scale of the current row.
     */
@@ -472,8 +568,8 @@
         coordinates.length !== 2 ||
         coordinates[0] === undefined ||
         coordinates[1] === undefined ||
-        typeof coordinates[0] !== 'number' ||
-        typeof coordinates[1] !== 'number'
+        typeof coordinates[0] !== &#x27;number&#x27; ||
+        typeof coordinates[1] !== &#x27;number&#x27;
       ) {
         throw 400;
       }
@@ -499,10 +595,10 @@
     if (!socket) {
       throw 400;
     }
-    if (frameEl === undefined || typeof frameEl !== 'object') {
+    if (frameEl === undefined || typeof frameEl !== &#x27;object&#x27;) {
       throw 400;
     }
-    if (contentEl === undefined || typeof contentEl !== 'object') {
+    if (contentEl === undefined || typeof contentEl !== &#x27;object&#x27;) {
       throw 400;
     }
     if (matrix === undefined || !Array.isArray(matrix)) {
@@ -519,7 +615,7 @@
     var height = 0;
     var shiftLeft = 0;
     var shiftTop = 0;
-    for (i = 0; i < matrix.length; i++) {
+    for (i = 0; i &lt; matrix.length; i++) {
       dimensions[i].spacing = dimensions[i].spacing ? dimensions[i].spacing : 0;
       dimensions[i].scale = dimensions[i].scale ? dimensions[i].scale : 1;
       dimensions[i].padding = dimensions[i].padding ? dimensions[i].padding : 0;
@@ -532,7 +628,7 @@
         width);
       height += dimensions[i].scale * dimensions[i].height +
         dimensions[i].scale * dimensions[i].margin;
-      for (j = 0; j < matrix[i].length; j++) {
+      for (j = 0; j &lt; matrix[i].length; j++) {
         if (channel === matrix[i][j]) {
           hpos = j;
           vpos = i;
@@ -540,21 +636,21 @@
       }
     }
     frameEl.style.width = (dimensions[vpos].scale *
-      dimensions[vpos].width) + 'px';
+      dimensions[vpos].width) + &#x27;px&#x27;;
     frameEl.style.height = (dimensions[vpos].scale *
-      dimensions[vpos].height) + 'px';
+      dimensions[vpos].height) + &#x27;px&#x27;;
     frameEl.style.transform =
-      'translate(' +
-      (dimensions[vpos].width * (1 - dimensions[vpos].scale) / 2) + 'px' +
-      ',' +
-      (dimensions[vpos].height * (1 - dimensions[vpos].scale) / 2) + 'px' +
-      ')' +
-      ' ' +
-      'scale(' + (1 / dimensions[vpos].scale) +
-      ', ' + (1 / dimensions[vpos].scale) + ')';
-    contentEl.style.width = width + 'px';
-    contentEl.style.height = height + 'px';
-    for (i = 0; i < vpos; i++) {
+      &#x27;translate(&#x27; +
+      (dimensions[vpos].width * (1 - dimensions[vpos].scale) / 2) + &#x27;px&#x27; +
+      &#x27;,&#x27; +
+      (dimensions[vpos].height * (1 - dimensions[vpos].scale) / 2) + &#x27;px&#x27; +
+      &#x27;)&#x27; +
+      &#x27; &#x27; +
+      &#x27;scale(&#x27; + (1 / dimensions[vpos].scale) +
+      &#x27;, &#x27; + (1 / dimensions[vpos].scale) + &#x27;)&#x27;;
+    contentEl.style.width = width + &#x27;px&#x27;;
+    contentEl.style.height = height + &#x27;px&#x27;;
+    for (i = 0; i &lt; vpos; i++) {
       shiftTop += dimensions[i].scale * dimensions[i].height +
         dimensions[i].scale * dimensions[i].margin;
     }
@@ -565,8 +661,8 @@
     var shiftLeftSpacing = hpos * dimensions[vpos].spacing *
       dimensions[vpos].scale;
     shiftLeft = shiftLeftPadding + shiftLeftWindows + shiftLeftSpacing;
-    contentEl.style.left = '-' + shiftLeft + 'px';
-    contentEl.style.top = '-' + shiftTop + 'px';
+    contentEl.style.left = &#x27;-&#x27; + shiftLeft + &#x27;px&#x27;;
+    contentEl.style.top = &#x27;-&#x27; + shiftTop + &#x27;px&#x27;;
     this.getFrame = getFrame;
     this.getContent = getContent;
     this.getMatrix = getMatrix;
@@ -576,9 +672,9 @@
     this.frameXYToContentXY = frameXYToContentXY;
     // jscs:disable
     /**
-    * This function returns the grid's frame.
+    * This function returns the grid&#x27;s frame.
     * @method getFrame
-    * @return {Object} The grid's frame DOM object.
+    * @return {Object} The grid&#x27;s frame DOM object.
     */
     // jscs:enable
     function getFrame() {
@@ -586,9 +682,9 @@
     }
     // jscs:disable
     /**
-    * This function returns the grid's content.
+    * This function returns the grid&#x27;s content.
     * @method getContent
-    * @return {Object} The grid's content DOM object.
+    * @return {Object} The grid&#x27;s content DOM object.
     */
     // jscs:enable
     function getContent() {
@@ -596,7 +692,7 @@
     }
     // jscs:disable
     /**
-    * This function returns the grid's matrix.
+    * This function returns the grid&#x27;s matrix.
     * @method getMatrix
     * @return {Array} An array of arrays of integers defining the channels for the grid.
     */
@@ -606,7 +702,7 @@
     }
     // jscs:disable
     /**
-    * This function returns the grid's width.
+    * This function returns the grid&#x27;s width.
     * @method getWidth
     * @return {Integer} The width of the grid.
     */
@@ -616,7 +712,7 @@
     }
     // jscs:disable
     /**
-    * This function returns the grid's height.
+    * This function returns the grid&#x27;s height.
     * @method getHeight
     * @return {Integer} The height of the grid.
     */
@@ -626,7 +722,7 @@
     }
     // jscs:disable
     /**
-    * This function returns the current row's scale.
+    * This function returns the current row&#x27;s scale.
     * @method getRowScale
     * @return {Integer} The scale of the current row.
     */
@@ -648,8 +744,8 @@
         coordinates.length !== 2 ||
         coordinates[0] === undefined ||
         coordinates[1] === undefined ||
-        typeof coordinates[0] !== 'number' ||
-        typeof coordinates[1] !== 'number'
+        typeof coordinates[0] !== &#x27;number&#x27; ||
+        typeof coordinates[1] !== &#x27;number&#x27;
       ) {
         throw 400;
       }
@@ -665,42 +761,42 @@
   * @namespace thr0w
   * @class Sync
   * @constructor
-  * @param {Object} grid The grid, {{#crossLink "thr0w.Grid"}}thr0w.Grid{{/crossLink}} or {{#crossLink "thr0w.FlexGrid"}}thr0w.FlexGrid{{/crossLink}} object.
+  * @param {Object} grid The grid, {{#crossLink &quot;thr0w.Grid&quot;}}thr0w.Grid{{/crossLink}} or {{#crossLink &quot;thr0w.FlexGrid&quot;}}thr0w.FlexGrid{{/crossLink}} object.
   * @param {String} _id The identifier for the sync.
   * @param {Function} message The function that generates the message.
-  * ```
+  * &#x60;&#x60;&#x60;
   * function()
   *
   * Returns:
   * Object
   * The message data.
-  * ```
+  * &#x60;&#x60;&#x60;
   * @param {Function} receive The function that handles received messages.
-  * ```
+  * &#x60;&#x60;&#x60;
   * function(data)
   *
   * Parameters:
   *
   * data Object
   * The message data.
-  * ```
+  * &#x60;&#x60;&#x60;
   * @param {Boolean} automated Optional flag to prevent interaction on all screens.
   */
   // jscs:enable
   function Sync(grid, _id, message, receive, automated) {
-    if (grid === undefined || typeof grid !== 'object') {
+    if (grid === undefined || typeof grid !== &#x27;object&#x27;) {
       throw 400;
     }
-    if (_id === undefined || typeof _id !== 'string') {
+    if (_id === undefined || typeof _id !== &#x27;string&#x27;) {
       throw 400;
     }
-    if (message === undefined || typeof message !== 'function') {
+    if (message === undefined || typeof message !== &#x27;function&#x27;) {
       throw 400;
     }
-    if (receive === undefined || typeof receive !== 'function') {
+    if (receive === undefined || typeof receive !== &#x27;function&#x27;) {
       throw 400;
     }
-    if (automated !== undefined && typeof automated !== 'boolean') {
+    if (automated !== undefined &amp;&amp; typeof automated !== &#x27;boolean&#x27;) {
       throw 400;
     }
     var channels = [];
@@ -710,13 +806,13 @@
     var locked = false;
     var lastActive = false;
     var matrix = grid.getMatrix();
-    var coverEl = document.createElement('div');
+    var coverEl = document.createElement(&#x27;div&#x27;);
     var frameEl = grid.getFrame();
-    coverEl.classList.add('thr0w_base_cover');
-    coverEl.style.visibility = 'hidden';
+    coverEl.classList.add(&#x27;thr0w_base_cover&#x27;);
+    coverEl.style.visibility = &#x27;hidden&#x27;;
     frameEl.appendChild(coverEl);
-    for (var i = 0; i < matrix.length; i++) {
-      for (var j = 0; j < matrix[i].length; j++) {
+    for (var i = 0; i &lt; matrix.length; i++) {
+      for (var j = 0; j &lt; matrix[i].length; j++) {
         channels.push(matrix[i][j]);
         if (channel === matrix[i][j]) {
           hpos = j;
@@ -724,8 +820,8 @@
         }
       }
     }
-    socket.on('message', syncMessageCallback);
-    thr0wChannel(channels, {thr0w: {type: 'sync', _id: _id, hello: true}});
+    socket.on(&#x27;message&#x27;, syncMessageCallback);
+    thr0wChannel(channels, {thr0w: {type: &#x27;sync&#x27;, _id: _id, hello: true}});
     this.update = update;
     this.idle = idle;
     this.destroy = destroy;
@@ -743,11 +839,11 @@
         active = true;
         lastActive = true;
         if (automated) {
-          coverEl.style.visibility = 'visible';
+          coverEl.style.visibility = &#x27;visible&#x27;;
         }
-        thr0wChannel(channels, {thr0w: {type: 'sync', _id: _id, lock: true}});
+        thr0wChannel(channels, {thr0w: {type: &#x27;sync&#x27;, _id: _id, lock: true}});
       }
-      thr0wChannel(channels, {thr0w: {type: 'sync',
+      thr0wChannel(channels, {thr0w: {type: &#x27;sync&#x27;,
         _id: _id, message: message()}});
     }
     // jscs:disable
@@ -762,9 +858,9 @@
       }
       active = false;
       if (automated) {
-        coverEl.style.visibility = 'hidden';
+        coverEl.style.visibility = &#x27;hidden&#x27;;
       }
-      thr0wChannel(channels, {thr0w: {type: 'sync', _id: _id, unlock: true}});
+      thr0wChannel(channels, {thr0w: {type: &#x27;sync&#x27;, _id: _id, unlock: true}});
     }
     function syncMessageCallback(rawMsg) {
       var msg = rawMsg.message;
@@ -772,16 +868,16 @@
         return;
       }
       var thr0wMsg = msg.thr0w;
-      if (thr0wMsg === undefined || thr0wMsg.type !== 'sync' ||
+      if (thr0wMsg === undefined || thr0wMsg.type !== &#x27;sync&#x27; ||
         thr0wMsg._id !== _id) {
         return;
       }
       if (thr0wMsg.hello) {
         if (active) {
-          thr0wChannel(channels, {thr0w: {type: 'sync', _id: _id, lock: true}});
+          thr0wChannel(channels, {thr0w: {type: &#x27;sync&#x27;, _id: _id, lock: true}});
         }
         if (lastActive) {
-          thr0wChannel(channels, {thr0w: {type: 'sync',
+          thr0wChannel(channels, {thr0w: {type: &#x27;sync&#x27;,
             _id: _id, message: message()}});
         }
         return;
@@ -789,26 +885,46 @@
       if (active) {
         return;
       }
-      if (thr0wMsg.lock && !active) {
+      if (thr0wMsg.lock &amp;&amp; !active) {
         lastActive = false;
         locked = true;
-        coverEl.style.visibility = 'visible';
+        coverEl.style.visibility = &#x27;visible&#x27;;
         return;
       }
-      if (thr0wMsg.unlock && !active) {
+      if (thr0wMsg.unlock &amp;&amp; !active) {
         locked = false;
-        coverEl.style.visibility = 'hidden';
+        coverEl.style.visibility = &#x27;hidden&#x27;;
         return;
       }
       receive(thr0wMsg.message);
     }
     function destroy() {
       frameEl.removeChild(coverEl);
-      socket.off('message', syncMessageCallback);
+      socket.off(&#x27;message&#x27;, syncMessageCallback);
     }
   }
   function abort() {
-    window.localStorage.removeItem('thr0w_channel', channel);
+    window.localStorage.removeItem(&#x27;thr0w_channel&#x27;, channel);
     window.location.reload();
   }
 })();
+
+    </pre>
+</div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>

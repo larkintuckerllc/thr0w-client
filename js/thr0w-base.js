@@ -436,7 +436,7 @@
     */
     // jscs:enable
     function getWidth() {
-      return contentEl.offsetWidth;
+      return contentEl.clientWidth;
     }
     // jscs:disable
     /**
@@ -446,7 +446,7 @@
     */
     // jscs:enable
     function getHeight() {
-      return contentEl.offsetHeight;
+      return contentEl.clientHeight;
     }
     // jscs:disable
     /**
