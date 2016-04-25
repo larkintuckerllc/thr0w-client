@@ -1,4 +1,4 @@
-README v2.0.3 / 22 APRIL 2016
+README v2.0.4 / 25 APRIL 2016
 
 # Thr0w Client
 

@@ -712,6 +712,7 @@
     var matrix = grid.getMatrix();
     var coverEl = document.createElement('div');
     var frameEl = grid.getFrame();
+    coverEl.id = 'thr0w_base_cover--' + _id;
     coverEl.classList.add('thr0w_base_cover');
     coverEl.style.visibility = 'hidden';
     frameEl.appendChild(coverEl);
