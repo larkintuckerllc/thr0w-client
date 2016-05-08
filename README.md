@@ -1,5 +1,3 @@
-README v2.0.4 / 25 APRIL 2016
-
 # Thr0w Client
 
 ## Introduction
@@ -23,6 +21,12 @@ Chrome Browser.
 Download the latest version and serve as static files from a web server:
 
 <https://github.com/larkintuckerllc/thr0w-client/releases>
+
+or using Bower:
+
+```
+bower install thr0w-client
+```
 
 For local development, one can use one of the following to spin up a
 lightweight development server.
