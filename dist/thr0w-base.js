@@ -19,6 +19,8 @@
   service.authenticated = authenticated;
   service.thr0w = thr0w;
   service.connect = connect;
+  service.onMessage = onMessage;
+  service.offMessage = offMessage;
   service.thr0wChannel = thr0wChannel;
   service.Grid = Grid;
   service.FlexGrid = FlexGrid;
@@ -333,6 +335,64 @@
         abort();
       }
     }
+  }
+  // jscs:disable
+  /**
+  * This function is add a message listener.
+  * @method onMessage
+  * @static
+  * @param messageCallback {Function} The callback function called for messages.
+  * ```
+  * function(data)
+  *
+  * Parameters:
+  *
+  * data Object
+  * The message data.
+  * ```
+  */
+  // jscs:enable
+  function onMessage(messageCallback) {
+    if (!authenticated()) {
+      throw 400;
+    }
+    if (channel === null) {
+      throw 400;
+    }
+    if (messageCallback === undefined ||
+      typeof messageCallback !== 'function') {
+      throw 400;
+    }
+    socket.on('message', messageCallback);
+  }
+  // jscs:disable
+  /**
+  * This function is removes a message listener.
+  * @method offMessage
+  * @static
+  * @param messageCallback {Function} The callback function called for messages.
+  * ```
+  * function(data)
+  *
+  * Parameters:
+  *
+  * data Object
+  * The message data.
+  * ```
+  */
+  // jscs:enable
+  function offMessage(messageCallback) {
+    if (!authenticated()) {
+      throw 400;
+    }
+    if (channel === null) {
+      throw 400;
+    }
+    if (messageCallback === undefined ||
+      typeof messageCallback !== 'function') {
+      throw 400;
+    }
+    socket.off('message', messageCallback);
   }
   // jscs:disable
   /**
