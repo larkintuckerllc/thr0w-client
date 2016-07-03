@@ -12,11 +12,14 @@
   var channel = null;
   var service = {};
   service.setBase = setBase;
+  service.addLoginTools = addLoginTools;
   service.addAdminTools = addAdminTools;
   service.getChannel = getChannel;
   service.login = login;
   service.logout = logout;
   service.authenticated = authenticated;
+  service.getToken = getToken;
+  service.loginToken = loginToken;
   service.thr0w = thr0w;
   service.connect = connect;
   service.onMessage = onMessage;
@@ -43,6 +46,57 @@
   // jscs:enable
   function setBase(base) {
     baseref = base;
+  }
+  // jscs:disable
+  /**
+  * This function is used to add the login tools.
+  * @method addLoginTools
+  * @static
+  * @param base {Object} The frame DOM element.
+  * @param loginCallback {Function} The callback function called when authenticated.
+  * ```
+  * function()
+  * ```
+  */
+  // jscs:enable
+  function addLoginTools(frameEl, loginCallback) {
+    if (frameEl === undefined || typeof frameEl !== 'object') {
+      throw 400;
+    }
+    if (loginCallback === undefined ||
+      typeof loginCallback !== 'function') {
+      throw 400;
+    }
+    if (authenticated()) {
+      return loginCallback();
+    }
+    var loginEl = document.createElement('form');
+    loginEl.id = 'thr0w_base_login';
+    // jscs:disable
+    loginEl.innerHTML = [
+      '<input id="thr0w_base_login__username" type="text" placeholder="Username">',
+      '<input id="thr0w_base_login__password" type="password" placeholder="Password">',
+      '<button type="submit">Login</button>'
+    ].join('\n');
+    // jscs:enable
+    loginEl.addEventListener('submit', loginElSubmit);
+    frameEl.appendChild(loginEl);
+    function loginElSubmit(e) {
+      e.preventDefault();
+      var username = loginEl
+        .querySelector('#thr0w_base_login__username').value;
+      var password = loginEl
+        .querySelector('#thr0w_base_login__password').value;
+      if (username && password) {
+        login(username, password, callback);
+      }
+      function callback(error) {
+        if (!error) {
+          loginEl.style.display = 'none';
+          loginCallback();
+        }
+      }
+    }
   }
   // jscs:disable
   /**
@@ -84,7 +138,7 @@
     } else if (authenticated()) {
       addConnectTools();
     } else {
-      addLoginTools();
+      addLoginTools(frameEl, addConnectTools);
     }
     function adminToolsConnect() {
       connect(channel, callback, messageCallback);
@@ -130,35 +184,6 @@
           channel = 0;
         }
         adminToolsConnect();
-      }
-    }
-    function addLoginTools() {
-      var loginEl = document.createElement('form');
-      loginEl.id = 'thr0w_base_login';
-      // jscs:disable
-      loginEl.innerHTML = [
-        '<input id="thr0w_base_login__username" type="text" placeholder="Username">',
-        '<input id="thr0w_base_login__password" type="password" placeholder="Password">',
-        '<button type="submit">Login</button>'
-      ].join('\n');
-      // jscs:enable
-      loginEl.addEventListener('submit', loginElSubmit);
-      frameEl.appendChild(loginEl);
-      function loginElSubmit(e) {
-        e.preventDefault();
-        var username = loginEl
-          .querySelector('#thr0w_base_login__username').value;
-        var password = loginEl
-          .querySelector('#thr0w_base_login__password').value;
-        if (username && password) {
-          login(username, password, callback);
-        }
-        function callback(error) {
-          if (!error) {
-            loginEl.style.display = 'none';
-            addConnectTools();
-          }
-        }
       }
     }
   }
@@ -251,6 +276,63 @@
   // jscs:enable
   function authenticated() {
     return window.localStorage.getItem('thr0w_token') !== null;
+  }
+  // jscs:disable
+  /**
+  * This function returns the authentication token.
+  * @method getToken
+  * @static
+  * @return {String} Token
+  */
+  // jscs:enable
+  function getToken() {
+    return window.localStorage.getItem('thr0w_token');
+  }
+  // jscs:disable
+  /**
+  * This function is used to login using a token.
+  * @method loginToken
+  * @static
+  * @param token {String} The token.
+  * @param loginTokenCallback {Function} The callback function.
+  * ```
+  * function(error)
+  *
+  * Parameters:
+  *
+  * error Integer
+  * The error code; null is success.
+  * ```
+  **/
+  // jscs:enable
+  function loginToken(token, loginTokenCallback) {
+    if (token === undefined || typeof token !== 'string') {
+      throw 400;
+    }
+    if (loginTokenCallback === undefined ||
+      typeof loginTokenCallback !== 'function') {
+      throw 400;
+    }
+    var ref = baseref + ':3000/api/valid';
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.open('POST', ref, true);
+    xmlhttp.setRequestHeader('Authorization',
+      'bearer ' + token);
+    xmlhttp.setRequestHeader('Content-type',
+      'application/json');
+    xmlhttp.onreadystatechange = handleOnreadystatechange;
+    xmlhttp.send(JSON.stringify({}));
+    function handleOnreadystatechange() {
+      if (xmlhttp.readyState !== 4) {
+        return;
+      }
+      if (xmlhttp.status !== 200) {
+        return loginTokenCallback(xmlhttp.status ? xmlhttp.status : 500);
+      }
+      window.localStorage.setItem('thr0w_token',
+        token);
+      return loginTokenCallback(null);
+    }
   }
   // jscs:disable
   /**
