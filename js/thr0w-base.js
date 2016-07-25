@@ -379,6 +379,7 @@
   function connect(chn, connectCallback, messageCallback) {
     var token;
     var authTimeout;
+    var connected = false;
     if (socket) {
       return;
     }
@@ -401,6 +402,7 @@
     authTimeout = window.setTimeout(fail, 5000);
     socket = io(baseref + ':3001');
     socket.on('authenticated', success);
+    socket.on('reconnect', reconnect);
     socket.emit('authenticate',
       JSON.stringify({token: token, channel: channel})
     );
@@ -408,13 +410,18 @@
       socket.disconnect();
       connectCallback(500);
     }
+    function reconnect() {
+      socket.emit('authenticate',
+        JSON.stringify({token: token, channel: channel})
+      );
+    }
     function success() {
-      window.clearTimeout(authTimeout);
-      socket.on('message', messageCallback);
-      socket.on('duplicate', duplicateCallback);
-      connectCallback(null);
-      function duplicateCallback() {
-        abort();
+      if (!connected) {
+        connected = true;
+        window.clearTimeout(authTimeout);
+        socket.on('message', messageCallback);
+        socket.on('duplicate', abort);
+        connectCallback(null);
       }
     }
   }
