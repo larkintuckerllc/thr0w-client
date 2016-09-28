@@ -141,19 +141,22 @@
       addLoginTools(frameEl, addConnectTools);
     }
     function adminToolsConnect() {
+      window.localStorage.setItem('thr0w_channel', channel);
       connect(channel, callback, messageCallback);
       function callback(error) {
         if (!error) {
-          window.localStorage.setItem('thr0w_channel', channel);
           document.addEventListener('keydown', checkEsc);
           connectCallback();
         } else {
-          abort();
+          window.setTimeout(retry, 10000);
         }
         function checkEsc(e) {
           if (e.keyCode === 27) {
-            abort();
+            clearChannel();
           }
+        }
+        function retry() {
+          window.location.reload();
         }
       }
     }
@@ -264,7 +267,7 @@
   // jscs:enable
   function logout() {
     window.localStorage.removeItem('thr0w_token');
-    abort();
+    window.location.reload();
   }
   // jscs:disable
   /**
@@ -420,7 +423,7 @@
         connected = true;
         window.clearTimeout(authTimeout);
         socket.on('message', messageCallback);
-        socket.on('duplicate', abort);
+        socket.on('duplicate', clearChannel);
         connectCallback(null);
       }
     }
@@ -853,8 +856,6 @@
       throw 400;
     }
     var channels = [];
-    var hpos;
-    var vpos;
     var active = false;
     var locked = false;
     var lastActive = false;
@@ -868,10 +869,6 @@
     for (var i = 0; i < matrix.length; i++) {
       for (var j = 0; j < matrix[i].length; j++) {
         channels.push(matrix[i][j]);
-        if (channel === matrix[i][j]) {
-          hpos = j;
-          vpos = i;
-        }
       }
     }
     socket.on('message', syncMessageCallback);
@@ -957,7 +954,7 @@
       socket.off('message', syncMessageCallback);
     }
   }
-  function abort() {
+  function clearChannel() {
     window.localStorage.removeItem('thr0w_channel', channel);
     window.location.reload();
   }
