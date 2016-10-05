@@ -155,9 +155,6 @@
             clearChannel();
           }
         }
-        function retry() {
-          window.location.reload();
-        }
       }
     }
     function addConnectTools() {
@@ -423,7 +420,7 @@
         connected = true;
         window.clearTimeout(authTimeout);
         socket.on('message', messageCallback);
-        socket.on('duplicate', clearChannel);
+        socket.on('duplicate', retry);
         connectCallback(null);
       }
     }
@@ -953,6 +950,9 @@
       frameEl.removeChild(coverEl);
       socket.off('message', syncMessageCallback);
     }
+  }
+  function retry() {
+    window.location.reload();
   }
   function clearChannel() {
     window.localStorage.removeItem('thr0w_channel', channel);
